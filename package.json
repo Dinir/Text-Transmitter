@@ -1,0 +1,19 @@
+{
+  "name": "Text-Transmitter",
+  "version": "0.1.0",
+  "main": "./main.js",
+  "scripts": {
+    "start": "./node_modules/.bin/electron .",
+    "electron-rebuild": "electron-rebuild"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.6.0",
+    "babel-preset-react": "^6.5.0",
+    "electron-prebuilt": "^0.37.7"
+  },
+  "dependencies": {
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1",
+    "twit": "^2.2.3"
+  }
+}

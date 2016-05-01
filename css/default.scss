@@ -1,0 +1,187 @@
+$blk: #000000;
+$red: #cc0000;
+$grn: #4e9a06;
+$yel: #c4a000;
+$blu: #3465a4;
+$mgt: #75507b;
+$cyn: #06989a;
+$lgry:#d3d7cf;
+$gry: #555753;
+$lred:#ef2929;
+$lgrn:#8ae234;
+$lyel:#fce94f;
+$lblu:#739fcf;
+$lmgt:#ad7fa8;
+$lcyn:#34e2e2;
+$wht: #eeeeec;
+$text:#ffffff;
+$cur: #00aa00;
+$taba:#aa0000;
+
+body {
+	background-color: $blk;
+	color: $text;
+	font-family: 'Droid Sans Mono', 'Noto Mono', 'Oxygen Mono', 'fixedsys', monospace;
+	font-size: 13px;
+	line-height: 1.2em;
+	overflow: hidden;
+}
+
+@mixin highlight($fore, $back) {
+	color: $fore;
+	background-color: $back;
+}
+
+.hl {
+	@include highlight($blk, $text);
+}
+.rightText {
+	float: right;
+	width: 100%;
+	margin-top: -1.15em;
+	text-align: right;
+}
+
+#cursor {
+	color: $cur;
+}
+
+section#tabs {
+	span {
+		display: block;
+		float: left;
+		
+		&:before, &:after {
+			content: "\00a0";
+		}
+		@include highlight($blk, $lgry);
+		text-decoration: underline;
+		
+		&.notify {
+			color: $mgt;
+			text-decoration: inherit;
+			&:before { color: $blk; }
+			&:after {
+				content: "+";
+				color: $blk;
+			}
+		}
+		
+		&.chosen {
+			@include highlight($text, $blk);
+			font-weight: bold;
+			text-decoration: none;
+		}
+		
+		&#close {
+			&:before, &:after {
+				content: none;
+			}
+			float: right;
+		}
+	}
+}
+
+section#main {
+	clear: both;
+	div {
+		.username {
+			font-weight: bold;
+			&.reply {
+				&:before {
+					content: "↳";
+				}
+			}
+			&.pinged {
+				color: $lyel;
+			}
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+		.text {
+			.link {
+				color: $blu;
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
+		.timestamp {
+			display: inline-block;
+			width: 40px;
+			clear: left;
+			color: $lgry;
+		}
+		.retweet {
+			display: block;
+			margin-left: 16px;
+			color: $grn;
+			&:before {
+				content: "↳retweeted by ";
+			}
+			.timestamp { color: $gry; }
+		}
+		.quote {
+			display: block;
+			margin-left: 16px;
+			text-indent: -16px;
+			color: $gry;
+			&:before {
+				content: "\" ";
+			}
+			&:after {
+				content: " \"";
+			}
+			.timestamp {
+				clear: none;
+				color: inherit;
+				text-indent: 0;
+			}
+		}
+		&.cursor {
+			background-color: $gry;
+		}
+	}
+}
+
+section#controls {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	#status {
+		.left {
+			width: 100%;
+			text-align: left;
+		}
+		.rightText span {
+			float: right;
+			display: block;
+			width: 64px;
+		}
+	}
+	#commandInput {
+		display: none;
+		width: 105%;
+		#commandContext {
+			.username {
+				font-weight: bold;
+			}
+		}
+		#query {
+			font-family: inherit;
+			font-size: inherit;
+			background-color: rgba(0,0,0,0);
+			color: $text;
+			width: 8px;
+			height: 15px;
+			padding: 0;
+			border: 0;
+			position: relative;
+		}
+		#cursor {
+			position: relative;
+			left: -8px;
+		}
+	}
+}
