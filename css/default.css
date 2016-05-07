@@ -6,63 +6,79 @@ body {
   font-size: 13px;
   line-height: 1.2em;
   overflow: hidden; }
+  body section {
+    width: 100%; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold; }
 
 .hl {
   color: #000000;
   background-color: #ffffff; }
 
+.hlsearch {
+  color: #000000;
+  background-color: #3465a4; }
+
 .rightText {
   float: right;
   width: 100%;
   margin-top: -1.15em;
+  margin-right: -.55em;
   text-align: right; }
 
 #cursor {
   color: #00aa00; }
 
-section#tabs span {
-  display: block;
-  float: left;
-  color: #000000;
-  background-color: #d3d7cf;
-  text-decoration: underline; }
-  section#tabs span:before, section#tabs span:after {
-    content: "\00a0"; }
-  section#tabs span.notify {
-    color: #75507b;
-    text-decoration: inherit; }
-    section#tabs span.notify:before {
-      color: #000000; }
-    section#tabs span.notify:after {
-      content: "+";
-      color: #000000; }
-  section#tabs span.chosen {
-    color: #ffffff;
-    background-color: #000000;
-    font-weight: bold;
-    text-decoration: none; }
-  section#tabs span#close {
-    float: right; }
-    section#tabs span#close:before, section#tabs span#close:after {
-      content: none; }
+section#tabs {
+  position: fixed;
+  top: 0; }
+  section#tabs span {
+    display: block;
+    float: left;
+    color: #000000;
+    background-color: #d3d7cf;
+    text-decoration: underline; }
+    section#tabs span:before, section#tabs span:after {
+      content: "\00a0"; }
+    section#tabs span.notify {
+      color: #75507b;
+      text-decoration: inherit; }
+      section#tabs span.notify:before {
+        color: #000000; }
+      section#tabs span.notify:after {
+        content: "+";
+        color: #000000; }
+    section#tabs span.chosen {
+      color: #ffffff;
+      background-color: #000000;
+      font-weight: bold;
+      text-decoration: none; }
+    section#tabs span#close {
+      float: right; }
+      section#tabs span#close:before, section#tabs span#close:after {
+        content: none; }
 
 section#main {
-  clear: both; }
+  clear: both;
+  margin: 15px 0; }
   section#main div .username {
     font-weight: bold; }
     section#main div .username.reply:before {
-      content: "↳"; }
+      content: "￫"; }
     section#main div .username.pinged {
       color: #fce94f; }
     section#main div .username:hover {
       text-decoration: underline; }
+  section#main div .text:before {
+    content: "\00a0"; }
   section#main div .text .link {
     color: #3465a4; }
     section#main div .text .link:hover {
       text-decoration: underline; }
   section#main div .timestamp {
     display: inline-block;
-    width: 40px;
+    width: 48px;
     clear: left;
     color: #d3d7cf; }
   section#main div .retweet {
@@ -70,7 +86,7 @@ section#main {
     margin-left: 16px;
     color: #4e9a06; }
     section#main div .retweet:before {
-      content: "↳retweeted by "; }
+      content: "⇌retweeted by "; }
     section#main div .retweet .timestamp {
       color: #555753; }
   section#main div .quote {
@@ -90,8 +106,8 @@ section#main {
     background-color: #555753; }
 
 section#controls {
-  position: absolute;
-  width: 100%;
+  position: fixed;
+  background-color: #000000;
   bottom: 0; }
   section#controls #status .left {
     width: 100%;
@@ -102,21 +118,39 @@ section#controls {
     width: 64px; }
   section#controls #commandInput {
     display: none;
-    width: 105%; }
+    width: 105%;
+   /*
+  #cursor {
+  	position: relative;
+  	left: -8px;
+  }*/ }
     section#controls #commandInput #commandContext .username {
       font-weight: bold; }
+    section#controls #commandInput #commandContext .rightText {
+      margin-right: 2.45em; }
     section#controls #commandInput #query {
       font-family: inherit;
       font-size: inherit;
       background-color: transparent;
       color: #ffffff;
-      width: 8px;
+      width: 100%;
       height: 15px;
       padding: 0;
       border: 0;
       position: relative; }
-    section#controls #commandInput #cursor {
-      position: relative;
-      left: -8px; }
+
+section#imgView {
+  position: fixed;
+  top: 100%;
+  width: auto;
+  height: auto;
+  background-color: black; }
+  section#imgView div {
+    border: 1px solid #ffffff;
+    margin: 7px 4px 7px 3px;
+    padding: 7px 3px 7px 4px; }
+  section#imgView img {
+    max-width: 320px;
+    max-height: 150px; }
 
 /*# sourceMappingURL=default.css.map */

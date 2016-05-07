@@ -13,6 +13,15 @@ let tl = new Map();
 // valid argument on the need of this array though,
 // that because you can just directly move the order of elements (in this case, tabs) and save the order at the end of the process and reload it at the startup.
 let tlOrder = [];
+let tlCurrent = 0;
+
+const streamURI = [
+	'statuses/filter',
+	'statuses/sample',
+	'statuses/firehose',
+	'user',
+	'site','1'
+];
 
 let tlCon = {
 	tab: {
@@ -22,11 +31,14 @@ let tlCon = {
 			if(!tl.has(tabName)
 			&& typeof tabName !== "undefined"
 			&& tlOrder.indexOf(tabName) === -1) {
-				tl.set(tabName, {
-					type:address,
-					params:parameters,
+				let v = {
+					type:address, 
+					params:parameters, 
 					tweets:[]
-				});
+				};
+				if(streamURI.indexOf(tabName)>=0)
+					v.notifications=0;
+				tl.set(tabName, v);
 				if(typeof position==="undefined")
 					tlOrder.push(tabName);
 				else
@@ -111,3 +123,27 @@ let tlCon = {
 		} // if-else tlCon.recentCall
 	} // update
 };
+
+/*
+window.onload = () => {
+
+	tlCon.tab.add("Home", 'statuses/home_timeline');
+	tlCon.tab.add("My Tweets", 'statuses/user_timeline', {screen_name: 'NardinRinet'}); console.log(tlOrder);
+	ReactDOM.render(
+		<div>
+			<display.tabs tlOrderArray={tlOrder} />
+			<section id="main">
+				{testTweets.map(
+					(v,i) => {
+						return (
+							<display.twitObj key={i} raw={v} />
+						)
+					}
+				)}
+			</section>
+			
+		</div>
+		, document.body.getElementsByTagName("article")[0]
+	)
+};
+*/

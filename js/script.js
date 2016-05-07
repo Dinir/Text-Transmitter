@@ -1,3 +1,10 @@
+"use strict";
+
+// data with `trim_user: true`
+
+var testTweets = [{ "created_at": "Sat Apr 30 08:06:43 +0000 2016", "id": 726321873428971500, "id_str": "726321873428971520", "text": "multiple quote\nhttps://t.co/m9PrlZcF2P\nhttps://t.co/QGu77ixlgb", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/m9PrlZcF2P", "expanded_url": "https://twitter.com/NardinRinet/status/712985244333248512", "display_url": "twitter.com/NardinRinet/st…", "indices": [15, 38] }, { "url": "https://t.co/QGu77ixlgb", "expanded_url": "https://twitter.com/NardinRinet/status/712985425099370496", "display_url": "twitter.com/NardinRinet/st…", "indices": [39, 62] }] }, "truncated": false, "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": [990651260], "quoted_status_id": 712985425099370500, "quoted_status_id_str": "712985425099370496", "quoted_status": { "created_at": "Thu Mar 24 12:52:26 +0000 2016", "id": 712985425099370500, "id_str": "712985425099370496", "text": "quote https://t.co/BNCpOCnF4q", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/BNCpOCnF4q", "expanded_url": "https://twitter.com/x_nuk/status/712889353802887169", "display_url": "twitter.com/x_nuk/status/7…", "indices": [6, 29] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "quoted_status_id": 712889353802887200, "quoted_status_id_str": "712889353802887169", "is_quote_status": true, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, "is_quote_status": true, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:53:05 +0000 2016", "id": 712985587318284300, "id_str": "712985587318284289", "text": "link that is of a video on Vine https://t.co/CnQ0YtiE6V", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/CnQ0YtiE6V", "expanded_url": "https://vine.co/v/idQJUOnHqOF", "display_url": "vine.co/v/idQJUOnHqOF", "indices": [32, 55] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:52:26 +0000 2016", "id": 712985425099370500, "id_str": "712985425099370496", "text": "quote https://t.co/BNCpOCnF4q", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/BNCpOCnF4q", "expanded_url": "https://twitter.com/x_nuk/status/712889353802887169", "display_url": "twitter.com/x_nuk/status/7…", "indices": [6, 29] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "quoted_status_id": 712889353802887200, "quoted_status_id_str": "712889353802887169", "quoted_status": { "created_at": "Thu Mar 24 06:30:41 +0000 2016", "id": 712889353802887200, "id_str": "712889353802887169", "text": "@DinirNertan 夢、幻。 https://t.co/evyQ5TQsnw", "entities": { "hashtags": [], "symbols": [], "user_mentions": [{ "screen_name": "DinirNertan", "name": "Dinir Nertan", "id": 990651260, "id_str": "990651260", "indices": [0, 12] }], "urls": [{ "url": "https://t.co/evyQ5TQsnw", "expanded_url": "https://www.youtube.com/watch?v=vBhyjy6S4c8", "display_url": "youtube.com/watch?v=vBhyjy…", "indices": [18, 41] }] }, "truncated": false, "source": "<a href=\"http://azurea.info/\" rel=\"nofollow\">Azurea for Windows</a>", "in_reply_to_status_id": 712888977758367700, "in_reply_to_status_id_str": "712888977758367744", "in_reply_to_user_id": 1247422820, "in_reply_to_user_id_str": "1247422820", "in_reply_to_screen_name": "x_nuk", "user": { "id": 1247422820, "id_str": "1247422820", "name": "즈눅", "screen_name": "x_nuk", "location": "We are being watched.", "description": "", "url": "https://t.co/i4FEaUJUCz", "entities": { "url": { "urls": [{ "url": "https://t.co/i4FEaUJUCz", "expanded_url": "http://keybase.io/x_nuk", "display_url": "keybase.io/x_nuk", "indices": [0, 23] }] }, "description": { "urls": [] } }, "protected": false, "followers_count": 419, "friends_count": 360, "listed_count": 17, "created_at": "Wed Mar 06 22:45:04 +0000 2013", "favourites_count": 1763, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 91952, "lang": "en", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "FFFF66", "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/694573366137589760/yZMv-pAr.jpg", "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/694573366137589760/yZMv-pAr.jpg", "profile_background_tile": true, "profile_image_url": "http://pbs.twimg.com/profile_images/727443983690027008/Qz-DXJ7r_normal.jpg", "profile_image_url_https": "https://pbs.twimg.com/profile_images/727443983690027008/Qz-DXJ7r_normal.jpg", "profile_banner_url": "https://pbs.twimg.com/profile_banners/1247422820/1443025457", "profile_link_color": "FF4567", "profile_sidebar_border_color": "000000", "profile_sidebar_fill_color": "000000", "profile_text_color": "000000", "profile_use_background_image": true, "has_extended_profile": true, "default_profile": false, "default_profile_image": false, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "ja" }, "is_quote_status": true, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:51:43 +0000 2016", "id": 712985244333248500, "id_str": "712985244333248512", "text": "https://t.co/TezzP9XCFJ\nhttps://t.co/L2OX3Sm5pa", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/TezzP9XCFJ", "expanded_url": "https://www.youtube.com/watch?v=_36yNWw_07g", "display_url": "youtube.com/watch?v=_36yNW…", "indices": [0, 23] }, { "url": "https://t.co/L2OX3Sm5pa", "expanded_url": "https://www.youtube.com/watch?v=MShbP3OpASA&feature=youtu.be&t=48m13s", "display_url": "youtube.com/watch?v=MShbP3…", "indices": [24, 47] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "und" }, { "created_at": "Thu Mar 24 12:51:30 +0000 2016", "id": 712985191724126200, "id_str": "712985191724126208", "text": "multiple links of videos https://t.co/TezzP9XCFJ https://t.co/L2OX3Sm5pa", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/TezzP9XCFJ", "expanded_url": "https://www.youtube.com/watch?v=_36yNWw_07g", "display_url": "youtube.com/watch?v=_36yNW…", "indices": [25, 48] }, { "url": "https://t.co/L2OX3Sm5pa", "expanded_url": "https://www.youtube.com/watch?v=MShbP3OpASA&feature=youtu.be&t=48m13s", "display_url": "youtube.com/watch?v=MShbP3…", "indices": [49, 72] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:51:07 +0000 2016", "id": 712985092210077700, "id_str": "712985092210077696", "text": "link that is of a video on the internet https://t.co/TezzP9XCFJ", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/TezzP9XCFJ", "expanded_url": "https://www.youtube.com/watch?v=_36yNWw_07g", "display_url": "youtube.com/watch?v=_36yNW…", "indices": [40, 63] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:50:13 +0000 2016", "id": 712984867160477700, "id_str": "712984867160477696", "text": "https://t.co/rPrIaFFaos", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/rPrIaFFaos", "expanded_url": "http://steampowered.com/about", "display_url": "steampowered.com/about", "indices": [0, 23] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "und" }, { "created_at": "Thu Mar 24 12:50:06 +0000 2016", "id": 712984839390007300, "id_str": "712984839390007296", "text": "https://t.co/dYM38Ib3D1", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [], "media": [{ "id": 712984837854855200, "id_str": "712984837854855168", "indices": [0, 23], "media_url": "http://pbs.twimg.com/media/CeUH7raUAAAQP8h.png", "media_url_https": "https://pbs.twimg.com/media/CeUH7raUAAAQP8h.png", "url": "https://t.co/dYM38Ib3D1", "display_url": "pic.twitter.com/dYM38Ib3D1", "expanded_url": "http://twitter.com/NardinRinet/status/712984839390007296/photo/1", "type": "photo", "sizes": { "thumb": { "w": 150, "h": 150, "resize": "crop" }, "medium": { "w": 600, "h": 295, "resize": "fit" }, "large": { "w": 640, "h": 315, "resize": "fit" }, "small": { "w": 340, "h": 167, "resize": "fit" } } }] }, "extended_entities": { "media": [{ "id": 712984837854855200, "id_str": "712984837854855168", "indices": [0, 23], "media_url": "http://pbs.twimg.com/media/CeUH7raUAAAQP8h.png", "media_url_https": "https://pbs.twimg.com/media/CeUH7raUAAAQP8h.png", "url": "https://t.co/dYM38Ib3D1", "display_url": "pic.twitter.com/dYM38Ib3D1", "expanded_url": "http://twitter.com/NardinRinet/status/712984839390007296/photo/1", "type": "photo", "sizes": { "thumb": { "w": 150, "h": 150, "resize": "crop" }, "medium": { "w": 600, "h": 295, "resize": "fit" }, "large": { "w": 640, "h": 315, "resize": "fit" }, "small": { "w": 340, "h": 167, "resize": "fit" } } }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "und" }, { "created_at": "Thu Mar 24 12:49:09 +0000 2016", "id": 712984598980866000, "id_str": "712984598980866048", "text": "image and link https://t.co/rPrIaFFaos https://t.co/m79GgTLqN3", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/rPrIaFFaos", "expanded_url": "http://steampowered.com/about", "display_url": "steampowered.com/about", "indices": [15, 38] }], "media": [{ "id": 712984598011969500, "id_str": "712984598011969536", "indices": [39, 62], "media_url": "http://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png", "media_url_https": "https://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png", "url": "https://t.co/m79GgTLqN3", "display_url": "pic.twitter.com/m79GgTLqN3", "expanded_url": "http://twitter.com/NardinRinet/status/712984598980866048/photo/1", "type": "photo", "sizes": { "large": { "w": 486, "h": 342, "resize": "fit" }, "small": { "w": 340, "h": 239, "resize": "fit" }, "thumb": { "w": 150, "h": 150, "resize": "crop" }, "medium": { "w": 486, "h": 342, "resize": "fit" } } }] }, "extended_entities": { "media": [{ "id": 712984598011969500, "id_str": "712984598011969536", "indices": [39, 62], "media_url": "http://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png", "media_url_https": "https://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png", "url": "https://t.co/m79GgTLqN3", "display_url": "pic.twitter.com/m79GgTLqN3", "expanded_url": "http://twitter.com/NardinRinet/status/712984598980866048/photo/1", "type": "photo", "sizes": { "large": { "w": 486, "h": 342, "resize": "fit" }, "small": { "w": 340, "h": 239, "resize": "fit" }, "thumb": { "w": 150, "h": 150, "resize": "crop" }, "medium": { "w": 486, "h": 342, "resize": "fit" } } }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:48:52 +0000 2016", "id": 712984526192939000, "id_str": "712984526192939008", "text": "multiple links https://t.co/Zks16LwkBJ https://t.co/rPrIaFFaos https://t.co/xsuFgrbap5 https://t.co/PNjyG1lEVl", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/Zks16LwkBJ", "expanded_url": "http://theuselessweb.com", "display_url": "theuselessweb.com", "indices": [15, 38] }, { "url": "https://t.co/rPrIaFFaos", "expanded_url": "http://steampowered.com/about", "display_url": "steampowered.com/about", "indices": [39, 62] }, { "url": "https://t.co/xsuFgrbap5", "expanded_url": "http://git.io/2048", "display_url": "git.io/2048", "indices": [63, 86] }, { "url": "https://t.co/PNjyG1lEVl", "expanded_url": "http://last.fm", "display_url": "last.fm", "indices": [87, 110] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:47:52 +0000 2016", "id": 712984274702471200, "id_str": "712984274702471169", "text": "link https://t.co/Zks16LwkBJ", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [{ "url": "https://t.co/Zks16LwkBJ", "expanded_url": "http://theuselessweb.com", "display_url": "theuselessweb.com", "indices": [5, 28] }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:43:55 +0000 2016", "id": 712983280392360000, "id_str": "712983280392359936", "text": "multiple images https://t.co/4IhoIiMFwI", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [], "media": [{ "id": 712983268560273400, "id_str": "712983268560273409", "indices": [16, 39], "media_url": "http://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png", "media_url_https": "https://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png", "url": "https://t.co/4IhoIiMFwI", "display_url": "pic.twitter.com/4IhoIiMFwI", "expanded_url": "http://twitter.com/NardinRinet/status/712983280392359936/photo/1", "type": "photo", "sizes": { "small": { "w": 340, "h": 224, "resize": "fit" }, "medium": { "w": 600, "h": 395, "resize": "fit" }, "thumb": { "w": 150, "h": 150, "resize": "crop" }, "large": { "w": 739, "h": 486, "resize": "fit" } } }] }, "extended_entities": { "media": [{ "id": 712983268560273400, "id_str": "712983268560273409", "indices": [16, 39], "media_url": "http://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png", "media_url_https": "https://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png", "url": "https://t.co/4IhoIiMFwI", "display_url": "pic.twitter.com/4IhoIiMFwI", "expanded_url": "http://twitter.com/NardinRinet/status/712983280392359936/photo/1", "type": "photo", "sizes": { "small": { "w": 340, "h": 224, "resize": "fit" }, "medium": { "w": 600, "h": 395, "resize": "fit" }, "thumb": { "w": 150, "h": 150, "resize": "crop" }, "large": { "w": 739, "h": 486, "resize": "fit" } } }, { "id": 712983278681108500, "id_str": "712983278681108480", "indices": [16, 39], "media_url": "http://pbs.twimg.com/media/CeUGg7CUsAARrnS.png", "media_url_https": "https://pbs.twimg.com/media/CeUGg7CUsAARrnS.png", "url": "https://t.co/4IhoIiMFwI", "display_url": "pic.twitter.com/4IhoIiMFwI", "expanded_url": "http://twitter.com/NardinRinet/status/712983280392359936/photo/1", "type": "photo", "sizes": { "small": { "w": 340, "h": 214, "resize": "fit" }, "thumb": { "w": 150, "h": 150, "resize": "crop" }, "large": { "w": 659, "h": 414, "resize": "fit" }, "medium": { "w": 600, "h": 377, "resize": "fit" } } }, { "id": 712983257369804800, "id_str": "712983257369804800", "indices": [16, 39], "media_url": "http://pbs.twimg.com/media/CeUGfrpUAAA7ORz.png", "media_url_https": "https://pbs.twimg.com/media/CeUGfrpUAAA7ORz.png", "url": "https://t.co/4IhoIiMFwI", "display_url": "pic.twitter.com/4IhoIiMFwI", "expanded_url": "http://twitter.com/NardinRinet/status/712983280392359936/photo/1", "type": "photo", "sizes": { "large": { "w": 1024, "h": 271, "resize": "fit" }, "thumb": { "w": 150, "h": 150, "resize": "crop" }, "small": { "w": 340, "h": 90, "resize": "fit" }, "medium": { "w": 600, "h": 159, "resize": "fit" } } }, { "id": 712983253632688100, "id_str": "712983253632688128", "indices": [16, 39], "media_url": "http://pbs.twimg.com/media/CeUGfduUIAAWm80.png", "media_url_https": "https://pbs.twimg.com/media/CeUGfduUIAAWm80.png", "url": "https://t.co/4IhoIiMFwI", "display_url": "pic.twitter.com/4IhoIiMFwI", "expanded_url": "http://twitter.com/NardinRinet/status/712983280392359936/photo/1", "type": "photo", "sizes": { "large": { "w": 486, "h": 342, "resize": "fit" }, "small": { "w": 340, "h": 239, "resize": "fit" }, "thumb": { "w": 150, "h": 150, "resize": "crop" }, "medium": { "w": 486, "h": 342, "resize": "fit" } } }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:42:16 +0000 2016", "id": 712982867760918500, "id_str": "712982867760918528", "text": "image https://t.co/LmpJQI4CwQ", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [], "media": [{ "id": 712982866813067300, "id_str": "712982866813067265", "indices": [6, 29], "media_url": "http://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png", "media_url_https": "https://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png", "url": "https://t.co/LmpJQI4CwQ", "display_url": "pic.twitter.com/LmpJQI4CwQ", "expanded_url": "http://twitter.com/NardinRinet/status/712982867760918528/photo/1", "type": "photo", "sizes": { "thumb": { "w": 150, "h": 150, "resize": "crop" }, "medium": { "w": 600, "h": 295, "resize": "fit" }, "large": { "w": 640, "h": 315, "resize": "fit" }, "small": { "w": 340, "h": 167, "resize": "fit" } } }] }, "extended_entities": { "media": [{ "id": 712982866813067300, "id_str": "712982866813067265", "indices": [6, 29], "media_url": "http://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png", "media_url_https": "https://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png", "url": "https://t.co/LmpJQI4CwQ", "display_url": "pic.twitter.com/LmpJQI4CwQ", "expanded_url": "http://twitter.com/NardinRinet/status/712982867760918528/photo/1", "type": "photo", "sizes": { "thumb": { "w": 150, "h": 150, "resize": "crop" }, "medium": { "w": 600, "h": 295, "resize": "fit" }, "large": { "w": 640, "h": 315, "resize": "fit" }, "small": { "w": 340, "h": 167, "resize": "fit" } } }] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "possibly_sensitive": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:41:44 +0000 2016", "id": 712982731974545400, "id_str": "712982731974545410", "text": "@NardinRinet replying with duplicated mentionings @NardinRinet", "entities": { "hashtags": [], "symbols": [], "user_mentions": [{ "screen_name": "NardinRinet", "name": "Nardin Rinet", "id": 712975464332075000, "id_str": "712975464332075008", "indices": [0, 12] }, { "screen_name": "NardinRinet", "name": "Nardin Rinet", "id": 712975464332075000, "id_str": "712975464332075008", "indices": [50, 62] }], "urls": [] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": 712982649845907500, "in_reply_to_status_id_str": "712982649845907457", "in_reply_to_user_id": 712975464332075000, "in_reply_to_user_id_str": "712975464332075008", "in_reply_to_screen_name": "NardinRinet", "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:41:24 +0000 2016", "id": 712982649845907500, "id_str": "712982649845907457", "text": "@DinirNertan replying with multiple mentionings (2) @NardinRinet", "entities": { "hashtags": [], "symbols": [], "user_mentions": [{ "screen_name": "DinirNertan", "name": "Dinir Nertan", "id": 990651260, "id_str": "990651260", "indices": [0, 12] }, { "screen_name": "NardinRinet", "name": "Nardin Rinet", "id": 712975464332075000, "id_str": "712975464332075008", "indices": [52, 64] }], "urls": [] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": 712982574398705700, "in_reply_to_status_id_str": "712982574398705664", "in_reply_to_user_id": 712975464332075000, "in_reply_to_user_id_str": "712975464332075008", "in_reply_to_screen_name": "NardinRinet", "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:41:06 +0000 2016", "id": 712982574398705700, "id_str": "712982574398705664", "text": "@NardinRinet @DinirNertan replying with multiple mentionings (1)", "entities": { "hashtags": [], "symbols": [], "user_mentions": [{ "screen_name": "NardinRinet", "name": "Nardin Rinet", "id": 712975464332075000, "id_str": "712975464332075008", "indices": [0, 12] }, { "screen_name": "DinirNertan", "name": "Dinir Nertan", "id": 990651260, "id_str": "990651260", "indices": [13, 25] }], "urls": [] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": 712982442202648600, "in_reply_to_status_id_str": "712982442202648577", "in_reply_to_user_id": 712975464332075000, "in_reply_to_user_id_str": "712975464332075008", "in_reply_to_screen_name": "NardinRinet", "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:40:35 +0000 2016", "id": 712982442202648600, "id_str": "712982442202648577", "text": "@NardinRinet replying with mentioning", "entities": { "hashtags": [], "symbols": [], "user_mentions": [{ "screen_name": "NardinRinet", "name": "Nardin Rinet", "id": 712975464332075000, "id_str": "712975464332075008", "indices": [0, 12] }], "urls": [] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": 712982304088399900, "in_reply_to_status_id_str": "712982304088399872", "in_reply_to_user_id": 712975464332075000, "in_reply_to_user_id_str": "712975464332075008", "in_reply_to_screen_name": "NardinRinet", "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:40:02 +0000 2016", "id": 712982304088399900, "id_str": "712982304088399872", "text": "replying without mentioning", "entities": { "hashtags": [], "symbols": [], "user_mentions": [], "urls": [] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": 712980407285715000, "in_reply_to_status_id_str": "712980407285714944", "in_reply_to_user_id": 712975464332075000, "in_reply_to_user_id_str": "712975464332075008", "in_reply_to_screen_name": "NardinRinet", "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "lang": "en" }, { "created_at": "Thu Mar 24 12:32:30 +0000 2016", "id": 712980407285715000, "id_str": "712980407285714944", "text": "@DinirNertan ACK", "entities": { "hashtags": [], "symbols": [], "user_mentions": [{ "screen_name": "DinirNertan", "name": "Dinir Nertan", "id": 990651260, "id_str": "990651260", "indices": [0, 12] }], "urls": [] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": 712980279665635300, "in_reply_to_status_id_str": "712980279665635328", "in_reply_to_user_id": 990651260, "in_reply_to_user_id_str": "990651260", "in_reply_to_screen_name": "DinirNertan", "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "lang": "und" }, { "created_at": "Thu Mar 24 12:31:49 +0000 2016", "id": 712980236766326800, "id_str": "712980236766326784", "text": "SYN @DinirNertan", "entities": { "hashtags": [], "symbols": [], "user_mentions": [{ "screen_name": "DinirNertan", "name": "Dinir Nertan", "id": 990651260, "id_str": "990651260", "indices": [4, 16] }], "urls": [] }, "truncated": false, "source": "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>", "in_reply_to_status_id": null, "in_reply_to_status_id_str": null, "in_reply_to_user_id": null, "in_reply_to_user_id_str": null, "in_reply_to_screen_name": null, "user": { "id": 712975464332075000, "id_str": "712975464332075008", "name": "Nardin Rinet", "screen_name": "NardinRinet", "location": "", "description": "", "url": null, "entities": { "description": { "urls": [] } }, "protected": false, "followers_count": 3, "friends_count": 1, "listed_count": 0, "created_at": "Thu Mar 24 12:12:51 +0000 2016", "favourites_count": 0, "utc_offset": 32400, "time_zone": "Seoul", "geo_enabled": false, "verified": false, "statuses_count": 21, "lang": "en-gb", "contributors_enabled": false, "is_translator": false, "is_translation_enabled": false, "profile_background_color": "F5F8FA", "profile_background_image_url": null, "profile_background_image_url_https": null, "profile_background_tile": false, "profile_image_url": "http://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_image_url_https": "https://abs.twimg.com/sticky/default_profile_images/default_profile_1_normal.png", "profile_link_color": "2B7BB9", "profile_sidebar_border_color": "C0DEED", "profile_sidebar_fill_color": "DDEEF6", "profile_text_color": "333333", "profile_use_background_image": true, "has_extended_profile": false, "default_profile": true, "default_profile_image": true, "following": false, "follow_request_sent": false, "notifications": false }, "geo": null, "coordinates": null, "place": null, "contributors": null, "is_quote_status": false, "retweet_count": 0, "favorite_count": 0, "favorited": false, "retweeted": false, "lang": "und" }];
+
+// [{"created_at":"Thu Mar 24 12:53:05 +0000 2016","id":712985587318284300,"id_str":"712985587318284289","text":"link that is of a video on Vine https://t.co/CnQ0YtiE6V","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/CnQ0YtiE6V","expanded_url":"https://vine.co/v/idQJUOnHqOF","display_url":"vine.co/v/idQJUOnHqOF","indices":[32,55]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:52:26 +0000 2016","id":712985425099370500,"id_str":"712985425099370496","text":"quote https://t.co/BNCpOCnF4q","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/BNCpOCnF4q","expanded_url":"https://twitter.com/x_nuk/status/712889353802887169","display_url":"twitter.com/x_nuk/status/7…","indices":[6,29]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"quoted_status_id":712889353802887200,"quoted_status_id_str":"712889353802887169","quoted_status":{"created_at":"Thu Mar 24 06:30:41 +0000 2016","id":712889353802887200,"id_str":"712889353802887169","text":"@DinirNertan 夢、幻。 https://t.co/evyQ5TQsnw","entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"DinirNertan","name":"Dinir Nertan","id":990651260,"id_str":"990651260","indices":[0,12]}],"urls":[{"url":"https://t.co/evyQ5TQsnw","expanded_url":"https://www.youtube.com/watch?v=vBhyjy6S4c8","display_url":"youtube.com/watch?v=vBhyjy…","indices":[18,41]}]},"truncated":false,"source":"<a href=\"http://azurea.info/\" rel=\"nofollow\">Azurea for Windows</a>","in_reply_to_status_id":712888977758367700,"in_reply_to_status_id_str":"712888977758367744","in_reply_to_user_id":1247422820,"in_reply_to_user_id_str":"1247422820","in_reply_to_screen_name":"x_nuk","user":{"id":1247422820,"id_str":"1247422820"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"ja"},"is_quote_status":true,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:51:43 +0000 2016","id":712985244333248500,"id_str":"712985244333248512","text":"https://t.co/TezzP9XCFJ\nhttps://t.co/L2OX3Sm5pa","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/TezzP9XCFJ","expanded_url":"https://www.youtube.com/watch?v=_36yNWw_07g","display_url":"youtube.com/watch?v=_36yNW…","indices":[0,23]},{"url":"https://t.co/L2OX3Sm5pa","expanded_url":"https://www.youtube.com/watch?v=MShbP3OpASA&feature=youtu.be&t=48m13s","display_url":"youtube.com/watch?v=MShbP3…","indices":[24,47]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"und"},{"created_at":"Thu Mar 24 12:51:30 +0000 2016","id":712985191724126200,"id_str":"712985191724126208","text":"multiple links of videos https://t.co/TezzP9XCFJ https://t.co/L2OX3Sm5pa","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/TezzP9XCFJ","expanded_url":"https://www.youtube.com/watch?v=_36yNWw_07g","display_url":"youtube.com/watch?v=_36yNW…","indices":[25,48]},{"url":"https://t.co/L2OX3Sm5pa","expanded_url":"https://www.youtube.com/watch?v=MShbP3OpASA&feature=youtu.be&t=48m13s","display_url":"youtube.com/watch?v=MShbP3…","indices":[49,72]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:51:07 +0000 2016","id":712985092210077700,"id_str":"712985092210077696","text":"link that is of a video on the internet https://t.co/TezzP9XCFJ","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/TezzP9XCFJ","expanded_url":"https://www.youtube.com/watch?v=_36yNWw_07g","display_url":"youtube.com/watch?v=_36yNW…","indices":[40,63]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:50:13 +0000 2016","id":712984867160477700,"id_str":"712984867160477696","text":"https://t.co/rPrIaFFaos","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/rPrIaFFaos","expanded_url":"http://steampowered.com/about","display_url":"steampowered.com/about","indices":[0,23]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"und"},{"created_at":"Thu Mar 24 12:50:06 +0000 2016","id":712984839390007300,"id_str":"712984839390007296","text":"https://t.co/dYM38Ib3D1","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[],"media":[{"id":712984837854855200,"id_str":"712984837854855168","indices":[0,23],"media_url":"http://pbs.twimg.com/media/CeUH7raUAAAQP8h.png","media_url_https":"https://pbs.twimg.com/media/CeUH7raUAAAQP8h.png","url":"https://t.co/dYM38Ib3D1","display_url":"pic.twitter.com/dYM38Ib3D1","expanded_url":"http://twitter.com/NardinRinet/status/712984839390007296/photo/1","type":"photo","sizes":{"thumb":{"w":150,"h":150,"resize":"crop"},"medium":{"w":600,"h":295,"resize":"fit"},"large":{"w":640,"h":315,"resize":"fit"},"small":{"w":340,"h":167,"resize":"fit"}}}]},"extended_entities":{"media":[{"id":712984837854855200,"id_str":"712984837854855168","indices":[0,23],"media_url":"http://pbs.twimg.com/media/CeUH7raUAAAQP8h.png","media_url_https":"https://pbs.twimg.com/media/CeUH7raUAAAQP8h.png","url":"https://t.co/dYM38Ib3D1","display_url":"pic.twitter.com/dYM38Ib3D1","expanded_url":"http://twitter.com/NardinRinet/status/712984839390007296/photo/1","type":"photo","sizes":{"thumb":{"w":150,"h":150,"resize":"crop"},"medium":{"w":600,"h":295,"resize":"fit"},"large":{"w":640,"h":315,"resize":"fit"},"small":{"w":340,"h":167,"resize":"fit"}}}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"und"},{"created_at":"Thu Mar 24 12:49:09 +0000 2016","id":712984598980866000,"id_str":"712984598980866048","text":"image and link https://t.co/rPrIaFFaos https://t.co/m79GgTLqN3","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/rPrIaFFaos","expanded_url":"http://steampowered.com/about","display_url":"steampowered.com/about","indices":[15,38]}],"media":[{"id":712984598011969500,"id_str":"712984598011969536","indices":[39,62],"media_url":"http://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png","media_url_https":"https://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png","url":"https://t.co/m79GgTLqN3","display_url":"pic.twitter.com/m79GgTLqN3","expanded_url":"http://twitter.com/NardinRinet/status/712984598980866048/photo/1","type":"photo","sizes":{"large":{"w":486,"h":342,"resize":"fit"},"small":{"w":340,"h":239,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"medium":{"w":486,"h":342,"resize":"fit"}}}]},"extended_entities":{"media":[{"id":712984598011969500,"id_str":"712984598011969536","indices":[39,62],"media_url":"http://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png","media_url_https":"https://pbs.twimg.com/media/CeUHtt7UAAAkSE6.png","url":"https://t.co/m79GgTLqN3","display_url":"pic.twitter.com/m79GgTLqN3","expanded_url":"http://twitter.com/NardinRinet/status/712984598980866048/photo/1","type":"photo","sizes":{"large":{"w":486,"h":342,"resize":"fit"},"small":{"w":340,"h":239,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"medium":{"w":486,"h":342,"resize":"fit"}}}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:48:52 +0000 2016","id":712984526192939000,"id_str":"712984526192939008","text":"multiple links https://t.co/Zks16LwkBJ https://t.co/rPrIaFFaos https://t.co/xsuFgrbap5 https://t.co/PNjyG1lEVl","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/Zks16LwkBJ","expanded_url":"http://theuselessweb.com","display_url":"theuselessweb.com","indices":[15,38]},{"url":"https://t.co/rPrIaFFaos","expanded_url":"http://steampowered.com/about","display_url":"steampowered.com/about","indices":[39,62]},{"url":"https://t.co/xsuFgrbap5","expanded_url":"http://git.io/2048","display_url":"git.io/2048","indices":[63,86]},{"url":"https://t.co/PNjyG1lEVl","expanded_url":"http://last.fm","display_url":"last.fm","indices":[87,110]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:47:52 +0000 2016","id":712984274702471200,"id_str":"712984274702471169","text":"link https://t.co/Zks16LwkBJ","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[{"url":"https://t.co/Zks16LwkBJ","expanded_url":"http://theuselessweb.com","display_url":"theuselessweb.com","indices":[5,28]}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:43:55 +0000 2016","id":712983280392360000,"id_str":"712983280392359936","text":"multiple images https://t.co/4IhoIiMFwI","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[],"media":[{"id":712983268560273400,"id_str":"712983268560273409","indices":[16,39],"media_url":"http://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png","media_url_https":"https://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png","url":"https://t.co/4IhoIiMFwI","display_url":"pic.twitter.com/4IhoIiMFwI","expanded_url":"http://twitter.com/NardinRinet/status/712983280392359936/photo/1","type":"photo","sizes":{"small":{"w":340,"h":224,"resize":"fit"},"medium":{"w":600,"h":395,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"large":{"w":739,"h":486,"resize":"fit"}}}]},"extended_entities":{"media":[{"id":712983268560273400,"id_str":"712983268560273409","indices":[16,39],"media_url":"http://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png","media_url_https":"https://pbs.twimg.com/media/CeUGgVVVAAEIpnv.png","url":"https://t.co/4IhoIiMFwI","display_url":"pic.twitter.com/4IhoIiMFwI","expanded_url":"http://twitter.com/NardinRinet/status/712983280392359936/photo/1","type":"photo","sizes":{"small":{"w":340,"h":224,"resize":"fit"},"medium":{"w":600,"h":395,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"large":{"w":739,"h":486,"resize":"fit"}}},{"id":712983278681108500,"id_str":"712983278681108480","indices":[16,39],"media_url":"http://pbs.twimg.com/media/CeUGg7CUsAARrnS.png","media_url_https":"https://pbs.twimg.com/media/CeUGg7CUsAARrnS.png","url":"https://t.co/4IhoIiMFwI","display_url":"pic.twitter.com/4IhoIiMFwI","expanded_url":"http://twitter.com/NardinRinet/status/712983280392359936/photo/1","type":"photo","sizes":{"small":{"w":340,"h":214,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"large":{"w":659,"h":414,"resize":"fit"},"medium":{"w":600,"h":377,"resize":"fit"}}},{"id":712983257369804800,"id_str":"712983257369804800","indices":[16,39],"media_url":"http://pbs.twimg.com/media/CeUGfrpUAAA7ORz.png","media_url_https":"https://pbs.twimg.com/media/CeUGfrpUAAA7ORz.png","url":"https://t.co/4IhoIiMFwI","display_url":"pic.twitter.com/4IhoIiMFwI","expanded_url":"http://twitter.com/NardinRinet/status/712983280392359936/photo/1","type":"photo","sizes":{"large":{"w":1024,"h":271,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"small":{"w":340,"h":90,"resize":"fit"},"medium":{"w":600,"h":159,"resize":"fit"}}},{"id":712983253632688100,"id_str":"712983253632688128","indices":[16,39],"media_url":"http://pbs.twimg.com/media/CeUGfduUIAAWm80.png","media_url_https":"https://pbs.twimg.com/media/CeUGfduUIAAWm80.png","url":"https://t.co/4IhoIiMFwI","display_url":"pic.twitter.com/4IhoIiMFwI","expanded_url":"http://twitter.com/NardinRinet/status/712983280392359936/photo/1","type":"photo","sizes":{"large":{"w":486,"h":342,"resize":"fit"},"small":{"w":340,"h":239,"resize":"fit"},"thumb":{"w":150,"h":150,"resize":"crop"},"medium":{"w":486,"h":342,"resize":"fit"}}}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:42:16 +0000 2016","id":712982867760918500,"id_str":"712982867760918528","text":"image https://t.co/LmpJQI4CwQ","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[],"media":[{"id":712982866813067300,"id_str":"712982866813067265","indices":[6,29],"media_url":"http://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png","media_url_https":"https://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png","url":"https://t.co/LmpJQI4CwQ","display_url":"pic.twitter.com/LmpJQI4CwQ","expanded_url":"http://twitter.com/NardinRinet/status/712982867760918528/photo/1","type":"photo","sizes":{"thumb":{"w":150,"h":150,"resize":"crop"},"medium":{"w":600,"h":295,"resize":"fit"},"large":{"w":640,"h":315,"resize":"fit"},"small":{"w":340,"h":167,"resize":"fit"}}}]},"extended_entities":{"media":[{"id":712982866813067300,"id_str":"712982866813067265","indices":[6,29],"media_url":"http://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png","media_url_https":"https://pbs.twimg.com/media/CeUGI8tVIAEWLaj.png","url":"https://t.co/LmpJQI4CwQ","display_url":"pic.twitter.com/LmpJQI4CwQ","expanded_url":"http://twitter.com/NardinRinet/status/712982867760918528/photo/1","type":"photo","sizes":{"thumb":{"w":150,"h":150,"resize":"crop"},"medium":{"w":600,"h":295,"resize":"fit"},"large":{"w":640,"h":315,"resize":"fit"},"small":{"w":340,"h":167,"resize":"fit"}}}]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"possibly_sensitive":false,"lang":"en"},{"created_at":"Thu Mar 24 12:41:44 +0000 2016","id":712982731974545400,"id_str":"712982731974545410","text":"@NardinRinet replying with duplicated mentionings @NardinRinet","entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"NardinRinet","name":"Nardin Rinet","id":712975464332075000,"id_str":"712975464332075008","indices":[0,12]},{"screen_name":"NardinRinet","name":"Nardin Rinet","id":712975464332075000,"id_str":"712975464332075008","indices":[50,62]}],"urls":[]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":712982649845907500,"in_reply_to_status_id_str":"712982649845907457","in_reply_to_user_id":712975464332075000,"in_reply_to_user_id_str":"712975464332075008","in_reply_to_screen_name":"NardinRinet","user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"en"},{"created_at":"Thu Mar 24 12:41:24 +0000 2016","id":712982649845907500,"id_str":"712982649845907457","text":"@DinirNertan replying with multiple mentionings (2) @NardinRinet","entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"DinirNertan","name":"Dinir Nertan","id":990651260,"id_str":"990651260","indices":[0,12]},{"screen_name":"NardinRinet","name":"Nardin Rinet","id":712975464332075000,"id_str":"712975464332075008","indices":[52,64]}],"urls":[]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":712982574398705700,"in_reply_to_status_id_str":"712982574398705664","in_reply_to_user_id":712975464332075000,"in_reply_to_user_id_str":"712975464332075008","in_reply_to_screen_name":"NardinRinet","user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"en"},{"created_at":"Thu Mar 24 12:41:06 +0000 2016","id":712982574398705700,"id_str":"712982574398705664","text":"@NardinRinet @DinirNertan replying with multiple mentionings (1)","entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"NardinRinet","name":"Nardin Rinet","id":712975464332075000,"id_str":"712975464332075008","indices":[0,12]},{"screen_name":"DinirNertan","name":"Dinir Nertan","id":990651260,"id_str":"990651260","indices":[13,25]}],"urls":[]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":712982442202648600,"in_reply_to_status_id_str":"712982442202648577","in_reply_to_user_id":712975464332075000,"in_reply_to_user_id_str":"712975464332075008","in_reply_to_screen_name":"NardinRinet","user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"en"},{"created_at":"Thu Mar 24 12:40:35 +0000 2016","id":712982442202648600,"id_str":"712982442202648577","text":"@NardinRinet replying with mentioning","entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"NardinRinet","name":"Nardin Rinet","id":712975464332075000,"id_str":"712975464332075008","indices":[0,12]}],"urls":[]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":712982304088399900,"in_reply_to_status_id_str":"712982304088399872","in_reply_to_user_id":712975464332075000,"in_reply_to_user_id_str":"712975464332075008","in_reply_to_screen_name":"NardinRinet","user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"en"},{"created_at":"Thu Mar 24 12:40:02 +0000 2016","id":712982304088399900,"id_str":"712982304088399872","text":"replying without mentioning","entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":712980407285715000,"in_reply_to_status_id_str":"712980407285714944","in_reply_to_user_id":712975464332075000,"in_reply_to_user_id_str":"712975464332075008","in_reply_to_screen_name":"NardinRinet","user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"en"},{"created_at":"Thu Mar 24 12:32:30 +0000 2016","id":712980407285715000,"id_str":"712980407285714944","text":"@DinirNertan ACK","entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"DinirNertan","name":"Dinir Nertan","id":990651260,"id_str":"990651260","indices":[0,12]}],"urls":[]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":712980279665635300,"in_reply_to_status_id_str":"712980279665635328","in_reply_to_user_id":990651260,"in_reply_to_user_id_str":"990651260","in_reply_to_screen_name":"DinirNertan","user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"und"},{"created_at":"Thu Mar 24 12:31:49 +0000 2016","id":712980236766326800,"id_str":"712980236766326784","text":"SYN @DinirNertan","entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"DinirNertan","name":"Dinir Nertan","id":990651260,"id_str":"990651260","indices":[4,16]}],"urls":[]},"truncated":false,"source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":712975464332075000,"id_str":"712975464332075008"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"und"}];
 /* things for storing data that should not be requested every time a request occurs goes here */
 
 /* test commands
@@ -25,7 +32,7 @@ var cmd = {
 		window.resizeTo(w * 8, h * 15 + 25);
 	},
 	rs: function rs(w, h) {
-		return this.resize(w, h);
+		return this.resize(w > 13 ? w : 13, h > 6 ? h : 6);
 	},
 
 	add: function add(name, uri, pos) {}
@@ -46,42 +53,40 @@ function execute(command) {
 // ; 186
 // Backspace 8
 
-document.onkeydown = keyPress;
-document.onkeyup = keyPress;
-
 var receivingCommand = false;
+var lastKeyCode = 0;
+var charHeight = 15;
 
 function keyPress(e) {
+	lastKeyCode = e.keyCode;
 	console.log(e.type + " " + e.keyCode + " " + e.code + " " + e.charCode);
 	//e.preventDefault();
 	var query = document.getElementById("query");
 
-	/* Note: keyCode is deprecated.
-  * https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
-  * But no alternative is currently available in electron.js!
-  */
+	// scroll a page when presses 'PgUp/Dn'
+	if (e.keyCode === 33 || e.keyCode === 34) {
+		document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - 2 * charHeight);
+	}
 
-	// write ':' or '/' to go command receiving mode, press 'esc' while on it to cancel.
-	if (!receivingCommand ? e.shiftKey && e.keyCode === 186 || e.keyCode === 191 : e.keyCode === 27) ctl.toggleCommand();
+	if (!receivingCommand) {
+		// when the buffer is closed
+		// ':' or '/' to open buffer
+		if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) ctl.toggleCommand();
+	} else {
+		// when the buffer is open
 
-	// TODO make this width change happens when keydown event occurs.
-	// change the input size according to the length of text wrote
-	if (receivingCommand) {
-		var charWidth = 7.8;
-		// change the size when typing,
-		// and hide when the last character has deleted with backspace.
-		if (query.value.length > 0) {
-			query.style.width = (query.value.length + 1) * charWidth + "px";
-		} else {
-			if (e.keyCode === 8 || e.keyCode === 46) ctl.toggleCommand();
+		// 'esc' or 'enter' to close buffer.
+		if (e.keyCode === 27 || e.keyCode === 13) {
+			if (e.keyCode === 13) execute(query.value);
+			ctl.toggleCommand();
 		}
 	}
+}
 
-	// press 'Enter' to execute the command.
-	if (receivingCommand && e.keyCode === 13) {
-		execute(query.value);
-		ctl.toggleCommand();
-	}
+function checkStates() {
+	var query = document.getElementById("query");
+	// 'backspace' or 'delete' to empty the buffer to close it
+	if (lastKeyCode === 8 || lastKeyCode === 46 && query.value.length === 0) ctl.toggleCommand();
 }
 
 // it toggles what the bottom line shows every time it's invoked.
@@ -103,6 +108,12 @@ var ctl = {
 		receivingCommand = !receivingCommand;
 	}
 };
+
+var scrollHandler = function scrollHandler() {
+	var e = window.event;
+	document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
+	return false;
+};
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -113,244 +124,180 @@ var ReactDOM = require('react-dom');
 
 // use moment to store timestamp
 // var test = moment(tss[15].created_at, "ddd MMM D H:mm:ss Z YYYY")
+/*
+const hlsearch = (container, what, spanClass) => {
+	let content = container.innerHTML,
+		pattern = new RegExp('(>[^<.]*)(' + what + ')([^<.]*)','g'),
+		replaceWith = '$1<span ' + ( spanClass ? 'class="' + spanClass + '"' : '' ) + '">$2</span>$3',
+		highlighted = content.replace(pattern,replaceWith);
+	return (container.innerHTML = highlighted) !== content;
+}
+*/
+var display = {
+	twitObj: React.createClass({
+		displayName: 'twitObj',
 
-var twitObj = React.createClass({
-	displayName: 'twitObj',
+		propTypes: {
+			raw: React.PropTypes.object.isRequired
+		},
+		render: function render() {
+			var raw = this.props.raw;
+			var timestamp = "00:00"; //raw.created_at;
+			var username = raw.user.screen_name;
+			var text = raw.text;
+			var manipulationIndices = [text];
 
-	propTypes: {
-		raw: React.PropTypes.object.isRequired
-	},
-	render: function render() {
-		var raw = this.props.raw;
-		var timestamp = raw.created_at;
-		var username = raw.user.screen_name;
-		var text = raw.text;
-		var manipulationIndices = [text];
+			var isReply = raw.entities.user_mentions.length > 0 || raw.in_reply_to_status_id_str !== null;
+			var doesPing = false;
+			var isRetweet = typeof raw.retweeted_status !== "undefined";
+			var isQuote = raw.is_quote_status;
+			var hasImage = typeof raw.entities.media !== "undefined";
+			var hasLink = raw.entities.urls.length > 0;
 
-		var isReply = raw.entities.user_mentions.length > 0 || raw.in_reply_to_status_id_str !== null;
-		var isRetweet = typeof raw.retweeted_status !== "undefined";
-		var isQuote = raw.is_quote_status;
-		var hasImage = typeof raw.entities.media !== "undefined";
-		var hasLink = raw.entities.urls.length > 0;
+			// reply info
+			// raw.entities.user_mentions
+			// {id_str, indices[], screen_name}[]
+			// raw.in_reply_to_status_id_str
+			// id (in string)
+			if (raw.entities.user_mentions.length > 0) {}
+			if (raw.in_reply_to_status_id_str !== null) {}
+			if (isRetweet) {
+				var userRTed = username;
+				var timeRTed = timestamp;
+				timestamp = "00:01"; //raw.retweeted_status.created_at;
+				username = raw.retweeted_status.user.screen_name;
+				text = raw.retweeted_status.text;
+			}
+			if (isQuote) {
+				var timeQuote = "00:02"; //raw.quoted_status.created_at;
+				var userQuote = raw.quoted_status.user.screen_name;
+				var textQuote = raw.quoted_status.text;
+			}
+			if (hasImage) {
+				// let images = raw.extended_entities.media.map(function(v) {
+				// 	manipulationIndices.push([...v.indices,]);
+				// 	return {
+				// 		indices:v.indices,
+				// 		url:v.media_url_https
+				// 	}
+				// });
+				raw.extended_entities.media.forEach(function (v) {
+					manipulationIndices.push([].concat(_toConsumableArray(v.indices), [1]));
+				});
+			}
+			// TODO I can make it so multiple quotes can be shown as quoted statuses.
+			if (hasLink) {}
 
-		// reply info
-		// raw.entities.user_mentions
-		// {id_str, indices[], screen_name}[]
-		// raw.in_reply_to_status_id_str
-		// id (in string)
-		if (raw.entities.user_mentions.length > 0) {}
-		if (raw.in_reply_to_status_id_str !== null) {}
-		if (isRetweet) {
-			var _userRTed = username;
-			var _timeRTed = timestamp;
-			timestamp = raw.retweeted_status.created_at;
-			username = raw.retweeted_status.user.screen_name;
-			text = raw.retweeted_status.text;
-		}
-		if (isQuote) {
-			var _timeQuote = raw.quoted_status.created_at;
-			var _userQuote = raw.quoted_status.user.screen_name;
-			var _textQuote = raw.quoted_status.text;
-		}
-		if (hasImage) {
-			// let images = raw.extended_entities.media.map(function(v) {
-			// 	manipulationIndices.push([...v.indices,]);
-			// 	return {
-			// 		indices:v.indices,
-			// 		url:v.media_url_https
-			// 	}
-			// });
-			raw.extended_entities.media.forEach(function (v) {
-				return manipulationIndices.push([].concat(_toConsumableArray(v.indices)));
-			});
-		}
-		// TODO I can make it so multiple quotes can be shown as quoted statuses.
-		if (hasLink) {}
-
-		return React.createElement(
-			'div',
-			null,
-			React.createElement(
-				'span',
-				{ className: 'timestamp' },
-				timestamp
-			),
-			React.createElement(
-				'span',
-				{ className: 'username' + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
-				username
-			),
-			React.createElement(
-				'span',
-				{ className: 'text' },
-				text
-			),
-			isRetweet ? React.createElement(
-				'span',
-				{ className: 'retweet' },
-				React.createElement(
-					'span',
-					{ className: 'username' },
-					userRTed
-				),
+			return React.createElement(
+				'div',
+				null,
+				React.createElement('div', { className: 'threadPrev' }),
 				React.createElement(
 					'span',
 					{ className: 'timestamp' },
-					timeRTed
-				)
-			) : null,
-			isQuote ? React.createElement(
-				'span',
-				{ className: 'quote' },
-				React.createElement(
-					'span',
-					{ className: 'timestamp' },
-					timeQuote
+					timestamp
 				),
 				React.createElement(
 					'span',
-					{ className: 'username' },
-					userQuote
+					{ className: 'username' + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
+					username
 				),
 				React.createElement(
 					'span',
 					{ className: 'text' },
-					textQuote
+					text
+				),
+				isRetweet ? React.createElement(
+					'span',
+					{ className: 'retweet' },
+					React.createElement(
+						'span',
+						{ className: 'username' },
+						userRTed
+					),
+					React.createElement(
+						'span',
+						{ className: 'timestamp' },
+						timeRTed
+					)
+				) : null,
+				isQuote ? React.createElement(
+					'span',
+					{ className: 'quote' },
+					React.createElement(
+						'span',
+						{ className: 'timestamp' },
+						timeQuote
+					),
+					React.createElement(
+						'span',
+						{ className: 'username' },
+						userQuote
+					),
+					React.createElement(
+						'span',
+						{ className: 'text' },
+						textQuote
+					)
+				) : null,
+				React.createElement('div', { className: 'threadAfter' })
+			);
+		}
+	}),
+	tabs: React.createClass({
+		displayName: 'tabs',
+
+		propTypes: {
+			tlOrderArray: React.PropTypes.array.isRequired
+		},
+		getInitialState: function getInitialState() {
+			return { order: this.props.tlOrderArray };
+		},
+
+		render: function render() {
+
+			return React.createElement(
+				'section',
+				{ id: 'tabs', className: 'hl' },
+				this.state.order.map(function (v, i) {
+					return React.createElement(
+						'span',
+						{ key: i, className: i === tlCurrent ? "chosen" : null },
+						typeof tl.get(v).notifications !== "undefined" ? React.createElement(
+							'span',
+							{ className: 'notifications' },
+							'0'
+						) : null,
+						'[',
+						v,
+						']'
+					);
+				}),
+				React.createElement(
+					'span',
+					{ id: 'close' },
+					'X'
 				)
-			) : null
-		);
-	}
-});
-
-function twitObject(rawObj) {
-	this.timestamp = rawObj.created_at;
-	this.username = rawObj.user.screen_name;
-	this.text = rawObj.text;
-
-	// TODO make them have more information about their related tweets.
-	this.isReply;
-	this.isRetweet;
-	this.isQuote;
-	this.hasImage;
-	this.hasLink;
-
-	if (this.isReply = rawObj.entities.user_mentions.length > 0 || rawObj.in_reply_to_status_id_str !== null) {}
-
-	if (this.isRetweet = typeof rawObj.retweeted_status !== "undefined") {
-		this.timeRTed = this.timestamp;
-		this.userRTed = this.username;
-		this.timestamp = rawObj.retweeted_status.created_at;
-		this.username = rawObj.retweeted_status.user.screen_name;
-		this.text = rawObj.retweeted_status.text;
-	}
-
-	if (this.isQuote = rawObj.is_quote_status) {
-		this.timeQuote = rawObj.quoted_status.created_at;
-		this.userQuote = rawObj.quoted_status.user.screen_name;
-		this.textQuote = rawObj.quoted_status.text;
-	}
-	if (this.hasImage = typeof rawObj.entities.media !== "undefined") {
-		// TODO parse the image link on the text, change it to display_url, make it clickable, put a placeholder of function that loads and shows you the image when clicked
-	}
-	if (this.hasLink = rawObj.entities.urls.length > 0) {
-		// TODO also do similar thing to the image functions here!
-	}
-}
-
-var timelineTweets = {};
-var tweetMold = "";
+			);
+		}
+	})
+};
+/*let ststt = "abcdefghijkl";
+ststt = ststt.substring(0,4)+"<a>"+ststt.substring(4,8)+"</a>"+ststt.substring(8);
+window.onload = () => {
+	ReactDOM.render(
+		<div>
+			<span>{ststt}</span>
+			</div>
+		,document.getElementById("main")
+	);
+};*/
+"use strict";
 
 window.onload = function () {
-	var data = [{ timestamp: '23:15', username: 'x_nuk', reply: true, pinged: true, text: "@DinirNertan OH YEAH I'M SO AWESOME" }, { timestamp: '14:58', username: '_30_Java_', text: '30億のデバイスで走るJava', retweet: { username: 'DinirNertan', timestamp: '16:13' } }];
-	var Quote = function Quote(_ref) {
-		var timestamp = _ref.timestamp;
-		var username = _ref.username;
-		var text = _ref.text;
-		return React.createElement(
-			'span',
-			{ className: 'quote' },
-			React.createElement(
-				'span',
-				{ className: 'timestamp' },
-				timestamp
-			),
-			React.createElement(
-				'span',
-				{ className: 'username' },
-				username
-			),
-			React.createElement(
-				'span',
-				{ className: 'text' },
-				text
-			)
-		);
-	};
-	var Retweet = function Retweet(_ref2) {
-		var username = _ref2.username;
-		var timestamp = _ref2.timestamp;
-		return React.createElement(
-			'span',
-			{ className: 'retweet' },
-			React.createElement(
-				'span',
-				{ className: 'username' },
-				username
-			),
-			React.createElement(
-				'span',
-				{ className: 'timestamp' },
-				timestamp
-			)
-		);
-	};
-	var Tweet = function Tweet(_ref3) {
-		var timestamp = _ref3.timestamp;
-		var username = _ref3.username;
-		var reply = _ref3.reply;
-		var pinged = _ref3.pinged;
-		var text = _ref3.text;
-		var quote = _ref3.quote;
-		var retweet = _ref3.retweet;
-		return React.createElement(
-			'div',
-			null,
-			React.createElement(
-				'span',
-				{ className: 'timestamp' },
-				timestamp
-			),
-			React.createElement(
-				'span',
-				{ className: ["username", reply ? "reply" : "", pinged ? "pinged" : ""].join(' ').trim() },
-				username
-			),
-			React.createElement(
-				'span',
-				{ className: 'text' },
-				text
-			),
-			quote ? Quote(quote) : null,
-			retweet ? Retweet(retweet) : null
-		);
-	};
-	var Timeline = function Timeline() {
-		return React.createElement(
-			'div',
-			{ id: 'timeline' },
-			data.map(Tweet)
-		);
-	};
-	ReactDOM.render(React.createElement(
-		'div',
-		null,
-		React.createElement(
-			'h1',
-			null,
-			'Hello, world!!'
-		),
-		React.createElement(Timeline, null)
-	), document.getElementById('main'));
+	document.addEventListener("keydown", keyPress);
+	document.addEventListener("keyup", checkStates);
+	document.body.addEventListener("mousewheel", scrollHandler, false);
 };
 'use strict';
 
@@ -362,7 +309,7 @@ var t = new (0, require('twit'))({
 });
 
 var appUserId = "712975464332075008";
-"use strict";
+'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -381,6 +328,9 @@ var tl = new Map();
 // valid argument on the need of this array though,
 // that because you can just directly move the order of elements (in this case, tabs) and save the order at the end of the process and reload it at the startup.
 var tlOrder = [];
+var tlCurrent = 0;
+
+var streamURI = ['statuses/filter', 'statuses/sample', 'statuses/firehose', 'user', 'site', '1'];
 
 var tlCon = {
 	tab: {
@@ -388,11 +338,13 @@ var tlCon = {
 		// that parameters also should not be encouraged to be filled manually by users. We will make a dictionary to refer for each of addresses and get needed ones to fill from.
 		add: function add(tabName, address, parameters, position) {
 			if (!tl.has(tabName) && typeof tabName !== "undefined" && tlOrder.indexOf(tabName) === -1) {
-				tl.set(tabName, {
+				var v = {
 					type: address,
 					params: parameters,
 					tweets: []
-				});
+				};
+				if (streamURI.indexOf(tabName) >= 0) v.notifications = 0;
+				tl.set(tabName, v);
 				if (typeof position === "undefined") tlOrder.push(tabName);else tlOrder.splice(position, 0, tabName);
 			}
 		},
@@ -471,3 +423,27 @@ var tlCon = {
 		} // if-else tlCon.recentCall
 	} // update
 };
+
+/*
+window.onload = () => {
+
+	tlCon.tab.add("Home", 'statuses/home_timeline');
+	tlCon.tab.add("My Tweets", 'statuses/user_timeline', {screen_name: 'NardinRinet'}); console.log(tlOrder);
+	ReactDOM.render(
+		<div>
+			<display.tabs tlOrderArray={tlOrder} />
+			<section id="main">
+				{testTweets.map(
+					(v,i) => {
+						return (
+							<display.twitObj key={i} raw={v} />
+						)
+					}
+				)}
+			</section>
+			
+		</div>
+		, document.body.getElementsByTagName("article")[0]
+	)
+};
+*/

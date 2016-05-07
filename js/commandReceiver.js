@@ -7,52 +7,48 @@
 // ; 186
 // Backspace 8
 
-document.onkeydown = keyPress;
-document.onkeyup = keyPress;
 
 let receivingCommand = false;
+let lastKeyCode = 0;
+const charHeight = 15;
 
 function keyPress(e) {
+	lastKeyCode = e.keyCode;
 	console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
 	//e.preventDefault();
 	const query = document.getElementById("query");
 
-	/* Note: keyCode is deprecated.
-	 * https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
-	 * But no alternative is currently available in electron.js!
-	 */
-
-	// write ':' or '/' to go command receiving mode, press 'esc' while on it to cancel.
-	if(
-		!receivingCommand
-		? e.shiftKey && e.keyCode===186 || e.keyCode===191
-		: e.keyCode===27
-	)
-		ctl.toggleCommand();
-
-	// TODO make this width change happens when keydown event occurs.
-	// change the input size according to the length of text wrote
-	if(receivingCommand) {
-		const charWidth = 7.8;
-		// change the size when typing,
-		// and hide when the last character has deleted with backspace.
-		if(query.value.length > 0) {
-			query.style.width = ((query.value.length+1) * charWidth) + "px";
-		} else {
-			if(e.keyCode===8 || e.keyCode===46) ctl.toggleCommand();
-		}
+	// scroll a page when presses 'PgUp/Dn'
+	if(e.keyCode===33 || e.keyCode===34) {
+		document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
 	}
 
-	// press 'Enter' to execute the command.
-	if(receivingCommand && e.keyCode===13) {
-		execute(query.value);
-		ctl.toggleCommand();
+	if(!receivingCommand) { // when the buffer is closed
+		// ':' or '/' to open buffer
+		if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
+			ctl.toggleCommand();
+
+	} else { // when the buffer is open
+
+		// 'esc' or 'enter' to close buffer.
+		if(e.keyCode===27 || e.keyCode===13) {
+			if(e.keyCode===13) execute(query.value);
+			ctl.toggleCommand();
+		}
 	}
 }
 
+function checkStates() {
+	const query = document.getElementById("query");
+	// 'backspace' or 'delete' to empty the buffer to close it
+	if(lastKeyCode===8 || lastKeyCode===46
+	                      && query.value.length === 0)
+		ctl.toggleCommand();
+}
+
 // it toggles what the bottom line shows every time it's invoked.
-let ctl = {
-	toggleCommand: function(){
+const ctl = {
+	toggleCommand: () => {
 		const query = document.getElementById("query");
 		const status = document.getElementById("status");
 		const commandInput = document.getElementById("commandInput");
@@ -70,3 +66,8 @@ let ctl = {
 	}
 };
 
+const scrollHandler = () => {
+	const e = window.event;
+	document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
+	return false;
+};

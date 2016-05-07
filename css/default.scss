@@ -18,13 +18,24 @@ $text:#ffffff;
 $cur: #00aa00;
 $taba:#aa0000;
 
+$char: 13px;
+$charWidth: 8px;
+$charHeight: 15px;
+
 body {
 	background-color: $blk;
 	color: $text;
 	font-family: 'Droid Sans Mono', 'Noto Mono', 'Oxygen Mono', 'fixedsys', monospace;
-	font-size: 13px;
+	font-size: $char;
 	line-height: 1.2em;
 	overflow: hidden;
+	section {
+		width: 100%;
+	}
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: bold;
 }
 
 @mixin highlight($fore, $back) {
@@ -35,10 +46,14 @@ body {
 .hl {
 	@include highlight($blk, $text);
 }
+.hlsearch {
+	@include highlight($blk, $blu);
+}
 .rightText {
 	float: right;
 	width: 100%;
 	margin-top: -1.15em;
+	margin-right: -.55em;
 	text-align: right;
 }
 
@@ -47,6 +62,8 @@ body {
 }
 
 section#tabs {
+	position: fixed;
+	top: 0;
 	span {
 		display: block;
 		float: left;
@@ -84,12 +101,13 @@ section#tabs {
 
 section#main {
 	clear: both;
+	margin: $charHeight 0;
 	div {
 		.username {
 			font-weight: bold;
 			&.reply {
 				&:before {
-					content: "↳";
+					content: "￫";
 				}
 			}
 			&.pinged {
@@ -100,6 +118,9 @@ section#main {
 			}
 		}
 		.text {
+			&:before {
+				content: "\00a0";
+			}
 			.link {
 				color: $blu;
 				&:hover {
@@ -109,7 +130,7 @@ section#main {
 		}
 		.timestamp {
 			display: inline-block;
-			width: 40px;
+			width: $charWidth*6;
 			clear: left;
 			color: $lgry;
 		}
@@ -118,14 +139,14 @@ section#main {
 			margin-left: 16px;
 			color: $grn;
 			&:before {
-				content: "↳retweeted by ";
+				content: "⇌retweeted by ";
 			}
 			.timestamp { color: $gry; }
 		}
 		.quote {
 			display: block;
-			margin-left: 16px;
-			text-indent: -16px;
+			margin-left: $charWidth*2;
+			text-indent: -$charWidth*2;
 			color: $gry;
 			&:before {
 				content: "\" ";
@@ -146,8 +167,8 @@ section#main {
 }
 
 section#controls {
-	position: absolute;
-	width: 100%;
+	position: fixed;
+	background-color: $blk;
 	bottom: 0;
 	#status {
 		.left {
@@ -167,21 +188,41 @@ section#controls {
 			.username {
 				font-weight: bold;
 			}
+			.rightText {
+				margin-right: 2.45em;
+			}
 		}
 		#query {
 			font-family: inherit;
 			font-size: inherit;
 			background-color: rgba(0,0,0,0);
 			color: $text;
-			width: 8px;
+			width: 100%;
 			height: 15px;
 			padding: 0;
 			border: 0;
 			position: relative;
-		}
+		}/*
 		#cursor {
 			position: relative;
 			left: -8px;
-		}
+		}*/
+	}
+}
+
+section#imgView {
+	position: fixed;
+	top: 100%;
+	width: auto;
+	height: auto;
+	background-color: black;
+	div {
+		border: 1px solid $text;
+		margin: 7px 4px 7px 3px;
+		padding: 7px 3px 7px 4px;
+	}
+	img {
+		max-width: 40*8px;
+		max-height: 10*15px;
 	}
 }

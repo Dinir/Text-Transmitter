@@ -2,7 +2,7 @@ node_modules/
 css/*.map
 js/twit.js
 npm-debug.log
-SampleTimeline.txt
+js/SampleTimeline.js
 # automatic backup things.
 *~
 *.swp
