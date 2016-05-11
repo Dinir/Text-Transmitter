@@ -14,6 +14,7 @@ let tl = new Map();
 // that because you can just directly move the order of elements (in this case, tabs) and save the order at the end of the process and reload it at the startup.
 let tlOrder = [];
 let tlCurrent = 0;
+const apiCallMax = 15;
 
 const streamURI = [
 	'statuses/filter',
@@ -44,6 +45,7 @@ let tlCon = {
 					tlOrder.push(tabName);
 				else
 					tlOrder.splice(position, 0, tabName);
+				tlCurrent = tlOrder.indexOf(tabName);
 			}
 		},
 		remove: function(tabName) {

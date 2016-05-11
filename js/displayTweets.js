@@ -50,7 +50,7 @@ const formatTime = {
 
 
 const display = {
-	twitObj: React.createClass({
+	TwitObj: React.createClass({
 		propTypes: {
 			raw: React.PropTypes.object.isRequired
 		},
@@ -144,11 +144,10 @@ const display = {
 			);
 		}
 	}),
-	tabs: React.createClass({
+	Tabs: React.createClass({
 		getInitialState: function() {
 			return ({order: tlOrder})
 		},
-		
 
 		render: function() {
 
@@ -158,7 +157,7 @@ const display = {
 						return (
 							<span key={i} className={i === tlCurrent? "chosen": null}>
 								{tl.get(v).notifications > 0? (
-									<span className="notifications"></span>
+									<span className="notifications">{tl.get(v).notifications}</span>
 								): null}
 								[{v}]
 							</span>
@@ -169,7 +168,7 @@ const display = {
 			)
 		}
 	}),
-	tweets: React.createClass({
+	Tweets: React.createClass({
 		propTypes: {
 			tabName: React.PropTypes.string.isRequired
 		},
@@ -186,8 +185,117 @@ const display = {
 				</section>
 			)
 		}
+	}),
+	Controls: React.createClass({
+		propTypes: {
+			receivingCommand: React.PropTypes.bool.isRequired,
+			currentLine: React.PropTypes.number,
+			apiCallLeft: React.PropTypes.number
+		},
+		getDefaultProps: () => ({
+			receivingCommand: false,
+			currentLine: 0,
+			apiCallLeft: 0
+		}),
+		render: function() {
+			return (
+				<section id="controls">
+					<div id="status">
+						<div className="left">&nbsp;</div>
+						<div className="rightText">
+							<span style={{width: charWidth+"px"}}>&nbsp;</span>
+							<span id="currentLine">{this.props.currentLine}%</span>
+							<span id="api">{this.props.apiCallLeft}/{apiCallMax}</span>
+						</div>
+					</div>
+					<div id="commandInput">
+						<div id="commandContext">
+							<div className="left">
+								replying to
+								<span className="username">DinirNertan</span>:
+								<span className="text">I ate an ice cream a...</span>
+								<div className="rightText">
+									81/140
+								</div>
+							</div>
+						</div>
+						<input type="text" id="query" maxlength="80" />
+					</div>
+				</section>
+			)
+		}
+	}),
+	ImgView: React.createClass({
+		render: function() {
+			return 	<div><img /></div>
+		}
+	}),
+
+	Main: React.createClass({
+		componentWillMount: function() {
+			this.receiveKey = function(e) {
+				lastKeyCode = e.keyCode;
+				console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
+				//e.preventDefault();
+				const query = document.getElementById("query");
+
+				// scroll a page when presses 'PgUp/Dn'
+				if(e.keyCode===33 || e.keyCode===34) {
+					document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
+				}
+
+				if(!receivingCommand) { // when the buffer is closed
+					// ':' or '/' to open buffer
+					if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
+						ctl.toggleCommand();
+
+				} else { // when the buffer is open
+
+					// 'esc' or 'enter' to close buffer.
+					if(e.keyCode===27 || e.keyCode===13) {
+						if(e.keyCode===13) execute(query.value);
+						ctl.toggleCommand();
+					}
+				}
+			};
+			this.tidyKey = () => {
+				const query = document.getElementById("query");
+				// if buffer got emptied after a keypress close it
+				if(!receivingCommand) {} else {
+					if(lastKeyCode)
+						if(query.value.length===0)
+							ctl.toggleCommand();
+				}
+			};
+			this.handleScroll = () => {
+				const e = window.event;
+				document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
+				return false;
+			};
+
+			document.addEventListener("keydown", this.receiveKey);
+			document.addEventListener("keyup", this.tidyKey);
+			document.body.addEventListener("mousewheel", this.handleScroll, false);
+		},
+		componentWillUnmount: function() {
+			document.removeEventListener("keydown", this.receiveKey);
+			document.removeEventListener("keyup", this.tidyKey);
+			document.body.removeEventListener("mousewheel", this.handleScroll, false);
+		},
+
+		render: function() {
+			return (
+				<div>
+					<display.Tabs tlOrderArray={tlOrder}/>
+					<display.Tweets tabName={tlOrder[tlCurrent]}/>
+					<display.Controls />
+					<display.ImgView />
+				</div>
+			)
+		}
 	})
 };
+
 /*let ststt = "abcdefghijkl";
 ststt = ststt.substring(0,4)+"<a>"+ststt.substring(4,8)+"</a>"+ststt.substring(8);
 window.onload = () => {
