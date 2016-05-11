@@ -10,7 +10,6 @@
 
 let receivingCommand = false;
 let lastKeyCode = 0;
-const charHeight = 15;
 
 function keyPress(e) {
 	lastKeyCode = e.keyCode;
@@ -40,10 +39,12 @@ function keyPress(e) {
 
 function checkStates() {
 	const query = document.getElementById("query");
-	// 'backspace' or 'delete' to empty the buffer to close it
-	if(lastKeyCode===8 || lastKeyCode===46
-	                      && query.value.length === 0)
-		ctl.toggleCommand();
+	// if buffer got emptied after a keypress close it
+	if(!receivingCommand) {} else {
+		if(lastKeyCode)
+			if(query.value.length===0)
+				ctl.toggleCommand();
+	}
 }
 
 // it toggles what the bottom line shows every time it's invoked.

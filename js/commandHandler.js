@@ -1,8 +1,13 @@
+const charWidth = 8;
+const charHeight = 15;
+
 let cmd = {
 	resize: function(w,h) {
-		window.resizeTo(w*8, h*15+25);
+		window.resizeTo((w>12?w:12)*charWidth, (h>7?h:7)*charHeight);
+		state.width = w;
+		state.height = h;
 	},
-	rs: function(w,h) { return this.resize(w>13?w:13,h>6?h:6) },
+	rs: function(w,h) { return this.resize(w,h) },
 
 	add: function(name,uri,pos) {
 

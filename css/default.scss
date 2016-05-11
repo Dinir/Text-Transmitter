@@ -42,6 +42,10 @@ h1, h2, h3, h4, h5, h6 {
 	color: $fore;
 	background-color: $back;
 }
+@mixin addBlank($before, $after) {
+	&:before { content: if($before, '\00a0', none); }
+	&:after { content: if($after, '\00a0', none); }
+}
 
 .hl {
 	@include highlight($blk, $text);
@@ -68,9 +72,7 @@ section#tabs {
 		display: block;
 		float: left;
 		
-		&:before, &:after {
-			content: "\00a0";
-		}
+		@include addBlank(true, true);
 		@include highlight($blk, $lgry);
 		text-decoration: underline;
 		
@@ -91,9 +93,7 @@ section#tabs {
 		}
 		
 		&#close {
-			&:before, &:after {
-				content: none;
-			}
+			@include addBlank(false, false);
 			float: right;
 		}
 	}
@@ -118,9 +118,7 @@ section#main {
 			}
 		}
 		.text {
-			&:before {
-				content: "\00a0";
-			}
+			@include addBlank(true, false);
 			.link {
 				color: $blu;
 				&:hover {
@@ -130,9 +128,10 @@ section#main {
 		}
 		.timestamp {
 			display: inline-block;
-			width: $charWidth*6;
+			//width: $charWidth*6;
 			clear: left;
 			color: $lgry;
+			@include addBlank(false, true);
 		}
 		.retweet {
 			display: block;
@@ -141,7 +140,10 @@ section#main {
 			&:before {
 				content: "⇌retweeted by ";
 			}
-			.timestamp { color: $gry; }
+			.timestamp {
+				color: $gry;
+				@include addBlank(true, false);
+			}
 		}
 		.quote {
 			display: block;

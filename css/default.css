@@ -39,8 +39,10 @@ section#tabs {
     color: #000000;
     background-color: #d3d7cf;
     text-decoration: underline; }
-    section#tabs span:before, section#tabs span:after {
-      content: "\00a0"; }
+    section#tabs span:before {
+      content: " "; }
+    section#tabs span:after {
+      content: " "; }
     section#tabs span.notify {
       color: #75507b;
       text-decoration: inherit; }
@@ -56,7 +58,9 @@ section#tabs {
       text-decoration: none; }
     section#tabs span#close {
       float: right; }
-      section#tabs span#close:before, section#tabs span#close:after {
+      section#tabs span#close:before {
+        content: none; }
+      section#tabs span#close:after {
         content: none; }
 
 section#main {
@@ -71,16 +75,21 @@ section#main {
     section#main div .username:hover {
       text-decoration: underline; }
   section#main div .text:before {
-    content: "\00a0"; }
+    content: " "; }
+  section#main div .text:after {
+    content: none; }
   section#main div .text .link {
     color: #3465a4; }
     section#main div .text .link:hover {
       text-decoration: underline; }
   section#main div .timestamp {
     display: inline-block;
-    width: 48px;
     clear: left;
     color: #d3d7cf; }
+    section#main div .timestamp:before {
+      content: none; }
+    section#main div .timestamp:after {
+      content: " "; }
   section#main div .retweet {
     display: block;
     margin-left: 16px;
@@ -89,6 +98,10 @@ section#main {
       content: "⇌retweeted by "; }
     section#main div .retweet .timestamp {
       color: #555753; }
+      section#main div .retweet .timestamp:before {
+        content: " "; }
+      section#main div .retweet .timestamp:after {
+        content: none; }
   section#main div .quote {
     display: block;
     margin-left: 16px;

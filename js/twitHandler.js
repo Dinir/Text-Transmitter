@@ -34,10 +34,11 @@ let tlCon = {
 				let v = {
 					type:address, 
 					params:parameters, 
-					tweets:[]
+					tweets:[],
+					notifications:0
 				};
-				if(streamURI.indexOf(tabName)>=0)
-					v.notifications=0;
+				// if(streamURI.indexOf(tabName)>=0)
+				// 	v.notifications=0;
 				tl.set(tabName, v);
 				if(typeof position==="undefined")
 					tlOrder.push(tabName);
@@ -85,65 +86,47 @@ let tlCon = {
 			let contents = tl.get(tabName);
 			let tweets = contents.tweets;
 			let params = contents.params;
+			let notifications = contents.notifications;
 
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			switch(direction) {
 				case 1:
-					if(tweets[0])
-						params.since_id = tweets[0].id_str;
+					if(tweets[0]) {
+						contents.params.since_id = tweets[0].id_str;
+						contents.params.max_id = undefined;
+					}
 					break;
 				case -1:
-					if(tweets[tweets.length-1])
-						params.max_id = tweets[tweets.length-1].id_str;
+					if(tweets[tweets.length-1]) {
+						contents.params.max_id = tweets[tweets.length-1].id_str;
+						contents.params.since_id = undefined;
+					}
 					break;
 			}
 
 			t.get(contents.type, params, function(err,data,response){
 				/*TODO check if received data should attach to or replace the previous data.
 				for some of the api address the `direction` is meaningless
-				and the data received should replace old datas instead of attaching to it.
+				and the data received should replace old data instead of attaching to it.
 				but we're only testing for home, mention, user timeline at the moment
 				so the default behavior will be adding the data to the old one.*/
 				// TODO learn what errors and response are for.
 				switch(direction) {
 					case 1:
-						tweets = data.concat(tweets);
+						contents.tweets = data.concat(tweets);
 						break;
 					case -1:
-						tweets.pop();
-						tweets = tweets.concat(data);
+						contents.tweets.pop();
+						contents.tweets = tweets.concat(data);
 						break;
 					case 0: // for those which doesn't need previous datas?
-						tweets = data;
+						contents.tweets = data;
 						break;
 				}
 				tl.set(tabName, contents);
 				tlCon.recentCall = false;
+				console.log("done");
 			}); // t.get
 		} // if-else tlCon.recentCall
 	} // update
 };
-
-/*
-window.onload = () => {
-
-	tlCon.tab.add("Home", 'statuses/home_timeline');
-	tlCon.tab.add("My Tweets", 'statuses/user_timeline', {screen_name: 'NardinRinet'}); console.log(tlOrder);
-	ReactDOM.render(
-		<div>
-			<display.tabs tlOrderArray={tlOrder} />
-			<section id="main">
-				{testTweets.map(
-					(v,i) => {
-						return (
-							<display.twitObj key={i} raw={v} />
-						)
-					}
-				)}
-			</section>
-			
-		</div>
-		, document.body.getElementsByTagName("article")[0]
-	)
-};
-*/
