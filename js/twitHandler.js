@@ -82,7 +82,7 @@ let tlCon = {
 		}
 	},
 	recentCall: false,
-	update: function(tabName, direction) {
+	update: function(tabName, direction, actions) {
 		if(tlCon.recentCall) {} else {
 			tlCon.recentCall = true;
 			let contents = tl.get(tabName);
@@ -127,6 +127,7 @@ let tlCon = {
 				}
 				tl.set(tabName, contents);
 				tlCon.recentCall = false;
+				actions();
 				console.log("done");
 			}); // t.get
 		} // if-else tlCon.recentCall

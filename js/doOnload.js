@@ -1,11 +1,17 @@
 window.onload = () => {
-	document.addEventListener("keydown", keyPress);
+	/*document.addEventListener("keydown", receiveKey);
 	document.addEventListener("keyup", checkStates);
-	document.body.addEventListener("mousewheel", scrollHandler, false);
+	document.body.addEventListener("mousewheel", scrollHandler, false);*/
 	
 	tlCon.tab.add("Home", 'statuses/home_timeline');
 	tlCon.tab.add("My Tweets", 'statuses/user_timeline', {screen_name: 'NardinRinet'}); console.log(tlOrder);
-	tlCon.update("Home", 1);
+	//tlCon.update("Home", 1);
+
+	tlCurrent = 0; console.log(tlOrder[tlCurrent]);
+	let test = tl.get("Home");
+	test.tweets = testTweets;
+	tl.set("Home", test);
+
 	ReactDOM.render(
 		<display.Main />
 		, document.getElementsByTagName("article")[0]

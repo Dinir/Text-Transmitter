@@ -122,7 +122,6 @@ const display = {
 
 			return (
 				<div>
-					<div className="threadPrev"></div>
 					<span className="timestamp">{formatTime.relTime(timestamp)}</span>
 					<span className={`username${isReply?" reply":""}${doesPing?" ping":""}`}>{username}</span>
 					<span className="text">{text}</span>
@@ -139,23 +138,24 @@ const display = {
 							<span className="timestamp">{formatTime.relTime(timeRTed)}</span>
 						</span>
 					): null}
-					<div className="threadAfter"></div>
 				</div>
 			);
 		}
 	}),
 	Tabs: React.createClass({
-		getInitialState: function() {
-			return ({order: tlOrder})
+		propTypes: {
+			tlOrder: React.PropTypes.array.isRequired,
+			tlCurrent: React.PropTypes.number,
+			changeTabFocus: React.PropTypes.func.isRequired,
+			closeTab: React.PropTypes.func.isRequired
 		},
-
 		render: function() {
 
 			return (
 				<section id="tabs" className="hl">
-					{this.state.order.map((v, i) => {
+					{this.props.tlOrder.map((v, i) => {
 						return (
-							<span key={i} className={i === tlCurrent? "chosen": null}>
+							<span onClick={()=>this.props.changeTabFocus(i)} key={i} className={i === tlCurrent? "chosen": null}>
 								{tl.get(v).notifications > 0? (
 									<span className="notifications">{tl.get(v).notifications}</span>
 								): null}
@@ -163,7 +163,7 @@ const display = {
 							</span>
 						)
 					})}
-					<span id="close" >X</span>
+					<span onClick={()=>this.props.closeTab(this.props.tlCurrent)} id="close" >X</span>
 				</section>
 			)
 		}
@@ -226,16 +226,49 @@ const display = {
 		}
 	}),
 	ImgView: React.createClass({
+		propTypes: {
+			show: React.PropTypes.bool
+		},
+		getDefaultProps: () => ({
+			show: false
+		}),
+		componentWillReceiveProps: n => {
+			document.getElementById("imgView")//n.show?
+		},
 		render: function() {
-			return 	<div><img /></div>
+			return 	(
+				<section id="imgView">
+					<div>
+						<img />
+					</div>
+				</section>
+			)
 		}
 	}),
 
 	Main: React.createClass({
+		getInitialState: () => ({
+			tlOrder: tlOrder,
+			tlCurrent: tlCurrent
+		}),
+
+		changeTabFocus: tlOrderNumber => {
+			this.setState({tlCurrent: tlOrderNumber})
+		},
+		closeTab: currentTabToRemove => {
+			tlCon.tab.remove(tlOrder[currentTabToRemove]);
+			this.setState({tlOrder: tlOrder});
+		},
+
+		receiveKey: ctl.receiveKey,
+		tidyKey: ctl.tidyKey,
+		handleScroll: ctl.handleScroll,
+
 		componentWillMount: function() {
+/*
 			this.receiveKey = function(e) {
 				lastKeyCode = e.keyCode;
-				console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
+				// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
 				//e.preventDefault();
 				const query = document.getElementById("query");
 
@@ -272,6 +305,7 @@ const display = {
 				document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
 				return false;
 			};
+*/
 
 			document.addEventListener("keydown", this.receiveKey);
 			document.addEventListener("keyup", this.tidyKey);
@@ -286,8 +320,8 @@ const display = {
 		render: function() {
 			return (
 				<div>
-					<display.Tabs tlOrderArray={tlOrder}/>
-					<display.Tweets tabName={tlOrder[tlCurrent]}/>
+					<display.Tabs changeTabFocus={this.changeTabFocus} closeTab={this.closeTab} tlOrder={this.state.tlOrder} tlCurrent={this.state.tlCurrent} />
+					<display.Tweets tabName={this.state.tlOrder[this.state.tlCurrent]}/>
 					<display.Controls />
 					<display.ImgView />
 				</div>

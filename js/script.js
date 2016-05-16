@@ -25,8 +25,19 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var charWidth = 8;
 var charHeight = 15;
 
+var EndpointURIs = {
+	"Mentions": "statuses/mentions_timeline",
+	"My Tweets": "statuses/user_timeline",
+	"Home": "statuses/home_timeline",
+	"Retweeted": "statuses/retweets_of_me",
+	"DM": ["direct_messages/sent", "direct_messages"]
+};
+
 var cmd = {
-	resize: function resize(w, h) {
+	resize: function resize() {
+		var w = arguments.length <= 0 || arguments[0] === undefined ? state.width : arguments[0];
+		var h = arguments.length <= 1 || arguments[1] === undefined ? state.height : arguments[1];
+
 		window.resizeTo((w > 12 ? w : 12) * charWidth, (h > 7 ? h : 7) * charHeight);
 		state.width = w;
 		state.height = h;
@@ -40,7 +51,12 @@ var cmd = {
 function execute(command) {
 	var prefix = command.slice(0, 1);
 	var argv = command.trim().substr(1).split(" ");
-	cmd[argv.shift()].apply(cmd, _toConsumableArray(argv));
+	switch (prefix) {
+		case ":":
+			cmd[argv.shift()].apply(cmd, _toConsumableArray(argv));break;
+		case "/":
+			break;
+	}
 }
 "use strict";
 
@@ -56,48 +72,93 @@ function execute(command) {
 var receivingCommand = false;
 var lastKeyCode = 0;
 
-function keyPress(e) {
+/*
+const receiveKey = e => {
 	lastKeyCode = e.keyCode;
-	console.log(e.type + " " + e.keyCode + " " + e.code + " " + e.charCode);
+	// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
 	//e.preventDefault();
-	var query = document.getElementById("query");
-
+	const query = document.getElementById("query");
+	
 	// scroll a page when presses 'PgUp/Dn'
-	if (e.keyCode === 33 || e.keyCode === 34) {
-		document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - 2 * charHeight);
+	if(e.keyCode===33 || e.keyCode===34) {
+		document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
 	}
-
-	if (!receivingCommand) {
-		// when the buffer is closed
+	
+	if(!receivingCommand) { // when the buffer is closed
 		// ':' or '/' to open buffer
-		if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) ctl.toggleCommand();
-	} else {
-		// when the buffer is open
-
+		if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
+			ctl.toggleCommand();
+		
+	} else { // when the buffer is open
+		
 		// 'esc' or 'enter' to close buffer.
-		if (e.keyCode === 27 || e.keyCode === 13) {
-			if (e.keyCode === 13) execute(query.value);
+		if(e.keyCode===27 || e.keyCode===13) {
+			if(e.keyCode===13) execute(query.value);
 			ctl.toggleCommand();
 		}
 	}
-}
-
-function checkStates() {
-	var query = document.getElementById("query");
+};
+const tidyKey = () => {
+	const query = document.getElementById("query");
 	// if buffer got emptied after a keypress close it
-	if (!receivingCommand) {} else {
-		if (lastKeyCode) if (query.value.length === 0) ctl.toggleCommand();
+	if(!receivingCommand) {} else {
+		if(lastKeyCode)
+			if(query.value.length===0)
+				ctl.toggleCommand();
 	}
-}
+};
+const handleScroll = () => {
+	const e = window.event;
+	document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
+	return false;
+};
+*/
 
 // it toggles what the bottom line shows every time it's invoked.
 var ctl = {
+	receiveKey: function receiveKey(e) {
+		lastKeyCode = e.keyCode;
+		// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
+		//e.preventDefault();
+		var query = document.getElementById("query");
+
+		// scroll a page when presses 'PgUp/Dn'
+		if (e.keyCode === 33 || e.keyCode === 34) {
+			document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - 2 * charHeight);
+		}
+
+		if (!receivingCommand) {
+			// when the buffer is closed
+			// ':' or '/' to open buffer
+			if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) ctl.toggleCommand();
+		} else {
+			// when the buffer is open
+
+			// 'esc' or 'enter' to close buffer.
+			if (e.keyCode === 27 || e.keyCode === 13) {
+				if (e.keyCode === 13) execute(query.value);
+				ctl.toggleCommand();
+			}
+		}
+	},
+	tidyKey: function tidyKey() {
+		var query = document.getElementById("query");
+		// if buffer got emptied after a keypress close it
+		if (!receivingCommand) {} else {
+			if (lastKeyCode) if (query.value.length === 0) ctl.toggleCommand();
+		}
+	},
+	handleScroll: function handleScroll() {
+		var e = window.event;
+		document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
+		return false;
+	},
+
 	toggleCommand: function toggleCommand() {
 		var query = document.getElementById("query");
 		var status = document.getElementById("status");
 		var commandInput = document.getElementById("commandInput");
 		if (receivingCommand) {
-			// should I be able to define variables and use them instead of invoking all these querySelectors every time?
 			query.value = "";
 			status.style.display = "inherit";
 			commandInput.style.display = "none";
@@ -247,7 +308,6 @@ var display = {
 			return React.createElement(
 				'div',
 				null,
-				React.createElement('div', { className: 'threadPrev' }),
 				React.createElement(
 					'span',
 					{ className: 'timestamp' },
@@ -295,27 +355,31 @@ var display = {
 						{ className: 'timestamp' },
 						formatTime.relTime(timeRTed)
 					)
-				) : null,
-				React.createElement('div', { className: 'threadAfter' })
+				) : null
 			);
 		}
 	}),
 	Tabs: React.createClass({
 		displayName: 'Tabs',
 
-		getInitialState: function getInitialState() {
-			return { order: tlOrder };
+		propTypes: {
+			tlOrder: React.PropTypes.array.isRequired,
+			tlCurrent: React.PropTypes.number,
+			changeTabFocus: React.PropTypes.func.isRequired,
+			closeTab: React.PropTypes.func.isRequired
 		},
-
 		render: function render() {
+			var _this = this;
 
 			return React.createElement(
 				'section',
 				{ id: 'tabs', className: 'hl' },
-				this.state.order.map(function (v, i) {
+				this.props.tlOrder.map(function (v, i) {
 					return React.createElement(
 						'span',
-						{ key: i, className: i === tlCurrent ? "chosen" : null },
+						{ onClick: function onClick() {
+								return _this.props.changeTabFocus(i);
+							}, key: i, className: i === tlCurrent ? "chosen" : null },
 						tl.get(v).notifications > 0 ? React.createElement(
 							'span',
 							{ className: 'notifications' },
@@ -328,7 +392,9 @@ var display = {
 				}),
 				React.createElement(
 					'span',
-					{ id: 'close' },
+					{ onClick: function onClick() {
+							return _this.props.closeTab(_this.props.tlCurrent);
+						}, id: 'close' },
 					'X'
 				)
 			);
@@ -436,11 +502,26 @@ var display = {
 	ImgView: React.createClass({
 		displayName: 'ImgView',
 
+		propTypes: {
+			show: React.PropTypes.bool
+		},
+		getDefaultProps: function getDefaultProps() {
+			return {
+				show: false
+			};
+		},
+		componentWillReceiveProps: function componentWillReceiveProps(n) {
+			document.getElementById("imgView"); //n.show?
+		},
 		render: function render() {
 			return React.createElement(
-				'div',
-				null,
-				React.createElement('img', null)
+				'section',
+				{ id: 'imgView' },
+				React.createElement(
+					'div',
+					null,
+					React.createElement('img', null)
+				)
 			);
 		}
 	}),
@@ -448,44 +529,67 @@ var display = {
 	Main: React.createClass({
 		displayName: 'Main',
 
+		getInitialState: function getInitialState() {
+			return {
+				tlOrder: tlOrder,
+				tlCurrent: tlCurrent
+			};
+		},
+
+		changeTabFocus: function changeTabFocus(tlOrderNumber) {
+			undefined.setState({ tlCurrent: tlOrderNumber });
+		},
+		closeTab: function closeTab(currentTabToRemove) {
+			tlCon.tab.remove(tlOrder[currentTabToRemove]);
+			undefined.setState({ tlOrder: tlOrder });
+		},
+
+		receiveKey: ctl.receiveKey,
+		tidyKey: ctl.tidyKey,
+		handleScroll: ctl.handleScroll,
+
 		componentWillMount: function componentWillMount() {
-			this.receiveKey = function (e) {
-				lastKeyCode = e.keyCode;
-				console.log(e.type + ' ' + e.keyCode + ' ' + e.code + ' ' + e.charCode);
-				//e.preventDefault();
-				var query = document.getElementById("query");
-
-				// scroll a page when presses 'PgUp/Dn'
-				if (e.keyCode === 33 || e.keyCode === 34) {
-					document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - 2 * charHeight);
-				}
-
-				if (!receivingCommand) {
-					// when the buffer is closed
-					// ':' or '/' to open buffer
-					if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) ctl.toggleCommand();
-				} else {
-					// when the buffer is open
-
-					// 'esc' or 'enter' to close buffer.
-					if (e.keyCode === 27 || e.keyCode === 13) {
-						if (e.keyCode === 13) execute(query.value);
-						ctl.toggleCommand();
-					}
-				}
-			};
-			this.tidyKey = function () {
-				var query = document.getElementById("query");
-				// if buffer got emptied after a keypress close it
-				if (!receivingCommand) {} else {
-					if (lastKeyCode) if (query.value.length === 0) ctl.toggleCommand();
-				}
-			};
-			this.handleScroll = function () {
-				var e = window.event;
-				document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
-				return false;
-			};
+			/*
+   			this.receiveKey = function(e) {
+   				lastKeyCode = e.keyCode;
+   				// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
+   				//e.preventDefault();
+   				const query = document.getElementById("query");
+   
+   				// scroll a page when presses 'PgUp/Dn'
+   				if(e.keyCode===33 || e.keyCode===34) {
+   					document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
+   				}
+   
+   				if(!receivingCommand) { // when the buffer is closed
+   					// ':' or '/' to open buffer
+   					if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
+   						ctl.toggleCommand();
+   
+   				} else { // when the buffer is open
+   
+   					// 'esc' or 'enter' to close buffer.
+   					if(e.keyCode===27 || e.keyCode===13) {
+   						if(e.keyCode===13) execute(query.value);
+   						ctl.toggleCommand();
+   					}
+   				}
+   			};
+   			this.tidyKey = () => {
+   				const query = document.getElementById("query");
+   				// if buffer got emptied after a keypress close it
+   				if(!receivingCommand) {} else {
+   					if(lastKeyCode)
+   						if(query.value.length===0)
+   							ctl.toggleCommand();
+   				}
+   			};
+   			this.handleScroll = () => {
+   				const e = window.event;
+   				document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
+   				return false;
+   			};
+   */
 
 			document.addEventListener("keydown", this.receiveKey);
 			document.addEventListener("keyup", this.tidyKey);
@@ -501,8 +605,8 @@ var display = {
 			return React.createElement(
 				'div',
 				null,
-				React.createElement(display.Tabs, { tlOrderArray: tlOrder }),
-				React.createElement(display.Tweets, { tabName: tlOrder[tlCurrent] }),
+				React.createElement(display.Tabs, { changeTabFocus: this.changeTabFocus, closeTab: this.closeTab, tlOrder: this.state.tlOrder, tlCurrent: this.state.tlCurrent }),
+				React.createElement(display.Tweets, { tabName: this.state.tlOrder[this.state.tlCurrent] }),
 				React.createElement(display.Controls, null),
 				React.createElement(display.ImgView, null)
 			);
@@ -523,13 +627,19 @@ window.onload = () => {
 "use strict";
 
 window.onload = function () {
-	document.addEventListener("keydown", keyPress);
-	document.addEventListener("keyup", checkStates);
-	document.body.addEventListener("mousewheel", scrollHandler, false);
+	/*document.addEventListener("keydown", receiveKey);
+ document.addEventListener("keyup", checkStates);
+ document.body.addEventListener("mousewheel", scrollHandler, false);*/
 
 	tlCon.tab.add("Home", 'statuses/home_timeline');
 	tlCon.tab.add("My Tweets", 'statuses/user_timeline', { screen_name: 'NardinRinet' });console.log(tlOrder);
-	tlCon.update("Home", 1);
+	//tlCon.update("Home", 1);
+
+	tlCurrent = 0;console.log(tlOrder[tlCurrent]);
+	var test = tl.get("Home");
+	test.tweets = testTweets;
+	tl.set("Home", test);
+
 	ReactDOM.render(React.createElement(display.Main, null), document.getElementsByTagName("article")[0]);
 };
 
@@ -631,7 +741,7 @@ var tlCon = {
 		}
 	},
 	recentCall: false,
-	update: function update(tabName, direction) {
+	update: function update(tabName, direction, actions) {
 		if (tlCon.recentCall) {} else {
 			(function () {
 				tlCon.recentCall = true;
@@ -678,6 +788,7 @@ var tlCon = {
 					}
 					tl.set(tabName, contents);
 					tlCon.recentCall = false;
+					actions();
 					console.log("done");
 				}); // t.get
 			})();
