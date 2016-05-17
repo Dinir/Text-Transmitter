@@ -50,6 +50,68 @@ var EndpointDefault = {
 
 var streamURI = ['statuses/filter', 'statuses/sample', 'statuses/firehose', 'user', 'site', '1'];
 
+// TODO move cmd and ctl inside of this Dmain component.
+var Dmain = React.createClass({
+	displayName: "Dmain",
+
+	getInitialState: function getInitialState() {
+		return {
+			tlOrder: tlOrder,
+			tlCurrent: tlCurrent
+		};
+	},
+
+	changeTabFocus: function changeTabFocus(tlOrderNumber) {
+		tlCurrent = tlOrderNumber;
+		this.setState({ tlCurrent: tlOrderNumber });
+	},
+	closeTab: function closeTab(currentTabToRemove) {
+		tlCon.tab.remove(tlOrder[currentTabToRemove]);
+		this.setState({
+			tlOrder: tlOrder,
+			tlCurrent: tlCurrent
+		});
+	},
+
+	componentWillMount: function componentWillMount() {
+		document.addEventListener("keydown", this.receiveKey);
+		document.addEventListener("keyup", this.tidyKey);
+		document.body.addEventListener("mousewheel", this.handleScroll, false);
+	},
+	componentWillUnmount: function componentWillUnmount() {
+		document.removeEventListener("keydown", this.receiveKey);
+		document.removeEventListener("keyup", this.tidyKey);
+		document.body.removeEventListener("mousewheel", this.handleScroll, false);
+	},
+
+	render: function render() {
+		return React.createElement(
+			"div",
+			null,
+			React.createElement(display.Tabs, { changeTabFocus: this.changeTabFocus, closeTab: this.closeTab, tlOrder: this.state.tlOrder, tlCurrent: this.state.tlCurrent }),
+			React.createElement(display.Tweets, { tabName: this.state.tlOrder[this.state.tlCurrent] }),
+			React.createElement(display.Controls, null),
+			React.createElement(display.ImgView, null)
+		);
+	},
+
+	executeCommand: function executeCommand(command) {
+		var prefix = command.slice(0, 1);
+		var argv = command.trim().substr(1).split(" ");
+		switch (prefix) {
+			case ":":
+				cmd[argv.shift()].apply(cmd, _toConsumableArray(argv));break;
+			case "/":
+				break;
+		}
+	},
+
+	receiveKey: ctl.receiveKey,
+	tidyKey: ctl.tidyKey,
+	handleScroll: ctl.handleScroll
+
+});
+
 var cmd = {
 	resize: function resize() {
 		var w = arguments.length <= 0 || arguments[0] === undefined ? state.width : arguments[0];
@@ -266,355 +328,295 @@ var formatTime = {
 	}
 };
 
-var display = {
-	TwitObj: React.createClass({
-		displayName: 'TwitObj',
+var DtwitObj = React.createClass({
+	displayName: 'DtwitObj',
 
-		propTypes: {
-			raw: React.PropTypes.object.isRequired
-		},
-		render: function render() {
-			var raw = this.props.raw;
-			var timestamp = formatTime.init(raw.created_at);
-			var username = raw.user.screen_name;
-			var text = raw.text;
-			var manipulationIndices = [text];
+	propTypes: {
+		raw: React.PropTypes.object.isRequired
+	},
+	render: function render() {
+		var raw = this.props.raw;
+		var timestamp = formatTime.init(raw.created_at);
+		var username = raw.user.screen_name;
+		var text = raw.text;
+		var manipulationIndices = [text];
 
-			var isReply = raw.entities.user_mentions.length > 0 || raw.in_reply_to_status_id_str !== null;
-			var doesPing = false;
-			var isQuote = raw.is_quote_status;
-			var isRetweet = typeof raw.retweeted_status !== "undefined";
-			var hasImage = typeof raw.entities.media !== "undefined";
-			var hasLink = raw.entities.urls.length > 0;
+		var isReply = raw.entities.user_mentions.length > 0 || raw.in_reply_to_status_id_str !== null;
+		var doesPing = false;
+		var isQuote = raw.is_quote_status;
+		var isRetweet = typeof raw.retweeted_status !== "undefined";
+		var hasImage = typeof raw.entities.media !== "undefined";
+		var hasLink = raw.entities.urls.length > 0;
 
-			// reply info
-			// raw.entities.user_mentions
-			// {id_str, indices[], screen_name}[]
-			// raw.in_reply_to_status_id_str
-			// id (in string)
-			if (raw.entities.user_mentions.length > 0) {}
-			if (raw.in_reply_to_status_id_str !== null) {}
-			if (isQuote) {
-				if (raw.quoted_status) {
-					var timeQuote = formatTime.init(raw.quoted_status.created_at);
-					var userQuote = raw.quoted_status.user.screen_name;
-					var textQuote = raw.quoted_status.text;
-				} else {
-					// this is the case where RTed tweet has quote in it
-					var timeQuote = formatTime.init(raw.retweeted_status.quoted_status.created_at);
-					var userQuote = raw.retweeted_status.quoted_status.user.screen_name;
-					var textQuote = raw.retweeted_status.quoted_status.text;
-				}
+		// reply info
+		// raw.entities.user_mentions
+		// {id_str, indices[], screen_name}[]
+		// raw.in_reply_to_status_id_str
+		// id (in string)
+		if (raw.entities.user_mentions.length > 0) {}
+		if (raw.in_reply_to_status_id_str !== null) {}
+		if (isQuote) {
+			if (raw.quoted_status) {
+				var timeQuote = formatTime.init(raw.quoted_status.created_at);
+				var userQuote = raw.quoted_status.user.screen_name;
+				var textQuote = raw.quoted_status.text;
+			} else {
+				// this is the case where RTed tweet has quote in it
+				var timeQuote = formatTime.init(raw.retweeted_status.quoted_status.created_at);
+				var userQuote = raw.retweeted_status.quoted_status.user.screen_name;
+				var textQuote = raw.retweeted_status.quoted_status.text;
 			}
-			if (isRetweet) {
-				var userRTed = username;
-				var timeRTed = timestamp;
-				timestamp = formatTime.init(raw.retweeted_status.created_at);
-				username = raw.retweeted_status.user.screen_name;
-				text = raw.retweeted_status.text;
-			}
-			if (hasImage) {
-				// var images = raw.extended_entities.media.map(function(v) {
-				// 	manipulationIndices.push([...v.indices,]);
-				// 	return {
-				// 		indices:v.indices,
-				// 		url:v.media_url_https
-				// 	}
-				// });
-				raw.extended_entities.media.forEach(function (v) {
-					manipulationIndices.push([].concat(_toConsumableArray(v.indices), [1]));
-				});
-			}
-			// TODO I can make it so multiple quotes can be shown as quoted statuses.
-			if (hasLink) {}
+		}
+		if (isRetweet) {
+			var userRTed = username;
+			var timeRTed = timestamp;
+			timestamp = formatTime.init(raw.retweeted_status.created_at);
+			username = raw.retweeted_status.user.screen_name;
+			text = raw.retweeted_status.text;
+		}
+		if (hasImage) {
+			// var images = raw.extended_entities.media.map(function(v) {
+			// 	manipulationIndices.push([...v.indices,]);
+			// 	return {
+			// 		indices:v.indices,
+			// 		url:v.media_url_https
+			// 	}
+			// });
+			raw.extended_entities.media.forEach(function (v) {
+				manipulationIndices.push([].concat(_toConsumableArray(v.indices), [1]));
+			});
+		}
+		// TODO I can make it so multiple quotes can be shown as quoted statuses.
+		if (hasLink) {}
 
-			return React.createElement(
-				'div',
-				null,
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'span',
+				{ className: 'timestamp' },
+				formatTime.relTime(timestamp)
+			),
+			React.createElement(
+				'span',
+				{ className: 'username' + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
+				username
+			),
+			React.createElement(
+				'span',
+				{ className: 'text' },
+				text
+			),
+			isQuote ? React.createElement(
+				'span',
+				{ className: 'quote' },
 				React.createElement(
 					'span',
 					{ className: 'timestamp' },
-					formatTime.relTime(timestamp)
+					formatTime.relTime(timeQuote)
 				),
 				React.createElement(
 					'span',
-					{ className: 'username' + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
-					username
+					{ className: 'username' },
+					userQuote
 				),
 				React.createElement(
 					'span',
 					{ className: 'text' },
-					text
-				),
-				isQuote ? React.createElement(
-					'span',
-					{ className: 'quote' },
-					React.createElement(
-						'span',
-						{ className: 'timestamp' },
-						formatTime.relTime(timeQuote)
-					),
-					React.createElement(
-						'span',
-						{ className: 'username' },
-						userQuote
-					),
-					React.createElement(
-						'span',
-						{ className: 'text' },
-						textQuote
-					)
-				) : null,
-				isRetweet ? React.createElement(
-					'span',
-					{ className: 'retweet' },
-					React.createElement(
-						'span',
-						{ className: 'username' },
-						userRTed
-					),
-					React.createElement(
-						'span',
-						{ className: 'timestamp' },
-						formatTime.relTime(timeRTed)
-					)
-				) : null
-			);
-		}
-	}),
-	Tabs: React.createClass({
-		displayName: 'Tabs',
-
-		propTypes: {
-			tlOrder: React.PropTypes.array.isRequired,
-			tlCurrent: React.PropTypes.number,
-			changeTabFocus: React.PropTypes.func.isRequired,
-			closeTab: React.PropTypes.func.isRequired
-		},
-		render: function render() {
-			var _this = this;
-
-			return React.createElement(
-				'section',
-				{ id: 'tabs', className: 'hl' },
-				this.props.tlOrder.map(function (v, i) {
-					return React.createElement(
-						'span',
-						{ onClick: function onClick() {
-								return _this.props.changeTabFocus(i);
-							}, key: i, className: i === _this.props.tlCurrent ? "chosen" : null },
-						tl.get(v).notifications > 0 ? React.createElement(
-							'span',
-							{ className: 'notifications' },
-							tl.get(v).notifications
-						) : null,
-						'[',
-						v,
-						']'
-					);
-				}),
+					textQuote
+				)
+			) : null,
+			isRetweet ? React.createElement(
+				'span',
+				{ className: 'retweet' },
 				React.createElement(
+					'span',
+					{ className: 'username' },
+					userRTed
+				),
+				React.createElement(
+					'span',
+					{ className: 'timestamp' },
+					formatTime.relTime(timeRTed)
+				)
+			) : null
+		);
+	}
+});
+var Dtabs = React.createClass({
+	displayName: 'Dtabs',
+
+	propTypes: {
+		tlOrder: React.PropTypes.array.isRequired,
+		tlCurrent: React.PropTypes.number,
+		changeTabFocus: React.PropTypes.func.isRequired,
+		closeTab: React.PropTypes.func.isRequired
+	},
+	render: function render() {
+		var _this = this;
+
+		return React.createElement(
+			'section',
+			{ id: 'tabs', className: 'hl' },
+			this.props.tlOrder.map(function (v, i) {
+				return React.createElement(
 					'span',
 					{ onClick: function onClick() {
-							return _this.props.closeTab(_this.props.tlCurrent);
-						}, id: 'close' },
-					'X'
-				)
-			);
-		}
-	}),
-	Tweets: React.createClass({
-		displayName: 'Tweets',
+							return _this.props.changeTabFocus(i);
+						}, key: i, className: i === _this.props.tlCurrent ? "chosen" : null },
+					tl.get(v).notifications > 0 ? React.createElement(
+						'span',
+						{ className: 'notifications' },
+						tl.get(v).notifications
+					) : null,
+					'[',
+					v,
+					']'
+				);
+			}),
+			React.createElement(
+				'span',
+				{ onClick: function onClick() {
+						return _this.props.closeTab(_this.props.tlCurrent);
+					}, id: 'close' },
+				'X'
+			)
+		);
+	}
+});
+var Dtweets = React.createClass({
+	displayName: 'Dtweets',
 
-		propTypes: {
-			tabName: React.PropTypes.string
-		},
+	propTypes: {
+		tabName: React.PropTypes.string
+	},
 
-		/*update: function() {
-  	if(tl.get(this.props.tabName).tweets.length===0) {
-  		tlCon.update(this.props.tabName, 1, )
-  	}
-  },*/render: function render() {
-			return React.createElement(
-				'section',
-				{ id: 'main' },
+	/*update: function() {
+ 	if(tl.get(this.props.tabName).tweets.length===0) {
+ 		tlCon.update(this.props.tabName, 1, )
+ 	}
+ },*/render: function render() {
+		return React.createElement(
+			'section',
+			{ id: 'main' },
+			React.createElement(
+				'div',
+				null,
+				this.props.tabName
+			)
+		);
+	}
+});
+var Dcontrols = React.createClass({
+	displayName: 'Dcontrols',
+
+	propTypes: {
+		receivingCommand: React.PropTypes.bool.isRequired,
+		currentLine: React.PropTypes.number,
+		apiCallLeft: React.PropTypes.number
+	},
+	getDefaultProps: function getDefaultProps() {
+		return {
+			receivingCommand: false,
+			currentLine: 0,
+			apiCallLeft: 0
+		};
+	},
+
+	render: function render() {
+		return React.createElement(
+			'section',
+			{ id: 'controls' },
+			React.createElement(
+				'div',
+				{ id: 'status' },
 				React.createElement(
 					'div',
-					null,
-					this.props.tabName
-				)
-			);
-		}
-	}),
-	Controls: React.createClass({
-		displayName: 'Controls',
-
-		propTypes: {
-			receivingCommand: React.PropTypes.bool.isRequired,
-			currentLine: React.PropTypes.number,
-			apiCallLeft: React.PropTypes.number
-		},
-		getDefaultProps: function getDefaultProps() {
-			return {
-				receivingCommand: false,
-				currentLine: 0,
-				apiCallLeft: 0
-			};
-		},
-		render: function render() {
-			return React.createElement(
-				'section',
-				{ id: 'controls' },
+					{ className: 'left' },
+					' '
+				),
 				React.createElement(
 					'div',
-					{ id: 'status' },
+					{ className: 'rightText' },
 					React.createElement(
-						'div',
-						{ className: 'left' },
+						'span',
+						{ style: { width: charWidth + "px" } },
 						' '
 					),
 					React.createElement(
+						'span',
+						{ id: 'currentLine' },
+						this.props.currentLine,
+						'%'
+					),
+					React.createElement(
+						'span',
+						{ id: 'api' },
+						this.props.apiCallLeft,
+						'/',
+						apiCallMax
+					)
+				)
+			),
+			React.createElement(
+				'div',
+				{ id: 'commandInput' },
+				React.createElement(
+					'div',
+					{ id: 'commandContext' },
+					React.createElement(
 						'div',
-						{ className: 'rightText' },
+						{ className: 'left' },
+						'replying to',
 						React.createElement(
 							'span',
-							{ style: { width: charWidth + "px" } },
-							' '
+							{ className: 'username' },
+							'DinirNertan'
+						),
+						':',
+						React.createElement(
+							'span',
+							{ className: 'text' },
+							'I ate an ice cream a...'
 						),
 						React.createElement(
-							'span',
-							{ id: 'currentLine' },
-							this.props.currentLine,
-							'%'
-						),
-						React.createElement(
-							'span',
-							{ id: 'api' },
-							this.props.apiCallLeft,
-							'/',
-							apiCallMax
+							'div',
+							{ className: 'rightText' },
+							'81/140'
 						)
 					)
 				),
-				React.createElement(
-					'div',
-					{ id: 'commandInput' },
-					React.createElement(
-						'div',
-						{ id: 'commandContext' },
-						React.createElement(
-							'div',
-							{ className: 'left' },
-							'replying to',
-							React.createElement(
-								'span',
-								{ className: 'username' },
-								'DinirNertan'
-							),
-							':',
-							React.createElement(
-								'span',
-								{ className: 'text' },
-								'I ate an ice cream a...'
-							),
-							React.createElement(
-								'div',
-								{ className: 'rightText' },
-								'81/140'
-							)
-						)
-					),
-					React.createElement('input', { type: 'text', id: 'query', maxlength: '80' })
-				)
-			);
-		}
-	}),
-	ImgView: React.createClass({
-		displayName: 'ImgView',
+				React.createElement('input', { type: 'text', id: 'query', maxlength: '80' })
+			)
+		);
+	}
+});
+var DimgView = React.createClass({
+	displayName: 'DimgView',
 
-		propTypes: {
-			show: React.PropTypes.bool
-		},
-		getDefaultProps: function getDefaultProps() {
-			return {
-				show: false
-			};
-		},
-		componentWillReceiveProps: function componentWillReceiveProps(n) {
-			document.getElementById("imgView"); //n.show?
-		},
-		render: function render() {
-			return React.createElement(
-				'section',
-				{ id: 'imgView' },
-				React.createElement(
-					'div',
-					null,
-					React.createElement('img', null)
-				)
-			);
-		}
-	}),
-
-	Main: React.createClass({
-		displayName: 'Main',
-
-		getInitialState: function getInitialState() {
-			return {
-				tlOrder: tlOrder,
-				tlCurrent: tlCurrent
-			};
-		},
-
-		changeTabFocus: function changeTabFocus(tlOrderNumber) {
-			this.setState({ tlCurrent: tlOrderNumber });
-		},
-		closeTab: function closeTab(currentTabToRemove) {
-			tlCon.tab.remove(tlOrder[currentTabToRemove]);
-			this.setState({
-				tlOrder: tlOrder,
-				tlCurrent: tlCurrent
-			});
-		},
-
-		receiveKey: ctl.receiveKey,
-		tidyKey: ctl.tidyKey,
-		handleScroll: ctl.handleScroll,
-
-		componentWillMount: function componentWillMount() {
-			document.addEventListener("keydown", this.receiveKey);
-			document.addEventListener("keyup", this.tidyKey);
-			document.body.addEventListener("mousewheel", this.handleScroll, false);
-		},
-		componentWillUnmount: function componentWillUnmount() {
-			document.removeEventListener("keydown", this.receiveKey);
-			document.removeEventListener("keyup", this.tidyKey);
-			document.body.removeEventListener("mousewheel", this.handleScroll, false);
-		},
-
-		render: function render() {
-			return React.createElement(
+	propTypes: {
+		show: React.PropTypes.bool
+	},
+	getDefaultProps: function getDefaultProps() {
+		return {
+			show: false
+		};
+	},
+	componentWillReceiveProps: function componentWillReceiveProps(n) {
+		document.getElementById("imgView"); //n.show?
+	},
+	render: function render() {
+		return React.createElement(
+			'section',
+			{ id: 'imgView' },
+			React.createElement(
 				'div',
 				null,
-				React.createElement(display.Tabs, { changeTabFocus: this.changeTabFocus, closeTab: this.closeTab, tlOrder: this.state.tlOrder, tlCurrent: this.state.tlCurrent }),
-				React.createElement(display.Tweets, { tabName: this.state.tlOrder[this.state.tlCurrent] }),
-				React.createElement(display.Controls, null),
-				React.createElement(display.ImgView, null)
-			);
-		}
-	})
-};
-
-/*let ststt = "abcdefghijkl";
-ststt = ststt.substring(0,4)+"<a>"+ststt.substring(4,8)+"</a>"+ststt.substring(8);
-window.onload = () => {
-	ReactDOM.render(
-		<div>
-			<span>{ststt}</span>
-			</div>
-		,document.getElementById("main")
-	);
-};*/
+				React.createElement('img', null)
+			)
+		);
+	}
+});
 "use strict";
 
 window.onload = function () {
