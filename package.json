@@ -4,7 +4,7 @@
   "main": "./main.js",
   "scripts": {
     "start": "./node_modules/.bin/electron .",
-    "buildscripts": "babel js/ --out-file js/script.js  --ignore=js/script.js",
+    "buildscripts": "babel js/ --out-file js/script.js --ignore=js/script.js",
     "electron-rebuild": "electron-rebuild"
   },
   "devDependencies": {

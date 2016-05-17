@@ -16,14 +16,6 @@ let tlOrder = [];
 let tlCurrent = 0;
 const apiCallMax = 15;
 
-const streamURI = [
-	'statuses/filter',
-	'statuses/sample',
-	'statuses/firehose',
-	'user',
-	'site','1'
-];
-
 let tlCon = {
 	tab: {
 		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
@@ -49,6 +41,9 @@ let tlCon = {
 			}
 		},
 		remove: function(tabName) {
+			if(tlCurrent>0 &&
+			tlCurrent===tlOrder.length-1)
+				tlCurrent--;
 			tl.delete(tabName);
 			tlOrder.splice(tlOrder.indexOf(tabName),1);
 		},

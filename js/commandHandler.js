@@ -1,15 +1,38 @@
 const charWidth = 8;
 const charHeight = 15;
 
-const EndpointURIs = {
-	"Mentions":"statuses/mentions_timeline",
-	"My Tweets":"statuses/user_timeline",
-	"Home":"statuses/home_timeline",
-	"Retweeted":"statuses/retweets_of_me",
-	"DM":["direct_messages/sent","direct_messages"],
+const EndpointDefault = {
+	"Mentions": {
+		uri: "statuses/mentions_timeline",
+		param: {}
+	},
+	"My Tweets": {
+		uri: "statuses/user_timeline",
+		param: {user_id: appUserId}
+	},
+	"Home": {
+		uri: "statuses/home_timeline",
+		param: {}
+	},
+	"Retweeted": {
+		uri:"statuses/retweets_of_me",
+		param: {}
+	},
+	"DM": {
+		uri: ["direct_messages/sent","direct_messages"],
+		param: {}
+	}
 };
 
-let cmd = {
+const streamURI = [
+	'statuses/filter',
+	'statuses/sample',
+	'statuses/firehose',
+	'user',
+	'site','1'
+];
+
+const cmd = {
 	resize: function(w=state.width,h=state.height) {
 		window.resizeTo((w>12?w:12)*charWidth, (h>7?h:7)*charHeight);
 		state.width = w;
@@ -17,8 +40,9 @@ let cmd = {
 	},
 	rs: function(w,h) { return this.resize(w,h) },
 
-	add: function(name,uri,pos) {
-
+	add: function(name,uri=EndpointDefault[name].uri,pos) {
+		const param = EndpointDefault[name].param==="undefined"?{}:EndpointDefault[name].param;
+		tlCon.tab.add(name,uri,param,pos);
 	}
 };
 function execute(command) {

@@ -155,7 +155,7 @@ const display = {
 				<section id="tabs" className="hl">
 					{this.props.tlOrder.map((v, i) => {
 						return (
-							<span onClick={()=>this.props.changeTabFocus(i)} key={i} className={i === tlCurrent? "chosen": null}>
+							<span onClick={()=>this.props.changeTabFocus(i)} key={i} className={i === this.props.tlCurrent? "chosen": null}>
 								{tl.get(v).notifications > 0? (
 									<span className="notifications">{tl.get(v).notifications}</span>
 								): null}
@@ -170,18 +170,27 @@ const display = {
 	}),
 	Tweets: React.createClass({
 		propTypes: {
-			tabName: React.PropTypes.string.isRequired
+			tabName: React.PropTypes.string
 		},
+		/*update: function() {
+			if(tl.get(this.props.tabName).tweets.length===0) {
+				tlCon.update(this.props.tabName, 1, )
+			}
+		},*/
 		render: function() {
 			return (
 				<section id="main">
-					{tl.get(this.props.tabName).tweets.map(
-						(v,i) => {
-							return (
-								<display.twitObj key={i} raw={v} />
-							)
-						}
-					)}
+					<div>{this.props.tabName}</div>
+					{
+
+						// tl.get(this.props.tabName).tweets.map(
+						// 	(v,i) => {
+						// 		return (
+						// 			<display.twitObj key={i} raw={v} />
+						// 		)
+						// 	}
+						// )
+					}
 				</section>
 			)
 		}
@@ -252,12 +261,15 @@ const display = {
 			tlCurrent: tlCurrent
 		}),
 
-		changeTabFocus: tlOrderNumber => {
-			this.setState({tlCurrent: tlOrderNumber})
+		changeTabFocus: function(tlOrderNumber) {
+			this.setState({tlCurrent: tlOrderNumber});
 		},
-		closeTab: currentTabToRemove => {
+		closeTab: function(currentTabToRemove) {
 			tlCon.tab.remove(tlOrder[currentTabToRemove]);
-			this.setState({tlOrder: tlOrder});
+			this.setState({
+				tlOrder: tlOrder,
+				tlCurrent: tlCurrent
+			});
 		},
 
 		receiveKey: ctl.receiveKey,
@@ -265,48 +277,6 @@ const display = {
 		handleScroll: ctl.handleScroll,
 
 		componentWillMount: function() {
-/*
-			this.receiveKey = function(e) {
-				lastKeyCode = e.keyCode;
-				// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
-				//e.preventDefault();
-				const query = document.getElementById("query");
-
-				// scroll a page when presses 'PgUp/Dn'
-				if(e.keyCode===33 || e.keyCode===34) {
-					document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
-				}
-
-				if(!receivingCommand) { // when the buffer is closed
-					// ':' or '/' to open buffer
-					if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
-						ctl.toggleCommand();
-
-				} else { // when the buffer is open
-
-					// 'esc' or 'enter' to close buffer.
-					if(e.keyCode===27 || e.keyCode===13) {
-						if(e.keyCode===13) execute(query.value);
-						ctl.toggleCommand();
-					}
-				}
-			};
-			this.tidyKey = () => {
-				const query = document.getElementById("query");
-				// if buffer got emptied after a keypress close it
-				if(!receivingCommand) {} else {
-					if(lastKeyCode)
-						if(query.value.length===0)
-							ctl.toggleCommand();
-				}
-			};
-			this.handleScroll = () => {
-				const e = window.event;
-				document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
-				return false;
-			};
-*/
-
 			document.addEventListener("keydown", this.receiveKey);
 			document.addEventListener("keyup", this.tidyKey);
 			document.body.addEventListener("mousewheel", this.handleScroll, false);

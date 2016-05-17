@@ -25,13 +25,30 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var charWidth = 8;
 var charHeight = 15;
 
-var EndpointURIs = {
-	"Mentions": "statuses/mentions_timeline",
-	"My Tweets": "statuses/user_timeline",
-	"Home": "statuses/home_timeline",
-	"Retweeted": "statuses/retweets_of_me",
-	"DM": ["direct_messages/sent", "direct_messages"]
+var EndpointDefault = {
+	"Mentions": {
+		uri: "statuses/mentions_timeline",
+		param: {}
+	},
+	"My Tweets": {
+		uri: "statuses/user_timeline",
+		param: { user_id: appUserId }
+	},
+	"Home": {
+		uri: "statuses/home_timeline",
+		param: {}
+	},
+	"Retweeted": {
+		uri: "statuses/retweets_of_me",
+		param: {}
+	},
+	"DM": {
+		uri: ["direct_messages/sent", "direct_messages"],
+		param: {}
+	}
 };
+
+var streamURI = ['statuses/filter', 'statuses/sample', 'statuses/firehose', 'user', 'site', '1'];
 
 var cmd = {
 	resize: function resize() {
@@ -46,7 +63,13 @@ var cmd = {
 		return this.resize(w, h);
 	},
 
-	add: function add(name, uri, pos) {}
+	add: function add(name) {
+		var uri = arguments.length <= 1 || arguments[1] === undefined ? EndpointDefault[name].uri : arguments[1];
+		var pos = arguments[2];
+
+		var param = EndpointDefault[name].param === "undefined" ? {} : EndpointDefault[name].param;
+		tlCon.tab.add(name, uri, param, pos);
+	}
 };
 function execute(command) {
 	var prefix = command.slice(0, 1);
@@ -379,7 +402,7 @@ var display = {
 						'span',
 						{ onClick: function onClick() {
 								return _this.props.changeTabFocus(i);
-							}, key: i, className: i === tlCurrent ? "chosen" : null },
+							}, key: i, className: i === _this.props.tlCurrent ? "chosen" : null },
 						tl.get(v).notifications > 0 ? React.createElement(
 							'span',
 							{ className: 'notifications' },
@@ -404,15 +427,22 @@ var display = {
 		displayName: 'Tweets',
 
 		propTypes: {
-			tabName: React.PropTypes.string.isRequired
+			tabName: React.PropTypes.string
 		},
-		render: function render() {
+
+		/*update: function() {
+  	if(tl.get(this.props.tabName).tweets.length===0) {
+  		tlCon.update(this.props.tabName, 1, )
+  	}
+  },*/render: function render() {
 			return React.createElement(
 				'section',
 				{ id: 'main' },
-				tl.get(this.props.tabName).tweets.map(function (v, i) {
-					return React.createElement(display.twitObj, { key: i, raw: v });
-				})
+				React.createElement(
+					'div',
+					null,
+					this.props.tabName
+				)
 			);
 		}
 	}),
@@ -537,11 +567,14 @@ var display = {
 		},
 
 		changeTabFocus: function changeTabFocus(tlOrderNumber) {
-			undefined.setState({ tlCurrent: tlOrderNumber });
+			this.setState({ tlCurrent: tlOrderNumber });
 		},
 		closeTab: function closeTab(currentTabToRemove) {
 			tlCon.tab.remove(tlOrder[currentTabToRemove]);
-			undefined.setState({ tlOrder: tlOrder });
+			this.setState({
+				tlOrder: tlOrder,
+				tlCurrent: tlCurrent
+			});
 		},
 
 		receiveKey: ctl.receiveKey,
@@ -549,48 +582,6 @@ var display = {
 		handleScroll: ctl.handleScroll,
 
 		componentWillMount: function componentWillMount() {
-			/*
-   			this.receiveKey = function(e) {
-   				lastKeyCode = e.keyCode;
-   				// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
-   				//e.preventDefault();
-   				const query = document.getElementById("query");
-   
-   				// scroll a page when presses 'PgUp/Dn'
-   				if(e.keyCode===33 || e.keyCode===34) {
-   					document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
-   				}
-   
-   				if(!receivingCommand) { // when the buffer is closed
-   					// ':' or '/' to open buffer
-   					if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
-   						ctl.toggleCommand();
-   
-   				} else { // when the buffer is open
-   
-   					// 'esc' or 'enter' to close buffer.
-   					if(e.keyCode===27 || e.keyCode===13) {
-   						if(e.keyCode===13) execute(query.value);
-   						ctl.toggleCommand();
-   					}
-   				}
-   			};
-   			this.tidyKey = () => {
-   				const query = document.getElementById("query");
-   				// if buffer got emptied after a keypress close it
-   				if(!receivingCommand) {} else {
-   					if(lastKeyCode)
-   						if(query.value.length===0)
-   							ctl.toggleCommand();
-   				}
-   			};
-   			this.handleScroll = () => {
-   				const e = window.event;
-   				document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
-   				return false;
-   			};
-   */
-
 			document.addEventListener("keydown", this.receiveKey);
 			document.addEventListener("keyup", this.tidyKey);
 			document.body.addEventListener("mousewheel", this.handleScroll, false);
@@ -667,8 +658,8 @@ var t = new (0, require('twit'))({
 	access_token_secret: 'AoAhBNkawjH93yFD0erDw8nbjecHPQOeTvp2IOpN5sXdi'
 });
 
-var appUserId = "712975464332075008";
-'use strict';
+var appUserId = "990651260"; // "712975464332075008";
+"use strict";
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -690,8 +681,6 @@ var tlOrder = [];
 var tlCurrent = 0;
 var apiCallMax = 15;
 
-var streamURI = ['statuses/filter', 'statuses/sample', 'statuses/firehose', 'user', 'site', '1'];
-
 var tlCon = {
 	tab: {
 		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
@@ -712,6 +701,7 @@ var tlCon = {
 			}
 		},
 		remove: function remove(tabName) {
+			if (tlCurrent > 0 && tlCurrent === tlOrder.length - 1) tlCurrent--;
 			tl.delete(tabName);
 			tlOrder.splice(tlOrder.indexOf(tabName), 1);
 		},
