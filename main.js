@@ -29,9 +29,9 @@ app.on('ready', function() {
 				monospace: "Droid Sans Mono"
 			}
 		}
-	}); // +25 is the menu bar height. Not tested on other system than Linux-Chrome.
+	});
 	mainWindow.loadURL('file://'+__dirname+'/index.html');
-	// mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
 	mainWindow.on('closed', function() {
 		mainWindow = null;
 	});

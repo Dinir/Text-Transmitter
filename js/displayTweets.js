@@ -1,5 +1,3 @@
-let React = require('react');
-let ReactDOM = require('react-dom');
 let moment = require('moment');
 
 // use moment to store timestamp
@@ -184,7 +182,7 @@ const Dtweets = React.createClass({
 					// tl.get(this.props.tabName).tweets.map(
 					// 	(v,i) => {
 					// 		return (
-					// 			<display.twitObj key={i} raw={v} />
+					// 			<DtwitObj key={i} raw={v} />
 					// 		)
 					// 	}
 					// )

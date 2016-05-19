@@ -111,9 +111,3 @@ const ctl = {
 		receivingCommand = !receivingCommand;
 	}
 };
-
-const scrollHandler = () => {
-	const e = window.event;
-	document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
-	return false;
-};

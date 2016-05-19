@@ -1,3 +1,7 @@
+let React = require('react');
+let ReactDOM = require('react-dom');
+
+const fs = require("fs");
 const charWidth = 8;
 const charHeight = 15;
 
@@ -32,15 +36,54 @@ const streamURI = [
 	'site','1'
 ];
 
-// TODO move cmd and ctl inside of this Dmain component.
+const loadSettings = (loc="./settings.json") => {
+	console.group(`Preparing settings...`);
+	let loadedSettings;
+	try {
+		loadedSettings = fs.readFileSync(loc);
+		console.log(`Done.`);
+		const result = JSON.parse(loadedSettings);
+		console.dir(result);
+		console.groupEnd();
+		return result;
+	} catch(e) {
+		const defaultSettings = {
+			width: 80,
+			height: 24
+		};
+		if(e.code==="ENOENT") {
+			console.log(`Couldn't find \`${loc}\`. Creating new default one...`);
+			fs.writeFile(
+				'./settings.json',
+				JSON.stringify(defaultSettings),
+				function(err) {
+					if(err) console.error(`There is a problem creating the default settings:\n${err.message}`);
+					else console.log(`Created default settings in \`${loc}\`.`);
+				}
+			);
+		} else {
+			console.error(`There is a problem preparing settings:\n${e}`);
+		}
+		console.log(`The default one will be used for now.`);
+		console.groupEnd();
+		return defaultSettings;
+	}
+};
+const saveSettings = (settings, loc="./settings.json") => {
+	fs.writeFile(loc, settings);
+};
+
 const Dmain = React.createClass({
 	getInitialState: () => ({
-		tlOrder: tlOrder,
-		tlCurrent: tlCurrent
+		settings: loadSettings(),
+		tlOrder: [],
+		tlCurrent: 0,
+		receivingCommand: false,
+		currentLine: 0,
+		apiCallLeft: 0
 	}),
 
 	changeTabFocus: function(tlOrderNumber) {
-		tlCurrent = tlOrderNumber;
 		this.setState({tlCurrent: tlOrderNumber});
 
 	},
@@ -58,6 +101,7 @@ const Dmain = React.createClass({
 		document.body.addEventListener("mousewheel", this.handleScroll, false);
 	},
 	componentWillUnmount: function() {
+		saveSettings();
 		document.removeEventListener("keydown", this.receiveKey);
 		document.removeEventListener("keyup", this.tidyKey);
 		document.body.removeEventListener("mousewheel", this.handleScroll, false);
@@ -66,19 +110,32 @@ const Dmain = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<display.Tabs changeTabFocus={this.changeTabFocus} closeTab={this.closeTab} tlOrder={this.state.tlOrder} tlCurrent={this.state.tlCurrent} />
-				<display.Tweets tabName={this.state.tlOrder[this.state.tlCurrent]}/>
-				<display.Controls />
-				<display.ImgView />
+				<Dtabs changeTabFocus={this.changeTabFocus} closeTab={this.closeTab} tlOrder={this.state.tlOrder} tlCurrent={this.state.tlCurrent} />
+				<Dtweets tabName={this.state.tlOrder[this.state.tlCurrent]}/>
+				<Dcontrols />
+				<DimgView />
 			</div>
 		)
 	},
 
+	cmd: {
+		resize: function(w=state.width,h=state.height) {
+			window.resizeTo((w>12?w:12)*charWidth, (h>7?h:7)*charHeight);
+			state.width = w;
+			state.height = h;
+		},
+		rs: function(w,h) { return this.resize(w,h) },
+
+		add: function(name,uri=EndpointDefault[name].uri,pos) {
+			const param = EndpointDefault[name].param==="undefined"?{}:EndpointDefault[name].param;
+			tlCon.tab.add(name,uri,param,pos);
+		}
+	},
 	executeCommand: function(command) {
 		let prefix = command.slice(0,1);
 		let argv = command.trim().substr(1).split(" ");
 		switch(prefix) {
-			case ":": cmd[argv.shift()](...argv); break;
+			case ":": this.cmd[argv.shift()](...argv); break;
 			case "/": break;
 		}
 	},
@@ -88,25 +145,3 @@ const Dmain = React.createClass({
 	handleScroll: ctl.handleScroll,
 
 });
-
-const cmd = {
-	resize: function(w=state.width,h=state.height) {
-		window.resizeTo((w>12?w:12)*charWidth, (h>7?h:7)*charHeight);
-		state.width = w;
-		state.height = h;
-	},
-	rs: function(w,h) { return this.resize(w,h) },
-
-	add: function(name,uri=EndpointDefault[name].uri,pos) {
-		const param = EndpointDefault[name].param==="undefined"?{}:EndpointDefault[name].param;
-		tlCon.tab.add(name,uri,param,pos);
-	}
-};
-function execute(command) {
-	let prefix = command.slice(0,1);
-	let argv = command.trim().substr(1).split(" ");
-	switch(prefix) {
-		case ":": cmd[argv.shift()](...argv); break;
-		case "/": break;
-	}
-}

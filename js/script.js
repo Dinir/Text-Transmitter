@@ -18,10 +18,14 @@ return prv;
 })(abc);
  */
 "use strict";
-"use strict";
+'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+var React = require('react');
+var ReactDOM = require('react-dom');
+
+var fs = require("fs");
 var charWidth = 8;
 var charHeight = 15;
 
@@ -50,19 +54,57 @@ var EndpointDefault = {
 
 var streamURI = ['statuses/filter', 'statuses/sample', 'statuses/firehose', 'user', 'site', '1'];
 
-// TODO move cmd and ctl inside of this Dmain component.
+var loadSettings = function loadSettings() {
+	var loc = arguments.length <= 0 || arguments[0] === undefined ? "./settings.json" : arguments[0];
+
+	console.group('Preparing settings...');
+	var loadedSettings = void 0;
+	try {
+		loadedSettings = fs.readFileSync(loc);
+		console.log('Done.');
+		var result = JSON.parse(loadedSettings);
+		console.dir(result);
+		console.groupEnd();
+		return result;
+	} catch (e) {
+		var defaultSettings = {
+			width: 80,
+			height: 24
+		};
+		if (e.code === "ENOENT") {
+			console.log('Couldn\'t find `' + loc + '`. Creating new default one...');
+			fs.writeFile('./settings.json', JSON.stringify(defaultSettings), function (err) {
+				if (err) console.error('There is a problem creating the default settings:\n' + err.message);else console.log('Created default settings in `' + loc + '`.');
+			});
+		} else {
+			console.error('There is a problem preparing settings:\n' + e);
+		}
+		console.log('The default one will be used for now.');
+		console.groupEnd();
+		return defaultSettings;
+	}
+};
+var saveSettings = function saveSettings(settings) {
+	var loc = arguments.length <= 1 || arguments[1] === undefined ? "./settings.json" : arguments[1];
+
+	fs.writeFile(loc, settings);
+};
+
 var Dmain = React.createClass({
-	displayName: "Dmain",
+	displayName: 'Dmain',
 
 	getInitialState: function getInitialState() {
 		return {
-			tlOrder: tlOrder,
-			tlCurrent: tlCurrent
+			settings: loadSettings(),
+			tlOrder: [],
+			tlCurrent: 0,
+			receivingCommand: false,
+			currentLine: 0,
+			apiCallLeft: 0
 		};
 	},
 
 	changeTabFocus: function changeTabFocus(tlOrderNumber) {
-		tlCurrent = tlOrderNumber;
 		this.setState({ tlCurrent: tlOrderNumber });
 	},
 	closeTab: function closeTab(currentTabToRemove) {
@@ -79,6 +121,7 @@ var Dmain = React.createClass({
 		document.body.addEventListener("mousewheel", this.handleScroll, false);
 	},
 	componentWillUnmount: function componentWillUnmount() {
+		saveSettings();
 		document.removeEventListener("keydown", this.receiveKey);
 		document.removeEventListener("keyup", this.tidyKey);
 		document.body.removeEventListener("mousewheel", this.handleScroll, false);
@@ -86,21 +129,44 @@ var Dmain = React.createClass({
 
 	render: function render() {
 		return React.createElement(
-			"div",
+			'div',
 			null,
-			React.createElement(display.Tabs, { changeTabFocus: this.changeTabFocus, closeTab: this.closeTab, tlOrder: this.state.tlOrder, tlCurrent: this.state.tlCurrent }),
-			React.createElement(display.Tweets, { tabName: this.state.tlOrder[this.state.tlCurrent] }),
-			React.createElement(display.Controls, null),
-			React.createElement(display.ImgView, null)
+			React.createElement(Dtabs, { changeTabFocus: this.changeTabFocus, closeTab: this.closeTab, tlOrder: this.state.tlOrder, tlCurrent: this.state.tlCurrent }),
+			React.createElement(Dtweets, { tabName: this.state.tlOrder[this.state.tlCurrent] }),
+			React.createElement(Dcontrols, null),
+			React.createElement(DimgView, null)
 		);
 	},
 
+	cmd: {
+		resize: function resize() {
+			var w = arguments.length <= 0 || arguments[0] === undefined ? state.width : arguments[0];
+			var h = arguments.length <= 1 || arguments[1] === undefined ? state.height : arguments[1];
+
+			window.resizeTo((w > 12 ? w : 12) * charWidth, (h > 7 ? h : 7) * charHeight);
+			state.width = w;
+			state.height = h;
+		},
+		rs: function rs(w, h) {
+			return this.resize(w, h);
+		},
+
+		add: function add(name) {
+			var uri = arguments.length <= 1 || arguments[1] === undefined ? EndpointDefault[name].uri : arguments[1];
+			var pos = arguments[2];
+
+			var param = EndpointDefault[name].param === "undefined" ? {} : EndpointDefault[name].param;
+			tlCon.tab.add(name, uri, param, pos);
+		}
+	},
 	executeCommand: function executeCommand(command) {
+		var _cmd;
+
 		var prefix = command.slice(0, 1);
 		var argv = command.trim().substr(1).split(" ");
 		switch (prefix) {
 			case ":":
-				cmd[argv.shift()].apply(cmd, _toConsumableArray(argv));break;
+				(_cmd = this.cmd)[argv.shift()].apply(_cmd, _toConsumableArray(argv));break;
 			case "/":
 				break;
 		}
@@ -111,38 +177,6 @@ var Dmain = React.createClass({
 	handleScroll: ctl.handleScroll
 
 });
-
-var cmd = {
-	resize: function resize() {
-		var w = arguments.length <= 0 || arguments[0] === undefined ? state.width : arguments[0];
-		var h = arguments.length <= 1 || arguments[1] === undefined ? state.height : arguments[1];
-
-		window.resizeTo((w > 12 ? w : 12) * charWidth, (h > 7 ? h : 7) * charHeight);
-		state.width = w;
-		state.height = h;
-	},
-	rs: function rs(w, h) {
-		return this.resize(w, h);
-	},
-
-	add: function add(name) {
-		var uri = arguments.length <= 1 || arguments[1] === undefined ? EndpointDefault[name].uri : arguments[1];
-		var pos = arguments[2];
-
-		var param = EndpointDefault[name].param === "undefined" ? {} : EndpointDefault[name].param;
-		tlCon.tab.add(name, uri, param, pos);
-	}
-};
-function execute(command) {
-	var prefix = command.slice(0, 1);
-	var argv = command.trim().substr(1).split(" ");
-	switch (prefix) {
-		case ":":
-			cmd[argv.shift()].apply(cmd, _toConsumableArray(argv));break;
-		case "/":
-			break;
-	}
-}
 "use strict";
 
 //import {execute} from "./commandHandler.js";
@@ -255,20 +289,12 @@ var ctl = {
 		receivingCommand = !receivingCommand;
 	}
 };
-
-var scrollHandler = function scrollHandler() {
-	var e = window.event;
-	document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
-	return false;
-};
-'use strict';
+"use strict";
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var React = require('react');
-var ReactDOM = require('react-dom');
 var moment = require('moment');
 
 // use moment to store timestamp
@@ -300,20 +326,20 @@ var formatTime = {
 		var d = p[0] - timeString[0]; // relative time in second
 		if (d < 60) {
 			// if less than a minute - return sec
-			return d + 's';
+			return d + "s";
 		} else if (d < 3600) {
 			// if less than an hour - return min
-			return parseInt(d / 60) + 'm';
+			return parseInt(d / 60) + "m";
 		} else if (d < 86400) {
 			// if less than a day - return hour
-			return parseInt(d / 3600) + 'h';
+			return parseInt(d / 3600) + "h";
 		} else if (d < 2678400) {
 			// if less than 31 days - return day
-			return parseInt(d / 86400) + 'd';
+			return parseInt(d / 86400) + "d";
 		} else {
 			// if more than a month - return month or year
 			var dd = formatTime.getDate([timeString[1], timeString[2], timeString[3]]).fromNow(true).split(" ");
-			return '' + (dd[0] === "a" ? 1 : dd[0]) + (dd[1][0] === "m" ? "M" : "y");
+			return "" + (dd[0] === "a" ? 1 : dd[0]) + (dd[1][0] === "m" ? "M" : "y");
 		}
 		/*} else if(p[3]===timeString[3]) { // if in same year
   	if(p[2]===timeString[2]) { // and in same month - return day
@@ -329,7 +355,7 @@ var formatTime = {
 };
 
 var DtwitObj = React.createClass({
-	displayName: 'DtwitObj',
+	displayName: "DtwitObj",
 
 	propTypes: {
 		raw: React.PropTypes.object.isRequired
@@ -390,53 +416,53 @@ var DtwitObj = React.createClass({
 		if (hasLink) {}
 
 		return React.createElement(
-			'div',
+			"div",
 			null,
 			React.createElement(
-				'span',
-				{ className: 'timestamp' },
+				"span",
+				{ className: "timestamp" },
 				formatTime.relTime(timestamp)
 			),
 			React.createElement(
-				'span',
-				{ className: 'username' + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
+				"span",
+				{ className: "username" + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
 				username
 			),
 			React.createElement(
-				'span',
-				{ className: 'text' },
+				"span",
+				{ className: "text" },
 				text
 			),
 			isQuote ? React.createElement(
-				'span',
-				{ className: 'quote' },
+				"span",
+				{ className: "quote" },
 				React.createElement(
-					'span',
-					{ className: 'timestamp' },
+					"span",
+					{ className: "timestamp" },
 					formatTime.relTime(timeQuote)
 				),
 				React.createElement(
-					'span',
-					{ className: 'username' },
+					"span",
+					{ className: "username" },
 					userQuote
 				),
 				React.createElement(
-					'span',
-					{ className: 'text' },
+					"span",
+					{ className: "text" },
 					textQuote
 				)
 			) : null,
 			isRetweet ? React.createElement(
-				'span',
-				{ className: 'retweet' },
+				"span",
+				{ className: "retweet" },
 				React.createElement(
-					'span',
-					{ className: 'username' },
+					"span",
+					{ className: "username" },
 					userRTed
 				),
 				React.createElement(
-					'span',
-					{ className: 'timestamp' },
+					"span",
+					{ className: "timestamp" },
 					formatTime.relTime(timeRTed)
 				)
 			) : null
@@ -444,7 +470,7 @@ var DtwitObj = React.createClass({
 	}
 });
 var Dtabs = React.createClass({
-	displayName: 'Dtabs',
+	displayName: "Dtabs",
 
 	propTypes: {
 		tlOrder: React.PropTypes.array.isRequired,
@@ -456,36 +482,36 @@ var Dtabs = React.createClass({
 		var _this = this;
 
 		return React.createElement(
-			'section',
-			{ id: 'tabs', className: 'hl' },
+			"section",
+			{ id: "tabs", className: "hl" },
 			this.props.tlOrder.map(function (v, i) {
 				return React.createElement(
-					'span',
+					"span",
 					{ onClick: function onClick() {
 							return _this.props.changeTabFocus(i);
 						}, key: i, className: i === _this.props.tlCurrent ? "chosen" : null },
 					tl.get(v).notifications > 0 ? React.createElement(
-						'span',
-						{ className: 'notifications' },
+						"span",
+						{ className: "notifications" },
 						tl.get(v).notifications
 					) : null,
-					'[',
+					"[",
 					v,
-					']'
+					"]"
 				);
 			}),
 			React.createElement(
-				'span',
+				"span",
 				{ onClick: function onClick() {
 						return _this.props.closeTab(_this.props.tlCurrent);
-					}, id: 'close' },
-				'X'
+					}, id: "close" },
+				"X"
 			)
 		);
 	}
 });
 var Dtweets = React.createClass({
-	displayName: 'Dtweets',
+	displayName: "Dtweets",
 
 	propTypes: {
 		tabName: React.PropTypes.string
@@ -497,10 +523,10 @@ var Dtweets = React.createClass({
  	}
  },*/render: function render() {
 		return React.createElement(
-			'section',
-			{ id: 'main' },
+			"section",
+			{ id: "main" },
 			React.createElement(
-				'div',
+				"div",
 				null,
 				this.props.tabName
 			)
@@ -508,7 +534,7 @@ var Dtweets = React.createClass({
 	}
 });
 var Dcontrols = React.createClass({
-	displayName: 'Dcontrols',
+	displayName: "Dcontrols",
 
 	propTypes: {
 		receivingCommand: React.PropTypes.bool.isRequired,
@@ -525,74 +551,74 @@ var Dcontrols = React.createClass({
 
 	render: function render() {
 		return React.createElement(
-			'section',
-			{ id: 'controls' },
+			"section",
+			{ id: "controls" },
 			React.createElement(
-				'div',
-				{ id: 'status' },
+				"div",
+				{ id: "status" },
 				React.createElement(
-					'div',
-					{ className: 'left' },
-					' '
+					"div",
+					{ className: "left" },
+					" "
 				),
 				React.createElement(
-					'div',
-					{ className: 'rightText' },
+					"div",
+					{ className: "rightText" },
 					React.createElement(
-						'span',
+						"span",
 						{ style: { width: charWidth + "px" } },
-						' '
+						" "
 					),
 					React.createElement(
-						'span',
-						{ id: 'currentLine' },
+						"span",
+						{ id: "currentLine" },
 						this.props.currentLine,
-						'%'
+						"%"
 					),
 					React.createElement(
-						'span',
-						{ id: 'api' },
+						"span",
+						{ id: "api" },
 						this.props.apiCallLeft,
-						'/',
+						"/",
 						apiCallMax
 					)
 				)
 			),
 			React.createElement(
-				'div',
-				{ id: 'commandInput' },
+				"div",
+				{ id: "commandInput" },
 				React.createElement(
-					'div',
-					{ id: 'commandContext' },
+					"div",
+					{ id: "commandContext" },
 					React.createElement(
-						'div',
-						{ className: 'left' },
-						'replying to',
+						"div",
+						{ className: "left" },
+						"replying to",
 						React.createElement(
-							'span',
-							{ className: 'username' },
-							'DinirNertan'
+							"span",
+							{ className: "username" },
+							"DinirNertan"
 						),
-						':',
+						":",
 						React.createElement(
-							'span',
-							{ className: 'text' },
-							'I ate an ice cream a...'
+							"span",
+							{ className: "text" },
+							"I ate an ice cream a..."
 						),
 						React.createElement(
-							'div',
-							{ className: 'rightText' },
-							'81/140'
+							"div",
+							{ className: "rightText" },
+							"81/140"
 						)
 					)
 				),
-				React.createElement('input', { type: 'text', id: 'query', maxlength: '80' })
+				React.createElement("input", { type: "text", id: "query", maxlength: "80" })
 			)
 		);
 	}
 });
 var DimgView = React.createClass({
-	displayName: 'DimgView',
+	displayName: "DimgView",
 
 	propTypes: {
 		show: React.PropTypes.bool
@@ -607,12 +633,12 @@ var DimgView = React.createClass({
 	},
 	render: function render() {
 		return React.createElement(
-			'section',
-			{ id: 'imgView' },
+			"section",
+			{ id: "imgView" },
 			React.createElement(
-				'div',
+				"div",
 				null,
-				React.createElement('img', null)
+				React.createElement("img", null)
 			)
 		);
 	}
@@ -642,11 +668,6 @@ function scrState(h) {
 	console.log("scrollable height: " + (document.body.clientHeight - window.innerHeight) + "\nmaximum scroll: " + document.body.scrollTop + " in (" + window.innerHeight / 15 + " lines)");
 }
 "use strict";
-
-var state = {
-	width: 80,
-	height: 24
-};
 'use strict';
 
 var t = new (0, require('twit'))({
@@ -676,12 +697,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 	}
 ]
  */
-var tl = new Map();
-// valid argument on the need of this array though,
-// that because you can just directly move the order of elements (in this case, tabs) and save the order at the end of the process and reload it at the startup.
-var tlOrder = [];
-var tlCurrent = 0;
-var apiCallMax = 15;
+/*
+let tl = new Map();
+let tlOrder = [];
+let tlCurrent = 0;
+const apiCallMax = 15;
+*/
 
 var tlCon = {
 	tab: {
@@ -723,7 +744,9 @@ var tlCon = {
 		reorder: function reorder(tabName, place, swap) {
 			if (typeof tabName !== "undefined") {
 				if (typeof swap !== "undefined") {
-					tlOrder.splice.apply(tlOrder, [place, 0].concat(_toConsumableArray(tlOrder.splice(tlOrder.indexOf(tabName), 1))));
+					var _tlOrder;
+
+					(_tlOrder = tlOrder).splice.apply(_tlOrder, [place, 0].concat(_toConsumableArray(tlOrder.splice(tlOrder.indexOf(tabName), 1))));
 				} else {
 					var placeSwap = tlOrder.indexOf(tabName);
 					tlCon.tab.reorder(tabName, place);
