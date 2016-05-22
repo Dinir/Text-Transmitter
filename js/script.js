@@ -18,12 +18,7 @@ return prv;
 })(abc);
  */
 "use strict";
-'use strict';
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var React = require('react');
-var ReactDOM = require('react-dom');
+"use strict";
 
 var fs = require("fs");
 var charWidth = 8;
@@ -57,11 +52,11 @@ var streamURI = ['statuses/filter', 'statuses/sample', 'statuses/firehose', 'use
 var loadSettings = function loadSettings() {
 	var loc = arguments.length <= 0 || arguments[0] === undefined ? "./settings.json" : arguments[0];
 
-	console.group('Preparing settings...');
+	console.groupCollapsed("Preparing settings...");
 	var loadedSettings = void 0;
 	try {
 		loadedSettings = fs.readFileSync(loc);
-		console.log('Done.');
+		console.log("Done.");
 		var result = JSON.parse(loadedSettings);
 		console.dir(result);
 		console.groupEnd();
@@ -69,17 +64,21 @@ var loadSettings = function loadSettings() {
 	} catch (e) {
 		var defaultSettings = {
 			width: 80,
-			height: 24
+			height: 24,
+
+			tl: new Map(),
+			tlOrder: [],
+			tlCurrent: 0
 		};
 		if (e.code === "ENOENT") {
-			console.log('Couldn\'t find `' + loc + '`. Creating new default one...');
+			console.log("Couldn't find `" + loc + "`. Creating new default one...");
 			fs.writeFile('./settings.json', JSON.stringify(defaultSettings), function (err) {
-				if (err) console.error('There is a problem creating the default settings:\n' + err.message);else console.log('Created default settings in `' + loc + '`.');
+				if (err) console.error("There is a problem creating the default settings:\n" + err.message);else console.log("Created default settings in `" + loc + "`.");
 			});
 		} else {
-			console.error('There is a problem preparing settings:\n' + e);
+			console.error("There is a problem preparing settings:\n" + e);
 		}
-		console.log('The default one will be used for now.');
+		console.log("The default one will be used for now.");
 		console.groupEnd();
 		return defaultSettings;
 	}
@@ -87,96 +86,8 @@ var loadSettings = function loadSettings() {
 var saveSettings = function saveSettings(settings) {
 	var loc = arguments.length <= 1 || arguments[1] === undefined ? "./settings.json" : arguments[1];
 
-	fs.writeFile(loc, settings);
+	fs.writeFile(loc, JSON.stringify(settings));
 };
-
-var Dmain = React.createClass({
-	displayName: 'Dmain',
-
-	getInitialState: function getInitialState() {
-		return {
-			settings: loadSettings(),
-			tlOrder: [],
-			tlCurrent: 0,
-			receivingCommand: false,
-			currentLine: 0,
-			apiCallLeft: 0
-		};
-	},
-
-	changeTabFocus: function changeTabFocus(tlOrderNumber) {
-		this.setState({ tlCurrent: tlOrderNumber });
-	},
-	closeTab: function closeTab(currentTabToRemove) {
-		tlCon.tab.remove(tlOrder[currentTabToRemove]);
-		this.setState({
-			tlOrder: tlOrder,
-			tlCurrent: tlCurrent
-		});
-	},
-
-	componentWillMount: function componentWillMount() {
-		document.addEventListener("keydown", this.receiveKey);
-		document.addEventListener("keyup", this.tidyKey);
-		document.body.addEventListener("mousewheel", this.handleScroll, false);
-	},
-	componentWillUnmount: function componentWillUnmount() {
-		saveSettings();
-		document.removeEventListener("keydown", this.receiveKey);
-		document.removeEventListener("keyup", this.tidyKey);
-		document.body.removeEventListener("mousewheel", this.handleScroll, false);
-	},
-
-	render: function render() {
-		return React.createElement(
-			'div',
-			null,
-			React.createElement(Dtabs, { changeTabFocus: this.changeTabFocus, closeTab: this.closeTab, tlOrder: this.state.tlOrder, tlCurrent: this.state.tlCurrent }),
-			React.createElement(Dtweets, { tabName: this.state.tlOrder[this.state.tlCurrent] }),
-			React.createElement(Dcontrols, null),
-			React.createElement(DimgView, null)
-		);
-	},
-
-	cmd: {
-		resize: function resize() {
-			var w = arguments.length <= 0 || arguments[0] === undefined ? state.width : arguments[0];
-			var h = arguments.length <= 1 || arguments[1] === undefined ? state.height : arguments[1];
-
-			window.resizeTo((w > 12 ? w : 12) * charWidth, (h > 7 ? h : 7) * charHeight);
-			state.width = w;
-			state.height = h;
-		},
-		rs: function rs(w, h) {
-			return this.resize(w, h);
-		},
-
-		add: function add(name) {
-			var uri = arguments.length <= 1 || arguments[1] === undefined ? EndpointDefault[name].uri : arguments[1];
-			var pos = arguments[2];
-
-			var param = EndpointDefault[name].param === "undefined" ? {} : EndpointDefault[name].param;
-			tlCon.tab.add(name, uri, param, pos);
-		}
-	},
-	executeCommand: function executeCommand(command) {
-		var _cmd;
-
-		var prefix = command.slice(0, 1);
-		var argv = command.trim().substr(1).split(" ");
-		switch (prefix) {
-			case ":":
-				(_cmd = this.cmd)[argv.shift()].apply(_cmd, _toConsumableArray(argv));break;
-			case "/":
-				break;
-		}
-	},
-
-	receiveKey: ctl.receiveKey,
-	tidyKey: ctl.tidyKey,
-	handleScroll: ctl.handleScroll
-
-});
 "use strict";
 
 //import {execute} from "./commandHandler.js";
@@ -234,50 +145,52 @@ const handleScroll = () => {
 */
 
 // it toggles what the bottom line shows every time it's invoked.
-var ctl = {
-	receiveKey: function receiveKey(e) {
+/*const ctl = {
+	receiveKey: e => {
 		lastKeyCode = e.keyCode;
 		// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
 		//e.preventDefault();
-		var query = document.getElementById("query");
-
+		const query = document.getElementById("query");
+		
 		// scroll a page when presses 'PgUp/Dn'
-		if (e.keyCode === 33 || e.keyCode === 34) {
-			document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - 2 * charHeight);
+		if(e.keyCode===33 || e.keyCode===34) {
+			document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
 		}
-
-		if (!receivingCommand) {
-			// when the buffer is closed
+		
+		if(!receivingCommand) { // when the buffer is closed
 			// ':' or '/' to open buffer
-			if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) ctl.toggleCommand();
-		} else {
-			// when the buffer is open
-
+			if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
+				ctl.toggleCommand();
+			
+		} else { // when the buffer is open
+			
 			// 'esc' or 'enter' to close buffer.
-			if (e.keyCode === 27 || e.keyCode === 13) {
-				if (e.keyCode === 13) execute(query.value);
+			if(e.keyCode===27 || e.keyCode===13) {
+				if(e.keyCode===13) execute(query.value);
 				ctl.toggleCommand();
 			}
 		}
 	},
-	tidyKey: function tidyKey() {
-		var query = document.getElementById("query");
+	tidyKey: () => {
+		const query = document.getElementById("query");
 		// if buffer got emptied after a keypress close it
-		if (!receivingCommand) {} else {
-			if (lastKeyCode) if (query.value.length === 0) ctl.toggleCommand();
+		if(!receivingCommand) {} else {
+			if(lastKeyCode)
+				if(query.value.length===0)
+					ctl.toggleCommand();
 		}
 	},
-	handleScroll: function handleScroll() {
-		var e = window.event;
-		document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
+	handleScroll: () => {
+		const e = window.event;
+		document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
 		return false;
 	},
-
-	toggleCommand: function toggleCommand() {
-		var query = document.getElementById("query");
-		var status = document.getElementById("status");
-		var commandInput = document.getElementById("commandInput");
-		if (receivingCommand) {
+	
+	toggleCommand: () => {
+		const query = document.getElementById("query");
+		const status = document.getElementById("status");
+		const commandInput = document.getElementById("commandInput");
+		if(receivingCommand) {
 			query.value = "";
 			status.style.display = "inherit";
 			commandInput.style.display = "none";
@@ -288,13 +201,15 @@ var ctl = {
 		}
 		receivingCommand = !receivingCommand;
 	}
-};
-"use strict";
+};*/
+'use strict';
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+var React = require('react');
+var ReactDOM = require('react-dom');
 var moment = require('moment');
 
 // use moment to store timestamp
@@ -326,20 +241,20 @@ var formatTime = {
 		var d = p[0] - timeString[0]; // relative time in second
 		if (d < 60) {
 			// if less than a minute - return sec
-			return d + "s";
+			return d + 's';
 		} else if (d < 3600) {
 			// if less than an hour - return min
-			return parseInt(d / 60) + "m";
+			return parseInt(d / 60) + 'm';
 		} else if (d < 86400) {
 			// if less than a day - return hour
-			return parseInt(d / 3600) + "h";
+			return parseInt(d / 3600) + 'h';
 		} else if (d < 2678400) {
 			// if less than 31 days - return day
-			return parseInt(d / 86400) + "d";
+			return parseInt(d / 86400) + 'd';
 		} else {
 			// if more than a month - return month or year
 			var dd = formatTime.getDate([timeString[1], timeString[2], timeString[3]]).fromNow(true).split(" ");
-			return "" + (dd[0] === "a" ? 1 : dd[0]) + (dd[1][0] === "m" ? "M" : "y");
+			return '' + (dd[0] === "a" ? 1 : dd[0]) + (dd[1][0] === "m" ? "M" : "y");
 		}
 		/*} else if(p[3]===timeString[3]) { // if in same year
   	if(p[2]===timeString[2]) { // and in same month - return day
@@ -355,7 +270,7 @@ var formatTime = {
 };
 
 var DtwitObj = React.createClass({
-	displayName: "DtwitObj",
+	displayName: 'DtwitObj',
 
 	propTypes: {
 		raw: React.PropTypes.object.isRequired
@@ -416,53 +331,53 @@ var DtwitObj = React.createClass({
 		if (hasLink) {}
 
 		return React.createElement(
-			"div",
+			'div',
 			null,
 			React.createElement(
-				"span",
-				{ className: "timestamp" },
+				'span',
+				{ className: 'timestamp' },
 				formatTime.relTime(timestamp)
 			),
 			React.createElement(
-				"span",
-				{ className: "username" + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
+				'span',
+				{ className: 'username' + (isReply ? " reply" : "") + (doesPing ? " ping" : "") },
 				username
 			),
 			React.createElement(
-				"span",
-				{ className: "text" },
+				'span',
+				{ className: 'text' },
 				text
 			),
 			isQuote ? React.createElement(
-				"span",
-				{ className: "quote" },
+				'span',
+				{ className: 'quote' },
 				React.createElement(
-					"span",
-					{ className: "timestamp" },
+					'span',
+					{ className: 'timestamp' },
 					formatTime.relTime(timeQuote)
 				),
 				React.createElement(
-					"span",
-					{ className: "username" },
+					'span',
+					{ className: 'username' },
 					userQuote
 				),
 				React.createElement(
-					"span",
-					{ className: "text" },
+					'span',
+					{ className: 'text' },
 					textQuote
 				)
 			) : null,
 			isRetweet ? React.createElement(
-				"span",
-				{ className: "retweet" },
+				'span',
+				{ className: 'retweet' },
 				React.createElement(
-					"span",
-					{ className: "username" },
+					'span',
+					{ className: 'username' },
 					userRTed
 				),
 				React.createElement(
-					"span",
-					{ className: "timestamp" },
+					'span',
+					{ className: 'timestamp' },
 					formatTime.relTime(timeRTed)
 				)
 			) : null
@@ -470,7 +385,7 @@ var DtwitObj = React.createClass({
 	}
 });
 var Dtabs = React.createClass({
-	displayName: "Dtabs",
+	displayName: 'Dtabs',
 
 	propTypes: {
 		tlOrder: React.PropTypes.array.isRequired,
@@ -482,36 +397,36 @@ var Dtabs = React.createClass({
 		var _this = this;
 
 		return React.createElement(
-			"section",
-			{ id: "tabs", className: "hl" },
+			'section',
+			{ id: 'tabs', className: 'hl' },
 			this.props.tlOrder.map(function (v, i) {
 				return React.createElement(
-					"span",
+					'span',
 					{ onClick: function onClick() {
 							return _this.props.changeTabFocus(i);
 						}, key: i, className: i === _this.props.tlCurrent ? "chosen" : null },
 					tl.get(v).notifications > 0 ? React.createElement(
-						"span",
-						{ className: "notifications" },
+						'span',
+						{ className: 'notifications' },
 						tl.get(v).notifications
 					) : null,
-					"[",
+					'[',
 					v,
-					"]"
+					']'
 				);
 			}),
 			React.createElement(
-				"span",
+				'span',
 				{ onClick: function onClick() {
 						return _this.props.closeTab(_this.props.tlCurrent);
-					}, id: "close" },
-				"X"
+					}, id: 'close' },
+				'X'
 			)
 		);
 	}
 });
 var Dtweets = React.createClass({
-	displayName: "Dtweets",
+	displayName: 'Dtweets',
 
 	propTypes: {
 		tabName: React.PropTypes.string
@@ -523,10 +438,10 @@ var Dtweets = React.createClass({
  	}
  },*/render: function render() {
 		return React.createElement(
-			"section",
-			{ id: "main" },
+			'section',
+			{ id: 'main' },
 			React.createElement(
-				"div",
+				'div',
 				null,
 				this.props.tabName
 			)
@@ -534,91 +449,108 @@ var Dtweets = React.createClass({
 	}
 });
 var Dcontrols = React.createClass({
-	displayName: "Dcontrols",
+	displayName: 'Dcontrols',
 
 	propTypes: {
 		receivingCommand: React.PropTypes.bool.isRequired,
-		currentLine: React.PropTypes.number,
-		apiCallLeft: React.PropTypes.number
+		currentPosition: React.PropTypes.number,
+		apiCallLeft: React.PropTypes.number,
+		apiCallMax: React.PropTypes.number,
+
+		cmdPrefix: React.PropTypes.string,
+		charCount: React.PropTypes.number,
+		charMax: React.PropTypes.number,
+
+		value: React.PropTypes.string,
+		receiveValueChange: React.PropTypes.func.isRequired
 	},
 	getDefaultProps: function getDefaultProps() {
 		return {
 			receivingCommand: false,
-			currentLine: 0,
-			apiCallLeft: 0
+			currentPosition: 0,
+			apiCallLeft: 0,
+			apiCallMax: 0,
+
+			cmdPrefix: ":",
+			charCount: 0,
+			charMax: 0,
+
+			value: ""
 		};
 	},
 
 	render: function render() {
 		return React.createElement(
-			"section",
-			{ id: "controls" },
+			'section',
+			{ id: 'controls' },
 			React.createElement(
-				"div",
-				{ id: "status" },
+				'div',
+				{ id: 'status' },
 				React.createElement(
-					"div",
-					{ className: "left" },
-					" "
+					'div',
+					{ className: 'left' },
+					' '
 				),
 				React.createElement(
-					"div",
-					{ className: "rightText" },
+					'div',
+					{ className: 'rightText' },
 					React.createElement(
-						"span",
+						'span',
 						{ style: { width: charWidth + "px" } },
-						" "
+						' '
 					),
 					React.createElement(
-						"span",
-						{ id: "currentLine" },
-						this.props.currentLine,
-						"%"
+						'span',
+						{ id: 'currentLine' },
+						this.props.currentPosition,
+						'%'
 					),
 					React.createElement(
-						"span",
-						{ id: "api" },
+						'span',
+						{ id: 'api' },
 						this.props.apiCallLeft,
-						"/",
-						apiCallMax
+						'/',
+						this.props.apiCallMax
 					)
 				)
 			),
 			React.createElement(
-				"div",
-				{ id: "commandInput" },
+				'div',
+				{ id: 'commandInput' },
 				React.createElement(
-					"div",
-					{ id: "commandContext" },
+					'div',
+					{ id: 'commandContext' },
 					React.createElement(
-						"div",
-						{ className: "left" },
-						"replying to",
+						'div',
+						{ className: 'left' },
+						'replying to',
 						React.createElement(
-							"span",
-							{ className: "username" },
-							"DinirNertan"
+							'span',
+							{ className: 'username' },
+							'DinirNertan'
 						),
-						":",
+						':',
 						React.createElement(
-							"span",
-							{ className: "text" },
-							"I ate an ice cream a..."
+							'span',
+							{ className: 'text' },
+							'I ate an ice cream a...'
 						),
 						React.createElement(
-							"div",
-							{ className: "rightText" },
-							"81/140"
+							'div',
+							{ className: 'rightText' },
+							this.props.charCount,
+							'/',
+							this.props.charMax
 						)
 					)
 				),
-				React.createElement("input", { type: "text", id: "query", maxlength: "80" })
+				React.createElement('input', { type: 'text', id: 'query', value: this.props.value, onChange: this.props.receiveValueChange, maxlength: '80' })
 			)
 		);
 	}
 });
 var DimgView = React.createClass({
-	displayName: "DimgView",
+	displayName: 'DimgView',
 
 	propTypes: {
 		show: React.PropTypes.bool
@@ -633,15 +565,299 @@ var DimgView = React.createClass({
 	},
 	render: function render() {
 		return React.createElement(
-			"section",
-			{ id: "imgView" },
+			'section',
+			{ id: 'imgView' },
 			React.createElement(
-				"div",
+				'div',
 				null,
-				React.createElement("img", null)
+				React.createElement('img', null)
 			)
 		);
 	}
+});
+
+var Dmain = React.createClass({
+	displayName: 'Dmain',
+
+	getInitialState: function getInitialState() {
+		return {
+			settings: {},
+			width: 80,
+			height: 24,
+
+			tl: new Map(),
+			tlOrder: [],
+			tlCurrent: 0,
+
+			commandBufferValue: "",
+			receivingCommand: false,
+			lastKeyCode: null,
+
+			cmdPrefix: 0,
+			charCount: 0,
+			charMax: 0,
+			currentPosition: 0,
+			visibleLine: 0,
+			apiCallLeft: 0,
+			apiCallMax: 15
+		};
+	},
+
+	componentWillMount: function componentWillMount() {
+		this.setState(loadSettings());
+		this.cmdresize(this.state.width, this.state.height);
+		document.addEventListener("keydown", this.ctlreceiveKey);
+		document.addEventListener("keyup", this.ctltidyKey);
+		document.body.addEventListener("mousewheel", this.ctlhandleScroll, false);
+	},
+	componentWillUnmount: function componentWillUnmount() {
+		saveSettings(this.state);
+		document.removeEventListener("keydown", this.ctlreceiveKey);
+		document.removeEventListener("keyup", this.ctltidyKey);
+		document.body.removeEventListener("mousewheel", this.ctlhandleScroll, false);
+	},
+
+	render: function render() {
+		return React.createElement(
+			'div',
+			null,
+			this.state.tlOrder.length <= 1 ? null : React.createElement(Dtabs, {
+				changeTabFocus: this.changeTabFocus,
+				closeTab: this.closeTab,
+				tlOrder: this.state.tlOrder,
+				tlCurrent: this.state.tlCurrent
+			}),
+			React.createElement(Dtweets, {
+				tabName: this.state.tlOrder[this.state.tlCurrent]
+			}),
+			React.createElement(Dcontrols, {
+				receivingCommand: this.state.receivingCommand,
+				currentPosition: this.state.currentPosition,
+				cmdPrefix: this.state.cmdPrefix,
+				charCount: this.state.charCount,
+				charMax: this.state.charMax,
+				value: this.state.commandBufferValue,
+				receiveValueChange: this.ctlreceiveValueChange
+			}),
+			React.createElement(DimgView, null)
+		);
+	},
+
+	// command buffer controls
+
+	cmdresize: function cmdresize() {
+		var w = arguments.length <= 0 || arguments[0] === undefined ? this.state.width : arguments[0];
+		var h = arguments.length <= 1 || arguments[1] === undefined ? this.state.height : arguments[1];
+
+		window.resizeTo((w > 12 ? w : 12) * charWidth, (h > 7 ? h : 7) * charHeight);
+		this.setState({ width: w, height: h });
+	},
+	cmdrs: function cmdrs(w, h) {
+		return this.cmdresize(w, h);
+	},
+	cmdadd: function cmdadd(name) {
+		var uri = arguments.length <= 1 || arguments[1] === undefined ? EndpointDefault[name].uri : arguments[1];
+		var pos = arguments[2];
+
+		var param = EndpointDefault[name].param === "undefined" ? {} : EndpointDefault[name].param;
+		tlCon.tab.add(name, uri, param, pos);
+	},
+	executeCommand: function executeCommand(command) {
+		var prefix = command.slice(0, 1);
+		var argv = command.trim().substr(1).split(" ");debugger;
+		switch (prefix) {
+			case ":":
+				this['cmd' + argv.shift()].apply(this, _toConsumableArray(argv));break;
+			case "/":
+				break;
+			case "r":
+				break;
+		}
+	},
+
+	ctlreceiveValueChange: function ctlreceiveValueChange(e) {
+		this.setState({
+			commandBufferValue: e.target.value,
+			cmdPrefix: e.target.value[0],
+			charCount: e.target.value.length
+		});
+	},
+
+	ctlreceiveKey: function ctlreceiveKey(e) {
+		this.setState({ lastKeyCode: e.keyCode });
+		// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
+		//e.preventDefault();
+		// const query = document.getElementById("query");
+
+		// scroll a page when presses 'PgUp/Dn'
+		if (e.keyCode === 33 || e.keyCode === 34) {
+			document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - 2 * charHeight);
+		}
+
+		if (!receivingCommand) {
+			// when the buffer is closed
+			// ':' or '/' to open buffer
+			if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) this.ctltoggleCommand();
+		} else {
+			// when the buffer is open
+
+			// 'esc' or 'enter' to close buffer.
+			if (e.keyCode === 27 || e.keyCode === 13) {
+				if (e.keyCode === 13) {
+					this.executeCommand(this.state.commandBufferValue);debugger;
+				}
+				this.ctltoggleCommand();
+			}
+		}
+	},
+	ctltidyKey: function ctltidyKey() {
+		// const query = document.getElementById("query");
+		// if buffer got emptied after a keypress close it
+		if (!this.state.receivingCommand) {} else {
+			if (this.state.lastKeyCode) if (this.state.commandBufferValue.length === 0) this.ctltoggleCommand();
+		}
+	},
+	ctlhandleScroll: function ctlhandleScroll() {
+		var e = window.event;
+		document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
+		return false;
+	},
+
+	ctltoggleCommand: function ctltoggleCommand() {
+		var status = document.getElementById("status");
+		var commandInput = document.getElementById("commandInput");
+		if (this.state.receivingCommand) {
+			this.state.commandBufferValue = "";
+			status.style.display = "inherit";
+			commandInput.style.display = "none";
+		} else {
+			status.style.display = "none";
+			commandInput.style.display = "inherit";
+			document.getElementById("query").focus();
+		}
+		this.setState(function (ps) {
+			return { receivingCommand: !ps.receivingCommand };
+		});
+	},
+
+	// tab controls
+
+	changeTabFocus: function changeTabFocus(tlOrderNumber) {
+		this.setState({ tlCurrent: tlOrderNumber });
+	},
+	closeTab: function closeTab(currentTabToRemove) {
+		tlCon.tab.remove(tlOrder[currentTabToRemove]);
+		this.setState({
+			tlOrder: tlOrder,
+			tlCurrent: tlCurrent
+		});
+	},
+
+	tab: {
+		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
+		// that parameters also should not be encouraged to be filled manually by users. We will make a dictionary to refer for each of addresses and get needed ones to fill from.
+		add: function add(tabName, address, parameters, position) {
+			if (!tl.has(tabName) && typeof tabName !== "undefined" && tlOrder.indexOf(tabName) === -1) {
+				var v = {
+					type: address,
+					params: parameters,
+					tweets: [],
+					notifications: 0
+				};
+				// if(streamURI.indexOf(tabName)>=0)
+				// 	v.notifications=0;
+				tl.set(tabName, v);
+				if (typeof position === "undefined") tlOrder.push(tabName);else tlOrder.splice(position, 0, tabName);
+				tlCurrent = tlOrder.indexOf(tabName);
+			}
+		},
+		remove: function remove(tabName) {
+			if (tlCurrent > 0 && tlCurrent === tlOrder.length - 1) tlCurrent--;
+			tl.delete(tabName);
+			tlOrder.splice(tlOrder.indexOf(tabName), 1);
+		},
+		flush: function flush(really) {
+			if (really === "y" || really === "Y") tl.forEach(function (v, k) {
+				tl.delete(k);
+			});
+		},
+		rename: function rename(tabName, alterName) {
+			if (typeof tabName !== "undefined" && typeof alterName !== "undefined" && tl.has(tabName) && !tl.has(alterName) && tlOrder.indexOf(tabName) > -1 && tlOrder.indexOf(alterName) === -1) {
+				var contents = tl.get(tabName);
+				tl.set(alterName, contents);
+				tlOrder.splice(tlOrder.indexOf(tabName), 1, alterName);
+				tl.delete(tabName);
+			}
+		},
+		reorder: function reorder(tabName, place, swap) {
+			if (typeof tabName !== "undefined") {
+				if (typeof swap !== "undefined") {
+					var _tlOrder;
+
+					(_tlOrder = tlOrder).splice.apply(_tlOrder, [place, 0].concat(_toConsumableArray(tlOrder.splice(tlOrder.indexOf(tabName), 1))));
+				} else {
+					var placeSwap = tlOrder.indexOf(tabName);
+					tlCon.tab.reorder(tabName, place);
+					tlCon.tab.reorder(tlOrder[place - 1], placeSwap);
+				}
+			}
+		}
+	},
+	recentCall: false,
+	update: function update(tabName, direction, actions) {
+		if (tlCon.recentCall) {} else {
+			(function () {
+				tlCon.recentCall = true;
+				var contents = tl.get(tabName);
+				var tweets = contents.tweets;
+				var params = contents.params;
+				var notifications = contents.notifications;
+
+				// TODO make it check if the type can use `since_id` and `max_id` first.
+				switch (direction) {
+					case 1:
+						if (tweets[0]) {
+							contents.params.since_id = tweets[0].id_str;
+							contents.params.max_id = undefined;
+						}
+						break;
+					case -1:
+						if (tweets[tweets.length - 1]) {
+							contents.params.max_id = tweets[tweets.length - 1].id_str;
+							contents.params.since_id = undefined;
+						}
+						break;
+				}
+
+				t.get(contents.type, params, function (err, data, response) {
+					/*TODO check if received data should attach to or replace the previous data.
+     	for some of the api address the `direction` is meaningless
+     and the data received should replace old data instead of attaching to it.
+     	but we're only testing for home, mention, user timeline at the moment
+     so the default behavior will be adding the data to the old one.*/
+					// TODO learn what errors and response are for.
+					switch (direction) {
+						case 1:
+							contents.tweets = data.concat(tweets);
+							break;
+						case -1:
+							contents.tweets.pop();
+							contents.tweets = tweets.concat(data);
+							break;
+						case 0:
+							// for those which doesn't need previous datas?
+							contents.tweets = data;
+							break;
+					}
+					tl.set(tabName, contents);
+					tlCon.recentCall = false;
+					actions();
+					console.log("done");
+				}); // t.get
+			})();
+		} // if-else tlCon.recentCall
+	} // update
+
 });
 "use strict";
 
@@ -650,16 +866,15 @@ window.onload = function () {
  document.addEventListener("keyup", checkStates);
  document.body.addEventListener("mousewheel", scrollHandler, false);*/
 
-	tlCon.tab.add("Home", 'statuses/home_timeline');
-	tlCon.tab.add("My Tweets", 'statuses/user_timeline', { screen_name: 'NardinRinet' });console.log(tlOrder);
-	//tlCon.update("Home", 1);
+	/*tlCon.tab.add("Home", 'statuses/home_timeline');
+ tlCon.tab.add("My Tweets", 'statuses/user_timeline', {screen_name: 'NardinRinet'}); console.log(tlOrder);
+ //tlCon.update("Home", 1);
+ 	tlCurrent = 0; console.log(tlOrder[tlCurrent]);
+ let test = tl.get("Home");
+ test.tweets = testTweets;
+ tl.set("Home", test);*/
 
-	tlCurrent = 0;console.log(tlOrder[tlCurrent]);
-	var test = tl.get("Home");
-	test.tweets = testTweets;
-	tl.set("Home", test);
-
-	ReactDOM.render(React.createElement(display.Main, null), document.getElementsByTagName("article")[0]);
+	ReactDOM.render(React.createElement(Dmain, null), document.getElementsByTagName("article")[0]);
 };
 
 function scrState(h) {
@@ -697,12 +912,10 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 	}
 ]
  */
-/*
-let tl = new Map();
-let tlOrder = [];
-let tlCurrent = 0;
-const apiCallMax = 15;
-*/
+var tl = new Map();
+// let tlOrder = [];
+// let tlCurrent = 0;
+// const apiCallMax = 15;
 
 var tlCon = {
 	tab: {
@@ -783,9 +996,9 @@ var tlCon = {
 
 				t.get(contents.type, params, function (err, data, response) {
 					/*TODO check if received data should attach to or replace the previous data.
-     for some of the api address the `direction` is meaningless
+     	for some of the api address the `direction` is meaningless
      and the data received should replace old data instead of attaching to it.
-     but we're only testing for home, mention, user timeline at the moment
+     	but we're only testing for home, mention, user timeline at the moment
      so the default behavior will be adding the data to the old one.*/
 					// TODO learn what errors and response are for.
 					switch (direction) {
@@ -810,3 +1023,116 @@ var tlCon = {
 		} // if-else tlCon.recentCall
 	} // update
 };
+
+/*let tlCon = {
+	tab: {
+		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
+		// that parameters also should not be encouraged to be filled manually by users. We will make a dictionary to refer for each of addresses and get needed ones to fill from.
+		add: function(tabName, address, parameters, position) {
+			if(!tl.has(tabName)
+			&& typeof tabName !== "undefined"
+			&& tlOrder.indexOf(tabName) === -1) {
+				let v = {
+					type:address, 
+					params:parameters, 
+					tweets:[],
+					notifications:0
+				};
+				// if(streamURI.indexOf(tabName)>=0)
+				// 	v.notifications=0;
+				tl.set(tabName, v);
+				if(typeof position==="undefined")
+					tlOrder.push(tabName);
+				else
+					tlOrder.splice(position, 0, tabName);
+				tlCurrent = tlOrder.indexOf(tabName);
+			}
+		},
+		remove: function(tabName) {
+			if(tlCurrent>0 &&
+			tlCurrent===tlOrder.length-1)
+				tlCurrent--;
+			tl.delete(tabName);
+			tlOrder.splice(tlOrder.indexOf(tabName),1);
+		},
+		flush: function(really) {
+			if(really === "y" || really === "Y")
+				tl.forEach(function(v, k) {tl.delete(k);})
+		},
+		rename: function(tabName, alterName) {
+			if(typeof tabName !== "undefined"
+			&& typeof alterName !== "undefined"
+			&& tl.has(tabName)
+			&& !tl.has(alterName)
+			&& tlOrder.indexOf(tabName) > -1
+			&& tlOrder.indexOf(alterName) === -1) {
+				let contents = tl.get(tabName);
+				tl.set(alterName, contents);
+				tlOrder.splice(tlOrder.indexOf(tabName), 1, alterName);
+				tl.delete(tabName);
+			}
+		},
+		reorder: function(tabName, place, swap) {
+			if(typeof tabName !== "undefined") {
+				if(typeof swap !== "undefined") {
+					tlOrder.splice(place, 0, ...tlOrder.splice(tlOrder.indexOf(tabName), 1));
+				} else {
+					let placeSwap = tlOrder.indexOf(tabName);
+					tlCon.tab.reorder(tabName, place);
+					tlCon.tab.reorder(tlOrder[place-1], placeSwap);
+				}
+			}
+		}
+	},
+	recentCall: false,
+	update: function(tabName, direction, actions) {
+		if(tlCon.recentCall) {} else {
+			tlCon.recentCall = true;
+			let contents = tl.get(tabName);
+			let tweets = contents.tweets;
+			let params = contents.params;
+			let notifications = contents.notifications;
+
+			// TODO make it check if the type can use `since_id` and `max_id` first.
+			switch(direction) {
+				case 1:
+					if(tweets[0]) {
+						contents.params.since_id = tweets[0].id_str;
+						contents.params.max_id = undefined;
+					}
+					break;
+				case -1:
+					if(tweets[tweets.length-1]) {
+						contents.params.max_id = tweets[tweets.length-1].id_str;
+						contents.params.since_id = undefined;
+					}
+					break;
+			}
+
+			t.get(contents.type, params, function(err,data,response){
+				/!*TODO check if received data should attach to or replace the previous data.
+				for some of the api address the `direction` is meaningless
+				and the data received should replace old data instead of attaching to it.
+				but we're only testing for home, mention, user timeline at the moment
+				so the default behavior will be adding the data to the old one.*!/
+				// TODO learn what errors and response are for.
+				switch(direction) {
+					case 1:
+						contents.tweets = data.concat(tweets);
+						break;
+					case -1:
+						contents.tweets.pop();
+						contents.tweets = tweets.concat(data);
+						break;
+					case 0: // for those which doesn't need previous datas?
+						contents.tweets = data;
+						break;
+				}
+				tl.set(tabName, contents);
+				tlCon.recentCall = false;
+				actions();
+				console.log("done");
+			}); // t.get
+		} // if-else tlCon.recentCall
+	} // update
+};*/

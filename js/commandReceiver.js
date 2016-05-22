@@ -54,7 +54,7 @@ const handleScroll = () => {
 */
 
 // it toggles what the bottom line shows every time it's invoked.
-const ctl = {
+/*const ctl = {
 	receiveKey: e => {
 		lastKeyCode = e.keyCode;
 		// console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
@@ -110,4 +110,4 @@ const ctl = {
 		}
 		receivingCommand = !receivingCommand;
 	}
-};
+};*/
