@@ -48,9 +48,15 @@ const formatTime = {
 	}
 };
 
+// TODO make contents type, so it can tell the thing it is about to render is whether a tweet, a message frame, or anything other.
+// make separate routines for each case of types, let them prepare rendering stuff, put the result in render function.
+// I might need to use `ComponentWillReceiveProps` or something.
 const DtwitObj = React.createClass({
 	propTypes: {
 		raw: React.PropTypes.object.isRequired
+	},
+	renderTwit: function() {
+
 	},
 	render: function() {
 		const raw = this.props.raw;
@@ -140,7 +146,7 @@ const DtwitObj = React.createClass({
 		);
 	}
 });
-const Dtabs =  React.createClass({
+const Dtabs = React.createClass({
 	propTypes: {
 		tlOrder: React.PropTypes.array.isRequired,
 		tlCurrent: React.PropTypes.number,
@@ -166,15 +172,17 @@ const Dtabs =  React.createClass({
 		)
 	}
 });
-const Dtweets = React.createClass({
+const Dcontent = React.createClass({
 	propTypes: {
-		tabName: React.PropTypes.string
+		isTweets: React.PropTypes.bool.isRequired,
+		needThreadFor: React.PropTypes.array,
+		currentTweets: React.PropTypes.array
 	},
-	/*update: function() {
-		if(tl.get(this.props.tabName).tweets.length===0) {
-			tlCon.update(this.props.tabName, 1, )
-		}
-	},*/
+	getDefaultProps: () => ({
+		isTweets: false,
+		needThreadFor: [],
+		currentTweets: []
+	}),
 	render: function() {
 		return (
 			<section id="main">
@@ -196,28 +204,29 @@ const Dtweets = React.createClass({
 const Dcontrols = React.createClass({
 	propTypes: {
 		receivingCommand: React.PropTypes.bool.isRequired,
+		value: React.PropTypes.string,
+		receiveValueChange: React.PropTypes.func.isRequired,
+
 		currentPosition: React.PropTypes.number,
 		apiCallLeft: React.PropTypes.number,
 		apiCallMax: React.PropTypes.number,
 
 		cmdPrefix: React.PropTypes.string,
 		charCount: React.PropTypes.number,
-		charMax: React.PropTypes.number,
-
-		value: React.PropTypes.string,
-		receiveValueChange: React.PropTypes.func.isRequired
+		charMax: React.PropTypes.string
 	},
 	getDefaultProps: () => ({
 		receivingCommand: false,
+		value: "",
+
 		currentPosition: 0,
 		apiCallLeft: 0,
 		apiCallMax: 0,
 
 		cmdPrefix: ":",
 		charCount: 0,
-		charMax: 0,
+		charMax: 0
 
-		value: ""
 	}),
 
 	render: function() {
@@ -234,9 +243,7 @@ const Dcontrols = React.createClass({
 				<div id="commandInput">
 					<div id="commandContext">
 						<div className="left">
-							replying to
-							<span className="username">DinirNertan</span>:
-							<span className="text">I ate an ice cream a...</span>
+							<span className="text">{this.props.context}</span>
 							<div className="rightText">
 								{this.props.charCount}/{this.props.charMax}
 							</div>
@@ -271,25 +278,26 @@ const DimgView = React.createClass({
 
 const Dmain = React.createClass({
 	getInitialState: () => ({
-		settings: {},
 		width: 80,
 		height: 24,
 
 		tl: new Map(),
 		tlOrder: [],
 		tlCurrent: 0,
+		twitsNeedingThread: [],
 
 		commandBufferValue: "",
 		receivingCommand: false,
 		lastKeyCode: null,
 
-		cmdPrefix: 0,
-		charCount: 0,
-		charMax: 0,
 		currentPosition: 0,
 		visibleLine: 0,
 		apiCallLeft: 0,
-		apiCallMax: 15
+		apiCallMax: 15,
+
+		cmdPrefix: "",
+		charCount: 0,
+		charMax: "0",
 	}),
 
 	componentWillMount: function() {
@@ -309,18 +317,15 @@ const Dmain = React.createClass({
 	render: function() {
 		return (
 			<div>
-				{
-					this.state.tlOrder.length<=1?
-					null:
-					<Dtabs
-						changeTabFocus={this.changeTabFocus}
-						closeTab={this.closeTab}
-						tlOrder={this.state.tlOrder}
-						tlCurrent={this.state.tlCurrent}
-					/>
-				}
-				<Dtweets
-					tabName={this.state.tlOrder[this.state.tlCurrent]}
+				<Dtabs
+					hidden={this.state.tlOrder.length<=1}
+					changeTabFocus={this.changeTabFocus}
+					closeTab={this.closeTab}
+					tlOrder={this.state.tlOrder}
+					tlCurrent={this.state.tlCurrent}
+				/>
+				<Dcontent
+				  needThreadFor={this.state.twitsNeedingThread}
 				/>
 				<Dcontrols
 					receivingCommand={this.state.receivingCommand}
@@ -418,6 +423,16 @@ const Dmain = React.createClass({
 			document.getElementById("query").focus();
 		}
 		this.setState(function(ps){return {receivingCommand: !ps.receivingCommand}});
+	},
+
+	// command buffer informations
+
+	setCharMax: function() {
+		switch(this.state.cmdPrefix) {
+			case ":": this.setState({charMax: 0}); break;
+			case "/": this.setState({charMax: 0}); break;
+			case "r": this.setState({charMax: 140}); break;
+		}
 	},
 
 	// tab controls

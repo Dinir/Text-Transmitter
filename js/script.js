@@ -269,12 +269,16 @@ var formatTime = {
 	}
 };
 
+// TODO make contents type, so it can tell the thing it is about to render is whether a tweet, a message frame, or anything other.
+// make separate routines for each case of types, let them prepare rendering stuff, put the result in render function.
+// I might need to use `ComponentWillReceiveProps` or something.
 var DtwitObj = React.createClass({
 	displayName: 'DtwitObj',
 
 	propTypes: {
 		raw: React.PropTypes.object.isRequired
 	},
+	renderTwit: function renderTwit() {},
 	render: function render() {
 		var raw = this.props.raw;
 		var timestamp = formatTime.init(raw.created_at);
@@ -425,18 +429,22 @@ var Dtabs = React.createClass({
 		);
 	}
 });
-var Dtweets = React.createClass({
-	displayName: 'Dtweets',
+var Dcontent = React.createClass({
+	displayName: 'Dcontent',
 
 	propTypes: {
-		tabName: React.PropTypes.string
+		isTweets: React.PropTypes.bool.isRequired,
+		needThreadFor: React.PropTypes.array,
+		currentTweets: React.PropTypes.array
 	},
-
-	/*update: function() {
- 	if(tl.get(this.props.tabName).tweets.length===0) {
- 		tlCon.update(this.props.tabName, 1, )
- 	}
- },*/render: function render() {
+	getDefaultProps: function getDefaultProps() {
+		return {
+			isTweets: false,
+			needThreadFor: [],
+			currentTweets: []
+		};
+	},
+	render: function render() {
 		return React.createElement(
 			'section',
 			{ id: 'main' },
@@ -453,29 +461,30 @@ var Dcontrols = React.createClass({
 
 	propTypes: {
 		receivingCommand: React.PropTypes.bool.isRequired,
+		value: React.PropTypes.string,
+		receiveValueChange: React.PropTypes.func.isRequired,
+
 		currentPosition: React.PropTypes.number,
 		apiCallLeft: React.PropTypes.number,
 		apiCallMax: React.PropTypes.number,
 
 		cmdPrefix: React.PropTypes.string,
 		charCount: React.PropTypes.number,
-		charMax: React.PropTypes.number,
-
-		value: React.PropTypes.string,
-		receiveValueChange: React.PropTypes.func.isRequired
+		charMax: React.PropTypes.string
 	},
 	getDefaultProps: function getDefaultProps() {
 		return {
 			receivingCommand: false,
+			value: "",
+
 			currentPosition: 0,
 			apiCallLeft: 0,
 			apiCallMax: 0,
 
 			cmdPrefix: ":",
 			charCount: 0,
-			charMax: 0,
+			charMax: 0
 
-			value: ""
 		};
 	},
 
@@ -523,17 +532,10 @@ var Dcontrols = React.createClass({
 					React.createElement(
 						'div',
 						{ className: 'left' },
-						'replying to',
-						React.createElement(
-							'span',
-							{ className: 'username' },
-							'DinirNertan'
-						),
-						':',
 						React.createElement(
 							'span',
 							{ className: 'text' },
-							'I ate an ice cream a...'
+							this.props.context
 						),
 						React.createElement(
 							'div',
@@ -581,25 +583,26 @@ var Dmain = React.createClass({
 
 	getInitialState: function getInitialState() {
 		return {
-			settings: {},
 			width: 80,
 			height: 24,
 
 			tl: new Map(),
 			tlOrder: [],
 			tlCurrent: 0,
+			twitsNeedingThread: [],
 
 			commandBufferValue: "",
 			receivingCommand: false,
 			lastKeyCode: null,
 
-			cmdPrefix: 0,
-			charCount: 0,
-			charMax: 0,
 			currentPosition: 0,
 			visibleLine: 0,
 			apiCallLeft: 0,
-			apiCallMax: 15
+			apiCallMax: 15,
+
+			cmdPrefix: "",
+			charCount: 0,
+			charMax: "0"
 		};
 	},
 
@@ -621,14 +624,15 @@ var Dmain = React.createClass({
 		return React.createElement(
 			'div',
 			null,
-			this.state.tlOrder.length <= 1 ? null : React.createElement(Dtabs, {
+			React.createElement(Dtabs, {
+				hidden: this.state.tlOrder.length <= 1,
 				changeTabFocus: this.changeTabFocus,
 				closeTab: this.closeTab,
 				tlOrder: this.state.tlOrder,
 				tlCurrent: this.state.tlCurrent
 			}),
-			React.createElement(Dtweets, {
-				tabName: this.state.tlOrder[this.state.tlCurrent]
+			React.createElement(Dcontent, {
+				needThreadFor: this.state.twitsNeedingThread
 			}),
 			React.createElement(Dcontrols, {
 				receivingCommand: this.state.receivingCommand,
@@ -738,6 +742,19 @@ var Dmain = React.createClass({
 		this.setState(function (ps) {
 			return { receivingCommand: !ps.receivingCommand };
 		});
+	},
+
+	// command buffer informations
+
+	setCharMax: function setCharMax() {
+		switch (this.state.cmdPrefix) {
+			case ":":
+				this.setState({ charMax: 0 });break;
+			case "/":
+				this.setState({ charMax: 0 });break;
+			case "r":
+				this.setState({ charMax: 140 });break;
+		}
 	},
 
 	// tab controls
@@ -917,7 +934,20 @@ var tl = new Map();
 // let tlCurrent = 0;
 // const apiCallMax = 15;
 
-var tlCon = {
+// TODO make a class controlling tls, and let them render browser sections by their own. and I will take this into Main class.
+var tlCon = React.createClass({
+	displayName: "tlCon",
+
+	propTypes: {},
+	getInitialState: function getInitialState() {
+		return {};
+	},
+	render: function render() {
+		return null;
+	}
+});
+
+var tlCon2 = {
 	tab: {
 		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
 		// that parameters also should not be encouraged to be filled manually by users. We will make a dictionary to refer for each of addresses and get needed ones to fill from.

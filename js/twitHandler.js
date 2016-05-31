@@ -14,7 +14,19 @@ let tl = new Map();
 // let tlCurrent = 0;
 // const apiCallMax = 15;
 
-const tlCon = {
+// TODO make a class controlling tls, and let them render browser sections by their own. and I will take this into Main class.
+const tlCon = React.createClass({
+	propTypes: {
+	},
+	getInitialState: () => ({
+	}),
+	render: function() {
+		return (null
+		)
+	}
+});
+
+const tlCon2 = {
 	tab: {
 		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
 		// that parameters also should not be encouraged to be filled manually by users. We will make a dictionary to refer for each of addresses and get needed ones to fill from.
