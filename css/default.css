@@ -1,4 +1,7 @@
 @charset "UTF-8";
+abc {
+  color: #def; }
+
 body {
   background-color: #000000;
   color: #ffffff;
