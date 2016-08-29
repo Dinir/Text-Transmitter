@@ -1,15 +1,5 @@
-node_modules/
-css/*.map
 js/twit.js
 npm-debug.log
 js/SampleTimeline.js
-# automatic backup things.
-*~
-*.swp
-.*.swp
-*.swo
-.*.swo
-# WebStorm should be awesome but I don't want to carry their settings here.
-# Also File Explorer setting won't be needed in the repo.
-.idea/*
-.directory
+ignoreme.txt
+frame.html

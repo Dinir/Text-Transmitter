@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="textTransmitter">
+<html>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport"
@@ -16,33 +16,36 @@
 		<link rel="stylesheet" href="./css/default.css"><!--
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js"></script>-->
-		<script src="./node_modules/angular/angular.js"></script>
 		<script src="./js/script.js"></script>
 		<script>
 
 		</script>
 	</head>
 
-	<body ng-app="textTransmitter">
+	<body>
 		<article>
-			<section id="tabs" class="hl" ng-controller="tabCtrl as tc">&nbsp;
-				<span ng-repeat="t in tc.tl"><span class="notify" ng-show="">{{t.notifications}}</span>[{{t.name}}]</span>
-				<span id="close" ng-click="">X</span>
+			<section id="tabs" class="hl">&nbsp;
+				<span><span class="notify">6</span>[Mention]</span>
+				<span class="chosen">[Home]</span>
+				<span>[My Tweets]</span>
+				<span>[Favorites]</span>
+				<span>[Game Developers]</span>
+				<span id="close">X</span>
 			</section>
-			<section id="main" ng-controller="contentsCtrl as cc">
-				<div ng-repeat="c in cc.contents">
+			<section id="main">
+				<div>
 					<span class="timestamp">23:15</span>
-					<span class="username reply pinged">Nardin</span>
+					<span class="username reply pinged">x_nuk</span>
 					<span class="text">@DinirNertan OH YEAH I'M SO AWESOME</span>
 				</div>
 				<div>
 					<span class="timestamp">23:14</span>
 					<span class="username reply">DinirNertan</span>
-					<span class="text">You crashed {{'every ' + 'of '}}the timestamp. Yes, you crashed it. @Nardin <span class="link">pic.twitter.com/TzIIyhA3Pf</span></span>
+					<span class="text">You crashed the timestamp. Yes, you crashed it. @x_nuk <span class="link">pic.twitter.com/TzIIyhA3Pf</span></span>
 				</div>
 				<div>
 					<span class="timestamp">23:12</span>
-					<span class="username reply pinged">Nardin</span>
+					<span class="username reply pinged">x_nuk</span>
 					<span class="text">@DinirNertan u ate an lorem ipsum and it was not lorem ipsum u ate an lorem ipsum and it was not lorem ipsum u ate an lorem ipsum and it was</span>
 				</div>
 				<div>
