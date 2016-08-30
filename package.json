@@ -4,13 +4,12 @@
   "main": "./main.js",
   "scripts": {
     "start": "./node_modules/.bin/electron .",
-    "buildscripts": "babel js/ --out-file js/script.js --ignore=js/script.js",
+    "buildscripts": "babel js --out-file js/script.js --ignore=js/script.js",
     "gencss": "sass --update scss:css",
     "electron-rebuild": "electron-rebuild"
   },
   "devDependencies": {
-    "babel-cli": "^6.0.0",
-    "gencss": "sass --update scss:css",
+    "babel-cli": "^6.14.0",
     "electron-prebuilt": "^0.37.7"
   },
   "dependencies": {

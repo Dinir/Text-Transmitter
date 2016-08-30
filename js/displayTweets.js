@@ -14,7 +14,7 @@ const hlsearch = (container, what, spanClass) => {
 
 // quick dom creator
 // accept tag, [classname, id], innerHTML.
-const dh = {
+/*const dh = {
 	element: function(tag, names, inner) {
 		let newOne = document.createElement(tag);
 		if(names.constructor === Array) {
@@ -30,7 +30,45 @@ const dh = {
 		};
 		return newOne;
 	}
+};*/
+
+const dobj = function(tag, names, inner, children) {
+	let newOne = document.createElement(tag);
+
+	if(names.constructor === Array) {
+		names[0]? newOne.className = names[0]:"";
+		names[1]? newOne.id = names[1]:"";
+	} else
+		newOne.className = names;
+
+	inner? newOne.innerHTML = inner:"";
+
+	// custom methods and properties goes below here
+	newOne.appendChildren = function(c) {
+		for(let i in arguments)
+			newOne.appendChild(arguments[i]);
+	};
+	if(children) {
+		if(children.constructor === Array)
+			newOne.appendChildren(...children);
+		else
+			newOne.appendChild(children);
+	}
+
+	return newOne;
 };
+
+/*var h = domObj("div","name","Root",[
+	domObj("span","desc"," : Description for root"),
+	domObj("ul","sub","Name of a sublist",[
+		domObj("li","name","List item 1",
+			domObj("span","desc"," : Description for List item 1")
+		),
+		domObj("li","name","List item 2",
+			domObj("span","desc"," : Description for List item 2")
+		)
+	])
+]);*/
 
 const display = {
 	twitObj: function(raw) {
@@ -78,63 +116,40 @@ const display = {
 			// 		url:v.media_url_https
 			// 	}
 			// });
-			raw.extended_entities.media.forEach(
-				v => {
-					manipulationIndices.push([
-						...v.indices,
-						(
-							1
-						)
-					]);
-				}
-			);
+			// raw.extended_entities.media.forEach(
+			// 	v => {
+			// 		manipulationIndices.push([
+			// 			...v.indices,
+			// 			(
+			// 				1
+			// 			)
+			// 		]);
+			// 	}
+			// );
 		}
 		if(hasLink) {
 			
 		}
 		
-		let dom = new dh.element(
-			"div", ["twitObj", id]
-		);
-		let domTimestamp = new dh.element(
-			"span", "timestamp", timestamp
-		);
-		let domUsername = new dh.element(
-			"span", `username${isReply?" reply":""}${doesPing?" ping":""}`, username
-		);
-		let domText = new dh.element(
-			"pre", "text", text
-		);
-		dom.appendChildren(domTimestamp, domUsername, domText);
-		if(isRetweet) {
-			let domRT = new dh.element(
-				"span", "retweet"
-			);
-			let domRTuser = new dh.element(
-				"span", "username", userRTed
-			);
-			let domRTtime = new dh.element(
-				"span", "timestamp", timeRTed
-			);
-			domRT.appendChildren(domRTuser, domRTtime);
-			dom.appendChild(domRT);
-		}
-		if(isQuote) {
-			let domQT = new dh.element(
-				"span", "retweet"
-			);
-			let domQTtime = new dh.element(
-				"span", "timestamp", timeQuote
-			);
-			let domQTuser = new dh.element(
-				"span", "username", userQuote
-			);
-			let domQTtext = new dh.element(
-				"pre", "text", textQuote
-			);
-			domQT.appendChildren(domQTtime, domQTuser, domQTtext);
-			dom.appendChild(domQT);
-		}
+		const dom = dobj("div",["twitObj",id],"",[
+			dobj("span","timestamp",timestamp),
+			dobj("span",`username${isReply?" reply":""}${doesPing?" ping":""}`,username),
+			dobj("pre","text",text)
+		]);
+		if(isRetweet) { dom.appendChild(
+			dobj("span","retweet","",[
+				dobj("span","username",userRTed),
+				dobj("span","timestamp",timeRTed)
+			])
+		)}
+		if(isQuote) { dom.appendChild(
+			dobj("span","quote","",[
+				dobj("span","timestamp",timeQuote),
+				dobj("span","username",userQuote),
+				dobj("pre","text",textQuote)
+			])
+		)}
+		
 		return dom;
 	},
 	tabObj: function(tlOrder) {
