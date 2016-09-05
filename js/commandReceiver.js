@@ -66,6 +66,7 @@ const ctl = {
 	}
 };
 
+// makes it so body scrolls 3 lines at a time.
 const scrollHandler = () => {
 	const e = window.event;
 	document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;

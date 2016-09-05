@@ -15,30 +15,47 @@ let tl = new Map();
 let tlOrder = [];
 let tlCurrent = 0;
 
-const streamURI = [
-	'statuses/filter',
-	'statuses/sample',
-	'statuses/firehose',
-	'user',
-	'site','1'
-];
+const URI = {
+	"Mention":'statuses/mentions_timeline',
+	"User":'statuses/user_timeline',
+	"Home":'statuses/home_timeline',
+	"RTed":'statuses/retweets_of_me',
+	"DM Sent":'direct_messages/sent',
+	"Search":'search/tweets',
+	"DM":'direct_messages',
+	"L":'lists/statuses'
+};
+const streamURI = {
+	"Filter":'statuses/filter',
+	"Sample":'statuses/sample',
+	"User":'user'
+};
 
 let tlCon = {
 	tab: {
 		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
 		// that parameters also should not be encouraged to be filled manually by users. We will make a dictionary to refer for each of addresses and get needed ones to fill from.
-		add: function(tabName, address, parameters, position) {
+		add: function(nameAndAddress, parameters, position) {
+			let tabName, address;
+			if(nameAndAddress.constructor === Array) {
+				tabName = nameAndAddress[0];
+				nameAndAddress[1]? address = nameAndAddress[1]:"";
+			} else {
+				tabName = nameAndAddress;
+				if(URI[nameAndAddress]) address = URI[nameAndAddress];
+				else console.error("Need to specify the URI.");
+			}
 			if(!tl.has(tabName)
 			&& typeof tabName !== "undefined"
 			&& tlOrder.indexOf(tabName) === -1) {
-				let v = {
-					type:address, 
-					params:parameters, 
+				let newTabFrame = {
+					type:address,
+					params:parameters,
 					tweets:[]
 				};
-				if(streamURI.indexOf(tabName)>=0)
-					v.notifications=0;
-				tl.set(tabName, v);
+				if(streamURI.hasOwnProperty(tabName))
+					newTabFrame.notifications=0;
+				tl.set(tabName, newTabFrame);
 				if(typeof position==="undefined")
 					tlOrder.push(tabName);
 				else
@@ -80,9 +97,16 @@ let tlCon = {
 	},
 	recentCall: false,
 	update: function(tabName, direction) {
-		if(tlCon.recentCall) {} else {
+		if(tlCon.recentCall) {} else if(direction) {
+			let contents;
+			if(tabName) contents = tl.get(tabName);
+			else if(tl.has("Home")) contents = tl.get("Home");
+			else {
+				console.error("Specify the tab to update.");
+				return;
+			}
+			
 			tlCon.recentCall = true;
-			let contents = tl.get(tabName);
 			let tweets = contents.tweets;
 			let params = contents.params;
 
@@ -99,22 +123,23 @@ let tlCon = {
 			}
 
 			t.get(contents.type, params, function(err,data,response){
+				// TODO learn what errors and response are for.
 				/*TODO check if received data should attach to or replace the previous data.
 				for some of the api address the `direction` is meaningless
 				and the data received should replace old datas instead of attaching to it.
 				but we're only testing for home, mention, user timeline at the moment
 				so the default behavior will be adding the data to the old one.*/
-				// TODO learn what errors and response are for.
+				data = data.map(c => new display.twitObj(c));
 				switch(direction) {
 					case 1:
-						tweets = data.concat(tweets);
+						contents.tweets = data.concat(tweets);
 						break;
 					case -1:
-						tweets.pop();
-						tweets = tweets.concat(data);
+						contents.tweets.pop();
+						contents.tweets = tweets.concat(data);
 						break;
 					case 0: // for those which doesn't need previous datas?
-						tweets = data;
+						contents.tweets = data;
 						break;
 				}
 				tl.set(tabName, contents);
@@ -123,27 +148,3 @@ let tlCon = {
 		} // if-else tlCon.recentCall
 	} // update
 };
-
-/*
-window.onload = () => {
-
-	tlCon.tab.add("Home", 'statuses/home_timeline');
-	tlCon.tab.add("My Tweets", 'statuses/user_timeline', {screen_name: 'NardinRinet'}); console.log(tlOrder);
-	ReactDOM.render(
-		<div>
-			<display.tabs tlOrderArray={tlOrder} />
-			<section id="main">
-				{testTweets.map(
-					(v,i) => {
-						return (
-							<display.twitObj key={i} raw={v} />
-						)
-					}
-				)}
-			</section>
-			
-		</div>
-		, document.body.getElementsByTagName("article")[0]
-	)
-};
-*/

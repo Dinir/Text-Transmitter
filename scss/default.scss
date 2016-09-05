@@ -106,7 +106,7 @@ section#main {
 		.username {
 			font-weight: bold;
 			&.reply {
-				&:before {
+				&:after {
 					content: "￫";
 				}
 			}
@@ -117,8 +117,10 @@ section#main {
 				text-decoration: underline;
 			}
 		}
-		.text {
+		pre.text {
 			@include addBlank(true, false);
+			display: inline; // removes line break at the start of pre
+			white-space: pre-wrap; // properly wrap texts inside the area
 			.link {
 				color: $blu;
 				&:hover {
@@ -127,7 +129,7 @@ section#main {
 			}
 		}
 		.timestamp {
-			display: inline-block;
+			display: inline;
 			//width: $charWidth*6;
 			clear: left;
 			color: $lgry;
@@ -160,6 +162,10 @@ section#main {
 				clear: none;
 				color: inherit;
 				text-indent: 0;
+			}
+			.text {
+				display: inline-block;
+				text-indent: -8px;
 			}
 		}
 		&.cursor {

@@ -71,22 +71,25 @@ section#main {
   margin: 15px 0; }
   section#main div .username {
     font-weight: bold; }
-    section#main div .username.reply:before {
+    section#main div .username.reply:after {
       content: "￫"; }
     section#main div .username.pinged {
       color: #fce94f; }
     section#main div .username:hover {
       text-decoration: underline; }
-  section#main div .text:before {
-    content: " "; }
-  section#main div .text:after {
-    content: none; }
-  section#main div .text .link {
-    color: #3465a4; }
-    section#main div .text .link:hover {
-      text-decoration: underline; }
+  section#main div pre.text {
+    display: inline;
+    white-space: pre-wrap; }
+    section#main div pre.text:before {
+      content: " "; }
+    section#main div pre.text:after {
+      content: none; }
+    section#main div pre.text .link {
+      color: #3465a4; }
+      section#main div pre.text .link:hover {
+        text-decoration: underline; }
   section#main div .timestamp {
-    display: inline-block;
+    display: inline;
     clear: left;
     color: #d3d7cf; }
     section#main div .timestamp:before {
@@ -118,6 +121,9 @@ section#main {
       clear: none;
       color: inherit;
       text-indent: 0; }
+    section#main div .quote .text {
+      display: inline-block;
+      text-indent: -8px; }
   section#main div.cursor {
     background-color: #555753; }
 

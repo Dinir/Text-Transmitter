@@ -86,8 +86,11 @@ const scrollHandler = () => {
 };
 let moment = require('moment');
 
-// use moment to store timestamp
-// var test = moment(tss[15].created_at, "ddd MMM D H:mm:ss Z YYYY")
+const storeTimestamp = rawTs => moment(rawTs, "ddd MMM D H:mm:ss Z YYYY");
+const simplifyTimestamp = ts => ts.fromNow(true).replace(/a few/, "<1").replace(/^an?/, "1").replace(/\s/, "").replace(/seconds|minutes?/, "m").replace(/hours?/, "h").replace(/days?/, "d").replace(/months?/, "M").replace(/years?/, "y");
+
+// moment().diff(ts, days') // yields 1 if now and ts are at least 1 days far.
+
 /*
 const hlsearch = (container, what, spanClass) => {
 	let content = container.innerHTML,
@@ -98,64 +101,11 @@ const hlsearch = (container, what, spanClass) => {
 }
 */
 
-// quick dom creator
-// accept tag, [classname, id], innerHTML.
-/*const dh = {
-	element: function(tag, names, inner) {
-		let newOne = document.createElement(tag);
-		if(names.constructor === Array) {
-			names[0]? newOne.className = names[0]:"";
-			names[1]? newOne.id = names[1]:"";
-		} else
-			newOne.className = names;
-		inner? newOne.innerHTML = inner:"";
-		// custom methods and properties goes below here
-		newOne.appendChildren = function(children) {
-			for(let i in arguments)
-				newOne.appendChild(arguments[i]);
-		};
-		return newOne;
-	}
-};*/
-
-const dobj = function (tag, names, inner, children) {
-	let newOne = document.createElement(tag);
-
-	if (names.constructor === Array) {
-		names[0] ? newOne.className = names[0] : "";
-		names[1] ? newOne.id = names[1] : "";
-	} else newOne.className = names;
-
-	inner ? newOne.innerHTML = inner : "";
-
-	// custom methods and properties goes below here
-	newOne.appendChildren = function (c) {
-		for (let i in arguments) newOne.appendChild(arguments[i]);
-	};
-	if (children) {
-		if (children.constructor === Array) newOne.appendChildren(...children);else newOne.appendChild(children);
-	}
-
-	return newOne;
-};
-
-/*var h = domObj("div","name","Root",[
-	domObj("span","desc"," : Description for root"),
-	domObj("ul","sub","Name of a sublist",[
-		domObj("li","name","List item 1",
-			domObj("span","desc"," : Description for List item 1")
-		),
-		domObj("li","name","List item 2",
-			domObj("span","desc"," : Description for List item 2")
-		)
-	])
-]);*/
-
 const display = {
 	twitObj: function (raw) {
 		// store default permanent data
 		const id = raw.id_str;
-		let timestamp = raw.created_at;
+		let timestamp = storeTimestamp(raw.created_at);
 		let username = raw.user.screen_name;
 		let text = raw.text;
 
@@ -170,20 +120,40 @@ const display = {
 		let doesPing = false;
 		let repliedTo = ['', '']; // type(username?status?), address
 
-		// make additional data related to the default data if needed		
+		// make additional data related to the default data if needed
+		console.log(raw);
+		let userRTed, timeRTed, timeQuote, userQuote, textQuote;
 		if (raw.entities.user_mentions.length > 0) {}
 		if (raw.in_reply_to_status_id_str !== null) {}
 		if (isRetweet) {
-			let userRTed = username;
-			let timeRTed = timestamp;
-			timestamp = "00:01"; //raw.retweeted_status.created_at;
+			userRTed = username;
+			timeRTed = timestamp;
+			timestamp = storeTimestamp(raw.retweeted_status.created_at);
 			username = raw.retweeted_status.user.screen_name;
 			text = raw.retweeted_status.text;
 		}
 		if (isQuote) {
-			let timeQuote = "00:02"; //raw.quoted_status.created_at;
-			let userQuote = raw.quoted_status.user.screen_name;
-			let textQuote = raw.quoted_status.text;
+			if (raw.quoted_status) {
+				timeQuote = storeTimestamp(raw.quoted_status.created_at);
+				userQuote = raw.quoted_status.user.screen_name;
+				textQuote = raw.quoted_status.text;
+			} else if (raw.retweeted_status && raw.retweeted_status.quoted_status) {
+				timeQuote = storeTimestamp(raw.retweeted_status.quoted_status.created_at);
+				userQuote = raw.retweeted_status.quoted_status.user.screen_name;
+				textQuote = raw.retweeted_status.quoted_status.text;
+				// it'll do the multiple quote tweet display.
+				/*} else if(raw.entities.urls.length !== 0) {
+    	const urls = raw.entities.urls;
+    	const isItStatusUrl = /https:\/\/twitter.com\/.*\/status\/\d*/ /*;
+                                                                    if(urls.map(function(o){return o.expanded_url}).join().search(isItStatusUrl) !== -1) {
+                                                                    timeQuote = [];
+                                                                    userQuote = [];
+                                                                    textQuote = [];
+                                                                    for(let i = 0; i<urls.length; i++) {
+                                                                    }
+                                                                    }
+                                                                    */
+			}
 		}
 		if (hasImage) {
 			// let images = raw.extended_entities.media.map(function(v) {
@@ -206,39 +176,105 @@ const display = {
 		}
 		if (hasLink) {}
 
-		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "timestamp", timestamp), dobj("span", `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`, username), dobj("pre", "text", text)]);
-		if (isRetweet) {
-			dom.appendChild(dobj("span", "retweet", "", [dobj("span", "username", userRTed), dobj("span", "timestamp", timeRTed)]));
+		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "timestamp", simplifyTimestamp(timestamp)), dobj("span", `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`, username), dobj("pre", "text", text)]);
+		if (isQuote && (raw.quoted_status || raw.retweeted_status && raw.retweeted_status.quoted_status)) {
+			dom.appendChild(dobj("span", "quote", "", [dobj("span", "timestamp", simplifyTimestamp(timeQuote)), dobj("span", "username", userQuote), dobj("pre", "text", textQuote)]));
 		}
-		if (isQuote) {
-			dom.appendChild(dobj("span", "quote", "", [dobj("span", "timestamp", timeQuote), dobj("span", "username", userQuote), dobj("pre", "text", textQuote)]));
+		if (isRetweet) {
+			dom.appendChild(dobj("span", "retweet", "", [dobj("span", "username", userRTed), dobj("span", "timestamp", simplifyTimestamp(timeRTed))]));
 		}
 
 		return dom;
 	},
 	tabObj: function (tlOrder) {
-		this.update = function () {
-
-			this.updateNotification();
+		let dom = dobj("section", ["hl", "tabs"], "");
+		let notis = tlOrder.map(v => tl.get(v).notifications);
+		dom.tabs = [];
+		dom.init = function () {
+			for (let i = 0; i < tlOrder.length; i++) {
+				if (notis[i]) {
+					let nt = dobj("span", [i === tlCurrent ? "chosen" : "", `tabs${ i }`], "", [dobj("span", [], notis[i])]);
+					nt.innerHTML += tlOrder[i];
+					dom.tabs.push(nt);
+				} else {
+					dom.tabs.push(dobj("span", [i === tlCurrent ? "chosen" : "", `tabs${ i }`], tlOrder[i]));
+				}
+			}
+			dom.tabs.push(dobj("span", [, "close"], "X"));
+			dom.appendChildren(...dom.tabs);
+			document.body.firstElementChild.replaceChild(dom, document.getElementById("tabs"));
 		};
-		this.updateNotification = function () {};
-		this.update();
-
-		let dom = dh.element("section", ["hl", "tabs"]);
+		dom.updateNotification = function () {};
+		//dom.update();
 		return dom;
 	}
 };
+
+/*
+test script:
+
+var twitDoms = []; var twts = []; t.get('statuses/user_timeline', {}, function(e,d,r){ twts=d; for(var i=0;i<twts.length;i++) twitDoms[i] = new display.twitObj(twts[i]); console.log('done'); });
+*/
 window.onload = () => {
 	document.addEventListener("keydown", keyPress);
 	document.addEventListener("keyup", checkStates);
 	document.body.addEventListener("mousewheel", scrollHandler, false);
+	//test scripts
+	tlCon.tab.add("Home", {});
+	tlCon.tab.add("Mention", {}, 0);
 };
-var Twit = require('twit');
-var t = new Twit({
-	consumer_key: 'xnUHcbRQGzwW1X0eeq2tonOvO',
-	consumer_secret: '	gHhGwNK4pjdNVq9qRgZM5yFSLLr92AnrzsTPJZVxR0I74HAwKJ',
-	access_token: 'a',
-	access_token_secret: 'a',
+// quick dom creator
+// accept tag, [classname, id], innerHTML.
+const dobj = function (tag, names, inner, children) {
+	let newOne = document.createElement(tag);
+
+	if (names.constructor === Array) {
+		names[0] ? newOne.className = names[0] : "";
+		names[1] ? newOne.id = names[1] : "";
+	} else newOne.className = names;
+
+	inner ? newOne.innerHTML = inner : "";
+
+	// custom methods and properties goes below here
+	newOne.appendChildren = function (c) {
+		for (let i in arguments) newOne.appendChild(arguments[i]);
+	};
+	if (children) {
+		if (children.constructor === Array) newOne.appendChildren(...children);else newOne.appendChild(children);
+	}
+
+	return newOne;
+};
+const fs = require('fs');
+let twts = [];
+fs.readFile('./twts.txt', (e, d) => {
+	if (e) throw e;twts = JSON.parse(d);
+});
+let twitDoms = [];
+let conv = function () {
+	for (var i = 0; i < twts.length; i++) twitDoms[i] = new display.twitObj(twts[i]);
+	console.log('done');
+};
+let attach = function () {
+	for (let i = 0; i < twitDoms.length; i++) document.getElementById("main").appendChild(twitDoms[i]);
+};
+let Twit = require('twit');
+const
+//ck  = "xnUHcbRQGzwW1X0eeq2tonOvO",
+//cks = "gHhGwNK4pjdNVq9qRgZM5yFSLLr92AnrzsTPJZVxR0I74HAwKJ";
+ck = "adyOv8nxxNwe4q7MdoAsLTgV8",
+      cks = "GUZIeiN6HNWN23JlCiR9HwrUhvAbMNEJasj7UWlwp5NKiDQY00";
+const
+//at = "990651260-YngPXwEFJvSSILGSgtiBOzq0X1VECs3gEfDTINB7",
+//ats = "AoAhBNkawjH93yFD0erDw8nbjecHPQOeTvp2IOpN5sXdi";
+at = "712975464332075008-SSkhEdwP1fPPlh1sxy3LCggliOTIzjs",
+      ats = "TUZkw1GxHBpCHdJq7X1SsPCnOEqCyfUceAC2ss5iR1pWP";
+
+let t = new Twit({
+	consumer_key: ck,
+	consumer_secret: cks,
+	access_token: at,
+	access_token_secret: ats,
 	timeout_ms: 30 * 1000
 });
 /*
@@ -258,21 +294,43 @@ let tl = new Map();
 let tlOrder = [];
 let tlCurrent = 0;
 
-const streamURI = ['statuses/filter', 'statuses/sample', 'statuses/firehose', 'user', 'site', '1'];
+const URI = {
+	"Mention": 'statuses/mentions_timeline',
+	"User": 'statuses/user_timeline',
+	"Home": 'statuses/home_timeline',
+	"RTed": 'statuses/retweets_of_me',
+	"DM Sent": 'direct_messages/sent',
+	"Search": 'search/tweets',
+	"DM": 'direct_messages',
+	"L": 'lists/statuses'
+};
+const streamURI = {
+	"Filter": 'statuses/filter',
+	"Sample": 'statuses/sample',
+	"User": 'user'
+};
 
 let tlCon = {
 	tab: {
 		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
 		// that parameters also should not be encouraged to be filled manually by users. We will make a dictionary to refer for each of addresses and get needed ones to fill from.
-		add: function (tabName, address, parameters, position) {
+		add: function (nameAndAddress, parameters, position) {
+			let tabName, address;
+			if (nameAndAddress.constructor === Array) {
+				tabName = nameAndAddress[0];
+				nameAndAddress[1] ? address = nameAndAddress[1] : "";
+			} else {
+				tabName = nameAndAddress;
+				if (URI[nameAndAddress]) address = URI[nameAndAddress];else console.error("Need to specify the URI.");
+			}
 			if (!tl.has(tabName) && typeof tabName !== "undefined" && tlOrder.indexOf(tabName) === -1) {
-				let v = {
+				let newTabFrame = {
 					type: address,
 					params: parameters,
 					tweets: []
 				};
-				if (streamURI.indexOf(tabName) >= 0) v.notifications = 0;
-				tl.set(tabName, v);
+				if (streamURI.hasOwnProperty(tabName)) newTabFrame.notifications = 0;
+				tl.set(tabName, newTabFrame);
 				if (typeof position === "undefined") tlOrder.push(tabName);else tlOrder.splice(position, 0, tabName);
 			}
 		},
@@ -307,9 +365,14 @@ let tlCon = {
 	},
 	recentCall: false,
 	update: function (tabName, direction) {
-		if (tlCon.recentCall) {} else {
+		if (tlCon.recentCall) {} else if (direction) {
+			let contents;
+			if (tabName) contents = tl.get(tabName);else if (tl.has("Home")) contents = tl.get("Home");else {
+				console.error("Specify the tab to update.");
+				return;
+			}
+
 			tlCon.recentCall = true;
-			let contents = tl.get(tabName);
 			let tweets = contents.tweets;
 			let params = contents.params;
 
@@ -324,23 +387,24 @@ let tlCon = {
 			}
 
 			t.get(contents.type, params, function (err, data, response) {
+				// TODO learn what errors and response are for.
 				/*TODO check if received data should attach to or replace the previous data.
     for some of the api address the `direction` is meaningless
     and the data received should replace old datas instead of attaching to it.
     but we're only testing for home, mention, user timeline at the moment
     so the default behavior will be adding the data to the old one.*/
-				// TODO learn what errors and response are for.
+				data = data.map(c => new display.twitObj(c));
 				switch (direction) {
 					case 1:
-						tweets = data.concat(tweets);
+						contents.tweets = data.concat(tweets);
 						break;
 					case -1:
-						tweets.pop();
-						tweets = tweets.concat(data);
+						contents.tweets.pop();
+						contents.tweets = tweets.concat(data);
 						break;
 					case 0:
 						// for those which doesn't need previous datas?
-						tweets = data;
+						contents.tweets = data;
 						break;
 				}
 				tl.set(tabName, contents);

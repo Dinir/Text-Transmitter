@@ -14,7 +14,7 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {
 	mainWindow = new BrowserWindow({
 		width: 80*8,
-		height: 48*15,
+		height: 24*15,
 		userContentSize: true,
 		title: "Text Transmitter",
 		autoHideMenuBar: true,
