@@ -79,6 +79,7 @@ const ctl = {
 	}
 };
 
+// makes it so body scrolls 3 lines at a time.
 const scrollHandler = () => {
 	const e = window.event;
 	document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
@@ -121,6 +122,7 @@ const display = {
 		let repliedTo = ['', '']; // type(username?status?), address
 
 		// make additional data related to the default data if needed
+		console.log("showing raw tweets from displayTweets:49");
 		console.log(raw);
 		let userRTed, timeRTed, timeQuote, userQuote, textQuote;
 		if (raw.entities.user_mentions.length > 0) {}
@@ -193,11 +195,11 @@ const display = {
 		dom.init = function () {
 			for (let i = 0; i < tlOrder.length; i++) {
 				if (notis[i]) {
-					let nt = dobj("span", [i === tlCurrent ? "chosen" : "", `tabs${ i }`], "", [dobj("span", [], notis[i])]);
-					nt.innerHTML += tlOrder[i];
+					let nt = dobj("span", [i === tlCurrent ? "chosen" : "", `tab${ i }`], "", [dobj("span", [], notis[i])]);
+					nt.innerHTML += `[${ tlOrder[i] }]`;
 					dom.tabs.push(nt);
 				} else {
-					dom.tabs.push(dobj("span", [i === tlCurrent ? "chosen" : "", `tabs${ i }`], tlOrder[i]));
+					dom.tabs.push(dobj("span", [i === tlCurrent ? "chosen" : "", `tab${ i }`], `[${ tlOrder[i] }]`));
 				}
 			}
 			dom.tabs.push(dobj("span", [, "close"], "X"));
@@ -205,7 +207,23 @@ const display = {
 			document.body.firstElementChild.replaceChild(dom, document.getElementById("tabs"));
 		};
 		dom.updateNotification = function () {};
-		//dom.update();
+		const updateCurrentTab = newTab => {
+			if (newTab.id.includes("tab")) {
+				// clicked a tab = changing current tab
+				const newNum = parseInt(newTab.id.match(/\d+/));
+				if (tlCurrent !== newNum) {
+					let tabs = document.getElementById("tabs").children;
+					changeClass(tabs[tlCurrent], "chosen", "");
+					changeClass(tabs[newNum], "chosen");
+					tlCurrent = newNum;
+				}
+			} else if (newTab.id === "close") {
+				// clicked the X = closing current tab
+			}
+		};
+		dom.addEventListener('click', function () {
+			updateCurrentTab(window.event.target);
+		});
 		return dom;
 	}
 };
@@ -215,7 +233,39 @@ test script:
 
 var twitDoms = []; var twts = []; t.get('statuses/user_timeline', {}, function(e,d,r){ twts=d; for(var i=0;i<twts.length;i++) twitDoms[i] = new display.twitObj(twts[i]); console.log('done'); });
 */
+const fs = require('fs');
+
 window.onload = () => {
+	/*
+ // load settings stored before.
+ console.groupCollapsed("Loading settings...");
+ fs.readFile("./test.txt", (e,d) => {
+ if(e) {
+ console.error("Failed to load the settings.\n\
+ \ Setting new default one.");
+ tlCon.tab.add("Mention",{});
+ tlCon.tab.add("Home",{});
+ tlCurrent = 1;
+ const defaultSetting = {
+ "width":80,
+ "height":24,
+ "tl":tl,
+ "tlOrder":tlOrder,
+ "tlCurrent":tlCurrent
+ };
+ fs.writeFile("./settings.json",JSON.stringify(defaultSetting),e => {
+ if(e) {
+ console.error("Failed saving the default one.\n\
+ Any new changes made in this session won't be saved.");
+ return e;
+ }
+ console.log("Saved the default setting.");
+ });
+ return e;
+ }
+ });*/
+	let abcdef = 111111;console.log(abcdef);
+
 	document.addEventListener("keydown", keyPress);
 	document.addEventListener("keyup", checkStates);
 	document.body.addEventListener("mousewheel", scrollHandler, false);
@@ -224,7 +274,7 @@ window.onload = () => {
 	tlCon.tab.add("Mention", {}, 0);
 };
 // quick dom creator
-// accept tag, [classname, id], innerHTML.
+// accept tag, [classname, id], innerHTML, [childrenNodes].
 const dobj = function (tag, names, inner, children) {
 	let newOne = document.createElement(tag);
 
@@ -245,7 +295,18 @@ const dobj = function (tag, names, inner, children) {
 
 	return newOne;
 };
-const fs = require('fs');
+
+const changeClass = (target, firstCl, secondCl) => {
+	// if first exist = add it
+	// if both exist = change first to second
+	if (firstCl) {
+		if (!secondCl) {
+			target.className += ` ${ firstCl }`;
+		} else {
+			target.className = firstCl === "*" ? secondCl : target.className.replace(new RegExp('\\s?' + firstCl), secondCl);
+		}
+	}
+};
 let twts = [];
 fs.readFile('./twts.txt', (e, d) => {
 	if (e) throw e;twts = JSON.parse(d);
@@ -413,27 +474,3 @@ let tlCon = {
 		} // if-else tlCon.recentCall
 	} // update
 };
-
-/*
-window.onload = () => {
-
-	tlCon.tab.add("Home", 'statuses/home_timeline');
-	tlCon.tab.add("My Tweets", 'statuses/user_timeline', {screen_name: 'NardinRinet'}); console.log(tlOrder);
-	ReactDOM.render(
-		<div>
-			<display.tabs tlOrderArray={tlOrder} />
-			<section id="main">
-				{testTweets.map(
-					(v,i) => {
-						return (
-							<display.twitObj key={i} raw={v} />
-						)
-					}
-				)}
-			</section>
-			
-		</div>
-		, document.body.getElementsByTagName("article")[0]
-	)
-};
-*/

@@ -68,7 +68,7 @@ let tlCon = {
 		},
 		flush: function(really) {
 			if(really === "y" || really === "Y")
-				tl.forEach(function(v, k) {tl.delete(k);})
+				tl.forEach(function(v, k) {tlCon.tab.remove(k);})
 		},
 		rename: function(tabName, alterName) {
 			if(typeof tabName !== "undefined"

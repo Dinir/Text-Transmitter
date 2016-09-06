@@ -46,6 +46,7 @@ const display = {
 		let repliedTo = ['', '']; // type(username?status?), address
 
 		// make additional data related to the default data if needed
+		console.log("showing raw tweets from displayTweets:49");
 		console.log(raw);
 		let userRTed, timeRTed, timeQuote, userQuote, textQuote;
 		if(raw.entities.user_mentions.length > 0) {
