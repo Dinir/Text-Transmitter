@@ -10,7 +10,18 @@
 
 let receivingCommand = false;
 let lastKeyCode = 0;
-const charHeight = 15;
+let cmdContextText, cmdContextRightText;
+const setCmdContext = (texts) => {
+	if(texts) {
+		if(texts.constructor===Array) {
+			if(texts[0]) cmdContextText = texts[0];
+			if(texts[1]) cmdContextRightText = texts[1];
+		} else {
+			cmdContextText = texts;
+		}
+	}
+	loCon.cmdContextUpdate();
+};
 
 function keyPress(e) {
 	lastKeyCode = e.keyCode;
@@ -52,8 +63,7 @@ const ctl = {
 		const query = document.getElementById("query");
 		const status = document.getElementById("status");
 		const commandInput = document.getElementById("commandInput");
-		if(receivingCommand){
-			// should I be able to define variables and use them instead of invoking all these querySelectors every time?
+		if(receivingCommand) {
 			query.value = "";
 			status.style.display = "inherit";
 			commandInput.style.display = "none";

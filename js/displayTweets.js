@@ -46,8 +46,6 @@ const display = {
 		let repliedTo = ['', '']; // type(username?status?), address
 
 		// make additional data related to the default data if needed
-		console.log("showing raw tweets from displayTweets:49");
-		console.log(raw);
 		let userRTed, timeRTed, timeQuote, userQuote, textQuote;
 		if(raw.entities.user_mentions.length > 0) {
 		}
@@ -134,7 +132,7 @@ const display = {
 		return dom;
 	},
 	tabObj: function(tlOrder) {
-		let dom = dobj("section",["hl","tabs"],"",);
+		let dom = dobj("section",["hl","tabs"],"&nbsp;");
 		let notis = tlOrder.map(v => tl.get(v).notifications);
 		dom.tabs = [];
 		dom.init = function() {

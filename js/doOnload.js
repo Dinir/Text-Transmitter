@@ -1,10 +1,12 @@
 
 
 window.onload = () => {
-	// load settings stored before.
-	console.groupCollapsed("Loading settings...");
-	settingsCon.load();
+	// load state stored before.
+	console.groupCollapsed("Loading state...");
+	stateCon.load();
 	console.groupEnd();
+	// build the screen.
+	
 	// add default event listeners globally.
 	document.addEventListener("keydown", keyPress);
 	document.addEventListener("keyup", checkStates);

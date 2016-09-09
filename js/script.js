@@ -1,3 +1,48 @@
+// quick dom creator
+// accept tag, [classname, id], innerHTML, [childrenNodes].
+const dobj = function (tag, names, inner, children, ...moreProps) {
+	let newOne = document.createElement(tag);
+
+	if (names) {
+		if (names.constructor === Array) {
+			names[0] ? newOne.className = names[0] : "";
+			names[1] ? newOne.id = names[1] : "";
+		} else newOne.className = names;
+	}
+
+	inner ? newOne.innerHTML = inner : "";
+
+	newOne.appendChildren = function (c) {
+		for (let i in arguments) newOne.appendChild(arguments[i]);
+	};
+
+	if (children) {
+		if (children.constructor === Array) newOne.appendChildren(...children);else newOne.appendChild(children);
+	}
+
+	if (moreProps) {
+		for (let k = 0; k < moreProps.length; k += 2) {
+			newOne[moreProps[k]] = moreProps[k + 1];
+		}
+	}
+
+	return newOne;
+};
+
+const changeClass = (target, firstCl, secondCl) => {
+	// if first exist = add it
+	// if both exist = change first to second
+	if (firstCl) {
+		if (!secondCl) {
+			target.className += ` ${ firstCl }`;
+		} else {
+			target.className = firstCl === "*" ? secondCl : target.className.replace(new RegExp('\\s?' + firstCl), secondCl);
+		}
+	}
+};
+const replaceDobj = (to, from) => {
+	from.parentNode.replaceChild(to, from);
+};
 let cmd = {
 	resize: function (w, h) {
 		window.resizeTo(w * 8, h * 15 + 25);
@@ -25,7 +70,6 @@ function execute(command) {
 
 let receivingCommand = false;
 let lastKeyCode = 0;
-const charHeight = 15;
 
 function keyPress(e) {
 	lastKeyCode = e.keyCode;
@@ -85,6 +129,22 @@ const scrollHandler = () => {
 	document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
 	return false;
 };
+
+
+let commandContextDom = dobj("div", "left", "");
+commandContextDom.rightText = dobj("div", "rightText", "");
+commandContextDom.appendChild(commandContextDom.rightText);
+// layout controller.
+const loCon = {
+	init: () => {
+		const wrapper = dobj("article", "", "", []);
+		const tabs = new display.tabObj(tlOrder);
+		const main = null;
+		const controls = dobj("section", [, "controls"], "", [dobj("div", [, "status"], "", [dobj("div", "left", "&nbsp;"), dobj("div", "rightText", "", [dobj("span", "", "&nbsp;", [], "style", "width: 8px;"), dobj("span", [, "currentLine"], "0%"), dobj("span", [, "api"], "")])]), dobj("div", [, "commandInput"], "", [dobj("div", [, "commandContext"], "", [commandContextDom]), dobj("input", [, "query"], "", [], "type", "text")])]);
+		// this is a placeholder. :(
+		const imgView = dobj("section", [, "imgView"], "", [dobj("div", "", "", [dobj("img")])]);
+	}
+};
 let moment = require('moment');
 
 const storeTimestamp = rawTs => moment(rawTs, "ddd MMM D H:mm:ss Z YYYY");
@@ -122,8 +182,6 @@ const display = {
 		let repliedTo = ['', '']; // type(username?status?), address
 
 		// make additional data related to the default data if needed
-		console.log("showing raw tweets from displayTweets:49");
-		console.log(raw);
 		let userRTed, timeRTed, timeQuote, userQuote, textQuote;
 		if (raw.entities.user_mentions.length > 0) {}
 		if (raw.in_reply_to_status_id_str !== null) {}
@@ -233,78 +291,133 @@ test script:
 
 var twitDoms = []; var twts = []; t.get('statuses/user_timeline', {}, function(e,d,r){ twts=d; for(var i=0;i<twts.length;i++) twitDoms[i] = new display.twitObj(twts[i]); console.log('done'); });
 */
-const fs = require('fs');
+
 
 window.onload = () => {
-	/*
- // load settings stored before.
- console.groupCollapsed("Loading settings...");
- fs.readFile("./test.txt", (e,d) => {
- if(e) {
- console.error("Failed to load the settings.\n\
- \ Setting new default one.");
- tlCon.tab.add("Mention",{});
- tlCon.tab.add("Home",{});
- tlCurrent = 1;
- const defaultSetting = {
- "width":80,
- "height":24,
- "tl":tl,
- "tlOrder":tlOrder,
- "tlCurrent":tlCurrent
- };
- fs.writeFile("./settings.json",JSON.stringify(defaultSetting),e => {
- if(e) {
- console.error("Failed saving the default one.\n\
- Any new changes made in this session won't be saved.");
- return e;
- }
- console.log("Saved the default setting.");
- });
- return e;
- }
- });*/
-	let abcdef = 111111;console.log(abcdef);
+	// load state stored before.
+	console.groupCollapsed("Loading state...");
+	stateCon.load();
+	console.groupEnd();
+	// build the screen.
 
+	// add default event listeners globally.
 	document.addEventListener("keydown", keyPress);
 	document.addEventListener("keyup", checkStates);
 	document.body.addEventListener("mousewheel", scrollHandler, false);
-	//test scripts
-	tlCon.tab.add("Home", {});
-	tlCon.tab.add("Mention", {}, 0);
 };
-// quick dom creator
-// accept tag, [classname, id], innerHTML, [childrenNodes].
-const dobj = function (tag, names, inner, children) {
-	let newOne = document.createElement(tag);
+const fs = require('fs');
 
-	if (names.constructor === Array) {
-		names[0] ? newOne.className = names[0] : "";
-		names[1] ? newOne.id = names[1] : "";
-	} else newOne.className = names;
+let state = {};
+let stateFileName;
+const charWidth = 8;
+const charHeight = 15;
+const stateCon = {
+	make: () => {
+		tlCon.tab.flush("Y");
+		tlCon.tab.add("Mention", {});
+		tlCon.tab.add("Home", {});
+		tlCurrent = 1;
+		const defaultState = JSON.stringify({
+			"width": 80,
+			"height": 24,
+			"tl": Array.from(tl),
+			"tlOrder": tlOrder,
+			"tlCurrent": tlCurrent
+		});
+		fs.writeFile("./state.json", defaultState, e => {
+			if (e) {
+				console.error("Failed creating the default one.\n" + "Any new changes made in this session won't be saved.");
+				return e;
+			}
+			stateFileName = "./state.json";
+			console.log("Created the default state.");
+		});
+	},
+	load: fileName => {
+		let target;
+		if (fileName) target = fileName;else target = "./state.json";
 
-	inner ? newOne.innerHTML = inner : "";
+		fs.readFile(target, (e, d) => {
+			if (e) {
+				console.error("Failed to load the state.\n" + "Creating new default one.");
+				stateCon.make();
+				return e;
+			}
+			try {
+				// It actually copies the references of the values obtained from JSON. It's great, but I'm not sure if it's okay to keep, as it's not intended at first.
+				state = JSON.parse(d);
+				state.tl = new Map(state.tl);
+				tl = state.tl;
+				tlOrder = state.tlOrder;
+				tlCurrent = state.tlCurrent;
+				stateFileName = target;
+				console.log("Loaded the state.");
+			} catch (e) {
+				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse()`?");
+			}
+		});
+	},
+	forceSave: (fileName, contentOfState) => {
+		// assert `contentOfState` is already in a JSON form.
+		let target;
+		if (fileName) target = fileName;else target = "./state.json";
+		let stateToSave;
 
-	// custom methods and properties goes below here
-	newOne.appendChildren = function (c) {
-		for (let i in arguments) newOne.appendChild(arguments[i]);
-	};
-	if (children) {
-		if (children.constructor === Array) newOne.appendChildren(...children);else newOne.appendChild(children);
-	}
-
-	return newOne;
-};
-
-const changeClass = (target, firstCl, secondCl) => {
-	// if first exist = add it
-	// if both exist = change first to second
-	if (firstCl) {
-		if (!secondCl) {
-			target.className += ` ${ firstCl }`;
+		/* TODO: I might want to change from Map to just Object if I come to the point that this map converting isn't working anymore.
+  `tl` is a Map, and I use `Array.from()` to convert it to a format that `JSON.stringify` can be applied.
+  It's only valid when the keys and values are serialisable.
+  See: http://stackoverflow.com/questions/28918232/how-do-i-persist-a-es6-map-in-localstorage-or-elsewhere/35078054#35078054 . */
+		if (contentOfState) {
+			stateToSave = contentOfState;
 		} else {
-			target.className = firstCl === "*" ? secondCl : target.className.replace(new RegExp('\\s?' + firstCl), secondCl);
+			// overwrite the variable `state` below with the current state, which is used for saving and loading states.
+			// TODO: while converting `tl` to a array, it lost every tweet it contains. Would there be a good way to convert an array of HTMLDivElement to a string, and get it back to original HTMLDivElement?
+			state = {
+				width: Math.round(window.innerWidth / charWidth),
+				height: Math.round(window.innerHeight / charHeight),
+				tl: Array.from(tl),
+				tlOrder: tlOrder,
+				tlCurrent: tlCurrent
+			};
+			stateToSave = JSON.stringify(state);
 		}
+
+		fs.writeFile(target, stateToSave, e => {
+			if (e) {
+				console.error("Failed saving current state!\n\
+				Try manually copy the result with `JSON.stringify(state)`");
+				return e;
+			}
+			stateFileName = target;
+			console.log("Saved the state.");
+		});
+	},
+	backup: () => {
+		fs.readFile(stateFileName, (e, d) => {
+			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
+			if (e) {
+				console.error("Failed loading the current state.\n" + "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
+				return e;
+			}
+			try {
+				const timestamp = moment().format("YYMMDDHHmmss");
+				stateCon.forceSave(`./state${ timestamp }.json`, d);
+				console.log(`Saved the current state in 'state${ timestamp }.json'.`);
+			} catch (e) {
+				console.error("Failed making a backup of the current state.");
+				return e;
+			}
+		});
+	},
+	save: fileName => {
+		// what it does is backup the old state with a new file name, and save current state with the designated file name so you can get back to old one.
+		let target;
+		if (fileName) target = fileName;else target = "./state.json";
+		// save the old one loaded at the startup.
+		stateCon.backup();
+		// save the current state with the designated file name.
+		stateCon.forceSave(target);
+		stateFileName = target;
 	}
 };
 let twts = [];
@@ -401,7 +514,7 @@ let tlCon = {
 		},
 		flush: function (really) {
 			if (really === "y" || really === "Y") tl.forEach(function (v, k) {
-				tl.delete(k);
+				tlCon.tab.remove(k);
 			});
 		},
 		rename: function (tabName, alterName) {

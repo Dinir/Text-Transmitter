@@ -1,26 +1,34 @@
 // quick dom creator
 // accept tag, [classname, id], innerHTML, [childrenNodes].
-const dobj = function(tag, names, inner, children) {
+const dobj = function(tag, names, inner, children, ...moreProps) {
 	let newOne = document.createElement(tag);
 	
-	if(names.constructor === Array) {
-		names[0]? newOne.className = names[0]:"";
-		names[1]? newOne.id = names[1]:"";
-	} else
-		newOne.className = names;
+	if(names) {
+		if(names.constructor===Array) {
+			names[0]?newOne.className = names[0]:"";
+			names[1]?newOne.id = names[1]:"";
+		} else
+			newOne.className = names;
+	}
 	
 	inner? newOne.innerHTML = inner:"";
 	
-	// custom methods and properties goes below here
 	newOne.appendChildren = function(c) {
 		for(let i in arguments)
 			newOne.appendChild(arguments[i]);
 	};
+	
 	if(children) {
 		if(children.constructor === Array)
 			newOne.appendChildren(...children);
 		else
 			newOne.appendChild(children);
+	}
+	
+	if(moreProps) {
+		for(let k=0;k<moreProps.length;k+=2) {
+			newOne[moreProps[k]] = moreProps[k+1];
+		}
 	}
 	
 	return newOne;
@@ -38,4 +46,7 @@ const changeClass = (target, firstCl, secondCl) => {
 				target.className.replace(new RegExp('\\s?'+firstCl), secondCl);
 		}
 	}
+};
+const replaceDobj = (to, from) => {
+	from.parentNode.replaceChild(to,from);
 };
