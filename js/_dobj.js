@@ -14,8 +14,11 @@ const dobj = function(tag, names, inner, children, ...moreProps) {
 	inner? newOne.innerHTML = inner:"";
 	
 	newOne.appendChildren = function(c) {
-		for(let i in arguments)
-			newOne.appendChild(arguments[i]);
+		if(c && c.constructor === Array) {
+			newOne.appendChildren(...c);
+		} else
+				for(let i in arguments)
+					newOne.appendChild(arguments[i]);
 	};
 	
 	if(children) {

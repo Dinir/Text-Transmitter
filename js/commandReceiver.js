@@ -14,8 +14,10 @@ let cmdContextText, cmdContextRightText;
 const setCmdContext = (texts) => {
 	if(texts) {
 		if(texts.constructor===Array) {
+			// if(varname) passes any non-empty string
+			// if(varname !== undefined) passes any string
 			if(texts[0]) cmdContextText = texts[0];
-			if(texts[1]) cmdContextRightText = texts[1];
+			if(texts[1] !== undefined) cmdContextRightText = texts[1];
 		} else {
 			cmdContextText = texts;
 		}
@@ -80,5 +82,6 @@ const ctl = {
 const scrollHandler = () => {
 	const e = window.event;
 	document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
+	loCon.updateScroll();
 	return false;
 };

@@ -13,7 +13,9 @@ const dobj = function (tag, names, inner, children, ...moreProps) {
 	inner ? newOne.innerHTML = inner : "";
 
 	newOne.appendChildren = function (c) {
-		for (let i in arguments) newOne.appendChild(arguments[i]);
+		if (c && c.constructor === Array) {
+			newOne.appendChildren(...c);
+		} else for (let i in arguments) newOne.appendChild(arguments[i]);
 	};
 
 	if (children) {
@@ -70,6 +72,20 @@ function execute(command) {
 
 let receivingCommand = false;
 let lastKeyCode = 0;
+let cmdContextText, cmdContextRightText;
+const setCmdContext = texts => {
+	if (texts) {
+		if (texts.constructor === Array) {
+			// if(varname) passes any non-empty string
+			// if(varname !== undefined) passes any string
+			if (texts[0]) cmdContextText = texts[0];
+			if (texts[1] !== undefined) cmdContextRightText = texts[1];
+		} else {
+			cmdContextText = texts;
+		}
+	}
+	loCon.cmdContextUpdate();
+};
 
 function keyPress(e) {
 	lastKeyCode = e.keyCode;
@@ -110,7 +126,6 @@ const ctl = {
 		const status = document.getElementById("status");
 		const commandInput = document.getElementById("commandInput");
 		if (receivingCommand) {
-			// should I be able to define variables and use them instead of invoking all these querySelectors every time?
 			query.value = "";
 			status.style.display = "inherit";
 			commandInput.style.display = "none";
@@ -127,23 +142,47 @@ const ctl = {
 const scrollHandler = () => {
 	const e = window.event;
 	document.body.scrollTop += (e.wheelDelta > 0 ? -1 : 1) * 3 * charHeight;
+	loCon.updateScroll();
 	return false;
 };
+const layout = {
+	wrapper: null,
+	tabs: null,
+	main: null,
+	controls: null,
+	imgView: null,
 
+	currentLine: dobj("span", [, "currentLine"], "BOT"),
+	cmdContext: dobj("div", "left", "", [dobj("div", "rightText", "")])
+};
 
-let commandContextDom = dobj("div", "left", "");
-commandContextDom.rightText = dobj("div", "rightText", "");
-commandContextDom.appendChild(commandContextDom.rightText);
 // layout controller.
 const loCon = {
+	updateTab: () => {},
+	updateMain: () => {},
+	updateStatus: () => {},
+	updateScroll: () => {
+		const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - 330) * 10000) / 100 + "%";
+		if (scrollPos === "100%") layout.currentLine.innerHTML = "BOT";else layout.currentLine.innerHTML = scrollPos;
+	},
+	// what does it do is changing parts of string:
+	// from: abcde<div class='rightText'>fghij</div>
+	// to  : newText<div class='rightText'>newRightText</div>
+	cmdContextUpdate: () => {
+		layout.cmdContext.innerHTML = layout.cmdContext.innerHTML.replace(/^.*(<div.+>).*<\/div>/, `${ cmdContextText }\$1${ cmdContextRightText }<\/div>`);
+	},
 	init: () => {
-		const wrapper = dobj("article", "", "", []);
-		const tabs = new display.tabObj(tlOrder);
-		const main = null;
-		const controls = dobj("section", [, "controls"], "", [dobj("div", [, "status"], "", [dobj("div", "left", "&nbsp;"), dobj("div", "rightText", "", [dobj("span", "", "&nbsp;", [], "style", "width: 8px;"), dobj("span", [, "currentLine"], "0%"), dobj("span", [, "api"], "")])]), dobj("div", [, "commandInput"], "", [dobj("div", [, "commandContext"], "", [commandContextDom]), dobj("input", [, "query"], "", [], "type", "text")])]);
+		layout.wrapper = dobj("article", "", "", []);
+		layout.tabs = new display.tabObj(tlOrder);
+		layout.main = dobj("section", [, "main"], "");
+		layout.controls = dobj("section", [, "controls"], "", [dobj("div", [, "status"], "", [dobj("div", "left", "&nbsp;"), dobj("div", "rightText", "", [dobj("span", "", "&nbsp;", [], "style", "width: 8px;"), layout.currentLine, dobj("span", [, "api"], "")])]), dobj("div", [, "commandInput"], "", [dobj("div", [, "commandContext"], "", [layout.cmdContext]), dobj("input", [, "query"], "", [], "type", "text")])]);
 		// this is a placeholder. :(
-		const imgView = dobj("section", [, "imgView"], "", [dobj("div", "", "", [dobj("img")])]);
+		layout.imgView = dobj("section", [, "imgView"], "", [dobj("div", "", "", [dobj("img")])]);
+
+		layout.wrapper.appendChildren(layout.tabs, layout.main, layout.controls, layout.imgView);
+		document.body.appendChild(layout.wrapper);
 	}
+
 };
 let moment = require('moment');
 
@@ -247,7 +286,7 @@ const display = {
 		return dom;
 	},
 	tabObj: function (tlOrder) {
-		let dom = dobj("section", ["hl", "tabs"], "");
+		let dom = dobj("section", ["hl", "tabs"], "&nbsp;");
 		let notis = tlOrder.map(v => tl.get(v).notifications);
 		dom.tabs = [];
 		dom.init = function () {
