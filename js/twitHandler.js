@@ -67,11 +67,12 @@ let tlCon = {
 			delete tl[tabName];
 			tlOrder.splice(tlOrder.indexOf(tabName),1);
 			if(!tlOrder[tlCurrent]) tlCurrent--;
-			if(!noUpdate) loCon.updateTabs();
+			if(noUpdate) {} else loCon.updateTabs();
 		},
 		flush: function(really) {
 			if(really === "y" || really === "Y")
-				tl.forEach(function(v, k) {tlCon.tab.remove(k, 1);});
+				for(var i in tl)
+					tlCon.tab.remove(tl[i], 1);
 		},
 		rename: function(tabName, alterName) {
 			if(typeof tabName !== "undefined"

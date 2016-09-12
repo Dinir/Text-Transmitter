@@ -197,7 +197,10 @@ const loCon = {
 	},
 	updateMain: () => {
 		layout.main = dobj("section", [, "main"], "");
-		layout.main.appendChildren(tl.get(tlOrder[tlCurrent]).tweets);
+		// for(let i=0;tl[tlOrder[tlCurrent]].tweets.length;i++) {
+		// 	layout.main.appendChild(tl[tlOrder[tlCurrent]].tweets[i])
+		// }
+		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
 		loCon.updateScroll();
 	},
@@ -385,6 +388,7 @@ const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
 	make: () => {
+		loCon.init();
 		tlCon.tab.flush("Y");
 		tlCon.tab.add("Mention", {});
 		tlCon.tab.add("Home", {});
@@ -392,7 +396,7 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width": 80,
 			"height": 24,
-			"tl": tl,
+			"tl": JSON.stringify(tl),
 			"tlOrder": tlOrder,
 			"tlCurrent": tlCurrent
 		});
@@ -404,6 +408,7 @@ const stateCon = {
 			stateFileName = "./state.json";
 			console.log("Created the default state.");
 		});
+		loCon.updateTabs();
 	},
 	load: fileName => {
 		let target;
@@ -417,8 +422,7 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
-				state.tl = new Map(state.tl);
-				tl = state.tl;
+				tl = JSON.parse(state.tl);
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
 				stateFileName = target;
@@ -587,12 +591,10 @@ let tlCon = {
 			delete tl[tabName];
 			tlOrder.splice(tlOrder.indexOf(tabName), 1);
 			if (!tlOrder[tlCurrent]) tlCurrent--;
-			if (!noUpdate) loCon.updateTabs();
+			if (noUpdate) {} else loCon.updateTabs();
 		},
 		flush: function (really) {
-			if (really === "y" || really === "Y") tl.forEach(function (v, k) {
-				tlCon.tab.remove(k, 1);
-			});
+			if (really === "y" || really === "Y") for (var i in tl) tlCon.tab.remove(tl[i], 1);
 		},
 		rename: function (tabName, alterName) {
 			if (typeof tabName !== "undefined" && typeof alterName !== "undefined" && tl.hasOwnProperty(tabName) && !tl.hasOwnProperty(alterName) && tlOrder.indexOf(tabName) > -1 && tlOrder.indexOf(alterName) === -1) {

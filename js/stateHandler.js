@@ -6,6 +6,7 @@ const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
 	make: () => {
+		loCon.init();
 		tlCon.tab.flush("Y");
 		tlCon.tab.add("Mention",{});
 		tlCon.tab.add("Home",{});
@@ -13,7 +14,7 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width":80,
 			"height":24,
-			"tl":tl,
+			"tl":JSON.stringify(tl),
 			"tlOrder":tlOrder,
 			"tlCurrent":tlCurrent
 		});
@@ -26,6 +27,7 @@ const stateCon = {
 			stateFileName = "./state.json";
 			console.log("Created the default state.");
 		});
+		loCon.updateTabs();
 	},
 	load: fileName => {
 		let target;
@@ -41,8 +43,7 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
-				state.tl = new Map(state.tl);
-				tl = state.tl;
+				tl = JSON.parse(state.tl);
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
 				stateFileName = target;
