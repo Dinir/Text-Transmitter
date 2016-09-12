@@ -32,12 +32,13 @@ const loCon = {
 				replaceDobj(layout.tabs, document.getElementById("tabs"));
 				break;
 		}
+		loCon.updateScroll();
 	},
 	updateMain: () => {
 		layout.main = dobj("section",[,"main"],"");
 		layout.main.appendChildren(tl.get(tlOrder[tlCurrent]).tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
-		
+		loCon.updateScroll();
 	},
 	updateStatus: () => {
 		

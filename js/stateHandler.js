@@ -48,6 +48,9 @@ const stateCon = {
 				tlCurrent = state.tlCurrent;
 				stateFileName = target;
 				console.log("Loaded the state.");
+				for(let i=0;i<tlOrder.length;i++) {
+					tlCon.forceUpdate(tlOrder[i], 1);
+				}
 				loCon.init();
 			}
 			catch(e) {

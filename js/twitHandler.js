@@ -61,6 +61,7 @@ let tlCon = {
 				else
 					tlOrder.splice(position, 0, tabName);
 			}
+			loCon.updateTabs();
 		},
 		remove: function(tabName) {
 			tl.delete(tabName);
@@ -71,6 +72,7 @@ let tlCon = {
 		flush: function(really) {
 			if(really === "y" || really === "Y")
 				tl.forEach(function(v, k) {tlCon.tab.remove(k);})
+			loCon.updateTabs();
 		},
 		rename: function(tabName, alterName) {
 			if(typeof tabName !== "undefined"
@@ -84,6 +86,7 @@ let tlCon = {
 				tlOrder.splice(tlOrder.indexOf(tabName), 1, alterName);
 				tl.delete(tabName);
 			}
+			loCon.updateTabs();
 		},
 		reorder: function(tabName, place, swap) {
 			if(typeof tabName !== "undefined") {
@@ -95,6 +98,7 @@ let tlCon = {
 					tlCon.tab.reorder(tlOrder[place-1], placeSwap);
 				}
 			}
+			loCon.updateTabs();
 		}
 	},
 	recentCall: false,
@@ -109,21 +113,29 @@ let tlCon = {
 			}
 			
 			tlCon.recentCall = true;
-			let tweets = contents.tweets;
-			let params = contents.params;
-			console.log(tweets);
-			console.log(params);
+			let tweets = tl.get(tabName).tweets;
+			let params = tl.get(tabName).params;
 
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch(direction) {
-				case 1:
-					if(tweets[0])
-						params.since_id = tweets[0].id_str;
-					break;
+				// case -1:
+				// 	if(tweets[tweets.length-1])
+				// 		params.max_id = tweets[tweets.length-1].id_str;
+				// 	break;
+				// case 1:
+				// default:
+				// 	if(tweets[0])
+				// 		params.since_id = tweets[0].id_str;
+				// 	break;
 				case -1:
 					if(tweets[tweets.length-1])
 						params.max_id = tweets[tweets.length-1].id_str;
+					break;
+				case 1:
+				default:
+					if(tweets[0])
+						params.since_id = tweets[0].id_str;
 					break;
 			}
 
@@ -137,21 +149,27 @@ let tlCon = {
 				data = data.map(c => new display.twitObj(c));
 				switch(direction) {
 					case 1:
-						contents.tweets = data.concat(tweets);
+						tweets = data.concat(tweets);
 						break;
 					case -1:
-						contents.tweets.pop();
-						contents.tweets = tweets.concat(data);
+						tweets.pop();
+						tweets = tweets.concat(data);
 						break;
 					case 0: // for those which doesn't need previous datas?
-						contents.tweets = data;
+						tweets = data;
 						break;
 				}
+				contents.tweets = tweets;
+				contents.params = params;
 				tl.set(tabName, contents);
 				if(tlOrder[tlCurrent] === tabName)
 					loCon.updateMain();
 				tlCon.recentCall = false;
 			}); // t.get
 		} // if-else tlCon.recentCall
-	} // update
+	}, // update
+	forceUpdate: function(tabName, direction) {
+		if(tlCon.recentCall) {tlCon.recentCall = false}
+		tlCon.update(tabName, direction);
+	}
 };
