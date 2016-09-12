@@ -48,6 +48,7 @@ const stateCon = {
 				tlCurrent = state.tlCurrent;
 				stateFileName = target;
 				console.log("Loaded the state.");
+				loCon.init();
 			}
 			catch(e) {
 				console.error("Failed parsing the state.\n" +

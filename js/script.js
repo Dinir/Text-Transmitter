@@ -116,7 +116,7 @@ function keyPress(e) {
 function checkStates() {
 	const query = document.getElementById("query");
 	// 'backspace' or 'delete' to empty the buffer to close it
-	if (lastKeyCode === 8 || lastKeyCode === 46 && query.value.length === 0) ctl.toggleCommand();
+	if ((lastKeyCode === 8 || lastKeyCode === 46) && query.value.length === 0) ctl.toggleCommand();
 }
 
 // it toggles what the bottom line shows every time it's invoked.
@@ -145,6 +145,21 @@ const scrollHandler = () => {
 	loCon.updateScroll();
 	return false;
 };
+
+const clickHandler = element => {
+	console.log(event);
+
+	if (event.clientY < 15) {
+		// clicked tabs line
+		if (event.target.id.match(/tab\d+/)) {
+			// clicked a tab
+			loCon.updateTabs("change", parseInt(event.target.id.match(/\d+/)));
+		} else if (event.target.id === "close") {
+			// clicked the close button
+			loCon.updateTabs("close");
+		}
+	}
+};
 const layout = {
 	wrapper: null,
 	tabs: null,
@@ -158,8 +173,32 @@ const layout = {
 
 // layout controller.
 const loCon = {
-	updateTab: () => {},
-	updateMain: () => {},
+	updateTabs: (eventType, clickedNumber) => {
+		switch (eventType) {
+			case "change":
+				if (tlCurrent !== clickedNumber) {
+					if (layout.tabs.tabDoms[tlCurrent]) changeClass(layout.tabs.tabDoms[tlCurrent], "chosen", " ");
+					changeClass(layout.tabs.tabDoms[clickedNumber], "chosen");
+					tlCurrent = clickedNumber;
+				}
+				loCon.updateMain();
+				break;
+			case "close":
+				tlCon.tab.remove(tlOrder[tlCurrent]);
+				loCon.updateTabs();
+				break;
+			default:
+				layout.tabs = new display.tabObj(tlOrder);
+				layout.tabs.make();
+				replaceDobj(layout.tabs, document.getElementById("tabs"));
+				break;
+		}
+	},
+	updateMain: () => {
+		layout.main = dobj("section", [, "main"], "");
+		layout.main.appendChildren(tl.get(tlOrder[tlCurrent]).tweets);
+		replaceDobj(layout.main, document.getElementById("main"));
+	},
 	updateStatus: () => {},
 	updateScroll: () => {
 		const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - 330) * 10000) / 100 + "%";
@@ -181,6 +220,7 @@ const loCon = {
 
 		layout.wrapper.appendChildren(layout.tabs, layout.main, layout.controls, layout.imgView);
 		document.body.appendChild(layout.wrapper);
+		loCon.updateTabs();
 	}
 
 };
@@ -288,41 +328,30 @@ const display = {
 	tabObj: function (tlOrder) {
 		let dom = dobj("section", ["hl", "tabs"], "&nbsp;");
 		let notis = tlOrder.map(v => tl.get(v).notifications);
-		dom.tabs = [];
-		dom.init = function () {
+		dom.tabDoms = [];
+		dom.make = function () {
 			for (let i = 0; i < tlOrder.length; i++) {
 				if (notis[i]) {
 					let nt = dobj("span", [i === tlCurrent ? "chosen" : "", `tab${ i }`], "", [dobj("span", [], notis[i])]);
 					nt.innerHTML += `[${ tlOrder[i] }]`;
-					dom.tabs.push(nt);
+					dom.tabDoms.push(nt);
 				} else {
-					dom.tabs.push(dobj("span", [i === tlCurrent ? "chosen" : "", `tab${ i }`], `[${ tlOrder[i] }]`));
+					dom.tabDoms.push(dobj("span", [i === tlCurrent ? "chosen" : "", `tab${ i }`], `[${ tlOrder[i] }]`));
 				}
 			}
-			dom.tabs.push(dobj("span", [, "close"], "X"));
-			dom.appendChildren(...dom.tabs);
+			dom.tabDoms.push(dobj("span", [, "close"], "X"));
+			dom.appendChildren(...dom.tabDoms);
 			document.body.firstElementChild.replaceChild(dom, document.getElementById("tabs"));
 		};
 		dom.updateNotification = function () {};
-		const updateCurrentTab = newTab => {
-			if (newTab.id.includes("tab")) {
-				// clicked a tab = changing current tab
-				const newNum = parseInt(newTab.id.match(/\d+/));
-				if (tlCurrent !== newNum) {
-					let tabs = document.getElementById("tabs").children;
-					changeClass(tabs[tlCurrent], "chosen", "");
-					changeClass(tabs[newNum], "chosen");
-					tlCurrent = newNum;
-				}
-			} else if (newTab.id === "close") {
-				// clicked the X = closing current tab
-			}
-		};
-		dom.addEventListener('click', function () {
-			updateCurrentTab(window.event.target);
-		});
 		return dom;
 	}
+};
+
+const replaceTabs = () => {
+	layout.tabs = new display.tabObj(tlOrder);
+	layout.tabs.make();
+	replaceDobj(layout.tabs, document.getElementById("tabs"));
 };
 
 /*
@@ -334,14 +363,16 @@ var twitDoms = []; var twts = []; t.get('statuses/user_timeline', {}, function(e
 
 window.onload = () => {
 	// load state stored before.
+	// also build the screen.
 	console.groupCollapsed("Loading state...");
 	stateCon.load();
 	console.groupEnd();
-	// build the screen.
-
 	// add default event listeners globally.
 	document.addEventListener("keydown", keyPress);
 	document.addEventListener("keyup", checkStates);
+	document.addEventListener("click", function () {
+		clickHandler(window.event.target);
+	});
 	document.body.addEventListener("mousewheel", scrollHandler, false);
 };
 const fs = require('fs');
@@ -391,6 +422,7 @@ const stateCon = {
 				tlCurrent = state.tlCurrent;
 				stateFileName = target;
 				console.log("Loaded the state.");
+				loCon.init();
 			} catch (e) {
 				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse()`?");
 			}
@@ -550,6 +582,8 @@ let tlCon = {
 		remove: function (tabName) {
 			tl.delete(tabName);
 			tlOrder.splice(tlOrder.indexOf(tabName), 1);
+			if (!tlOrder[tlCurrent]) tlCurrent--;
+			loCon.updateTabs();
 		},
 		flush: function (really) {
 			if (really === "y" || really === "Y") tl.forEach(function (v, k) {
@@ -588,8 +622,11 @@ let tlCon = {
 			tlCon.recentCall = true;
 			let tweets = contents.tweets;
 			let params = contents.params;
+			console.log(tweets);
+			console.log(params);
 
 			// TODO make it check if the type can use `since_id` and `max_id` first.
+			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch (direction) {
 				case 1:
 					if (tweets[0]) params.since_id = tweets[0].id_str;
@@ -621,6 +658,7 @@ let tlCon = {
 						break;
 				}
 				tl.set(tabName, contents);
+				if (tlOrder[tlCurrent] === tabName) loCon.updateMain();
 				tlCon.recentCall = false;
 			}); // t.get
 		} // if-else tlCon.recentCall

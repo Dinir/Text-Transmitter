@@ -65,6 +65,8 @@ let tlCon = {
 		remove: function(tabName) {
 			tl.delete(tabName);
 			tlOrder.splice(tlOrder.indexOf(tabName),1);
+			if(!tlOrder[tlCurrent]) tlCurrent--;
+			loCon.updateTabs();
 		},
 		flush: function(really) {
 			if(really === "y" || really === "Y")
@@ -109,8 +111,11 @@ let tlCon = {
 			tlCon.recentCall = true;
 			let tweets = contents.tweets;
 			let params = contents.params;
+			console.log(tweets);
+			console.log(params);
 
 			// TODO make it check if the type can use `since_id` and `max_id` first.
+			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch(direction) {
 				case 1:
 					if(tweets[0])
@@ -143,6 +148,8 @@ let tlCon = {
 						break;
 				}
 				tl.set(tabName, contents);
+				if(tlOrder[tlCurrent] === tabName)
+					loCon.updateMain();
 				tlCon.recentCall = false;
 			}); // t.get
 		} // if-else tlCon.recentCall

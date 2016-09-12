@@ -134,8 +134,8 @@ const display = {
 	tabObj: function(tlOrder) {
 		let dom = dobj("section",["hl","tabs"],"&nbsp;");
 		let notis = tlOrder.map(v => tl.get(v).notifications);
-		dom.tabs = [];
-		dom.init = function() {
+		dom.tabDoms = [];
+		dom.make = function() {
 			for(let i=0;i<tlOrder.length;i++) {
 				if(notis[i]) {
 					let nt = dobj(
@@ -145,43 +145,32 @@ const display = {
 						[dobj("span", [], notis[i])]
 					);
 					nt.innerHTML += `[${tlOrder[i]}]`;
-					dom.tabs.push(nt);
+					dom.tabDoms.push(nt);
 				} else {
-					dom.tabs.push(dobj(
+					dom.tabDoms.push(dobj(
 							"span",
 							[i===tlCurrent?"chosen":"", `tab${i}`],
 							`[${tlOrder[i]}]`
 					));
 				}
 			}
-			dom.tabs.push(
+			dom.tabDoms.push(
 				dobj("span",[,"close"],"X")
 			);
-			dom.appendChildren(...dom.tabs);
+			dom.appendChildren(...dom.tabDoms);
 			document.body.firstElementChild.replaceChild(dom,document.getElementById("tabs"));
 		};
 		dom.updateNotification = function() {
 			
 		};
-		const updateCurrentTab = (newTab) => {
-			if(newTab.id.includes("tab")) {
-				// clicked a tab = changing current tab
-				const newNum = parseInt(newTab.id.match(/\d+/));
-				if(tlCurrent!==newNum) {
-					let tabs = document.getElementById("tabs").children;
-					changeClass(tabs[tlCurrent], "chosen", "");
-					changeClass(tabs[newNum], "chosen");
-					tlCurrent = newNum;
-				}
-			} else if(newTab.id === "close") {
-				// clicked the X = closing current tab
-			}
-		};
-		dom.addEventListener('click',function(){
-			updateCurrentTab(window.event.target);
-		});
 		return dom;
 	}
+};
+
+const replaceTabs = () => {
+	layout.tabs = new display.tabObj(tlOrder);
+	layout.tabs.make();
+	replaceDobj(layout.tabs, document.getElementById("tabs"));
 };
 
 /*

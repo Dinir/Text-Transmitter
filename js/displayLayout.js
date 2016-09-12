@@ -11,10 +11,32 @@ const layout = {
 
 // layout controller.
 const loCon = {
-	updateTab: () => {
-		
+	updateTabs: (eventType, clickedNumber) => {
+		switch (eventType) {
+			case "change":
+				if(tlCurrent!==clickedNumber) {
+					if(layout.tabs.tabDoms[tlCurrent])
+						changeClass(layout.tabs.tabDoms[tlCurrent], "chosen", " ");
+					changeClass(layout.tabs.tabDoms[clickedNumber], "chosen");
+					tlCurrent = clickedNumber;
+				}
+				loCon.updateMain();
+				break;
+			case "close":
+				tlCon.tab.remove(tlOrder[tlCurrent]);
+				loCon.updateTabs();
+				break;
+			default:
+				layout.tabs = new display.tabObj(tlOrder);
+				layout.tabs.make();
+				replaceDobj(layout.tabs, document.getElementById("tabs"));
+				break;
+		}
 	},
 	updateMain: () => {
+		layout.main = dobj("section",[,"main"],"");
+		layout.main.appendChildren(tl.get(tlOrder[tlCurrent]).tweets);
+		replaceDobj(layout.main, document.getElementById("main"));
 		
 	},
 	updateStatus: () => {
@@ -67,6 +89,7 @@ const loCon = {
 			layout.imgView
 		);
 		document.body.appendChild(layout.wrapper);
+		loCon.updateTabs();
 	}
 	
 };

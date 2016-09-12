@@ -54,7 +54,7 @@ function keyPress(e) {
 function checkStates() {
 	const query = document.getElementById("query");
 	// 'backspace' or 'delete' to empty the buffer to close it
-	if(lastKeyCode===8 || lastKeyCode===46
+	if((lastKeyCode===8 || lastKeyCode===46)
 	                      && query.value.length === 0)
 		ctl.toggleCommand();
 }
@@ -84,4 +84,23 @@ const scrollHandler = () => {
 	document.body.scrollTop += (e.wheelDelta>0?-1:1)*3*charHeight;
 	loCon.updateScroll();
 	return false;
+};
+
+const clickHandler = (element) => {
+	console.log(event);
+	
+	if(event.clientY < 15) {
+		// clicked tabs line
+		if(event.target.id.match(/tab\d+/)) {
+			// clicked a tab
+			loCon.updateTabs(
+				"change",
+				parseInt(event.target.id.match(/\d+/))
+			);
+		} else if(event.target.id === "close") {
+			// clicked the close button
+			loCon.updateTabs("close");
+		}
+			
+	}
 };
