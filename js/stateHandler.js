@@ -6,6 +6,7 @@ const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
 	make: () => {
+		loCon.init();
 		tlCon.tab.flush("Y");
 		tlCon.tab.add("Mention",{});
 		tlCon.tab.add("Home",{});
@@ -13,11 +14,11 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width":80,
 			"height":24,
-			"tl":tl,
+			"tl":JSON.stringify(tl),
 			"tlOrder":tlOrder,
 			"tlCurrent":tlCurrent
 		});
-		fs.writeFile("./state.json",defaultState,e => {
+		fs.writeFile("./state.json",defaultState,'utf8',e => {
 			if(e) {
 				console.error("Failed creating the default one.\n" +
 				              "Any new changes made in this session won't be saved.");
@@ -26,13 +27,14 @@ const stateCon = {
 			stateFileName = "./state.json";
 			console.log("Created the default state.");
 		});
+		loCon.updateTabs();
 	},
 	load: fileName => {
 		let target;
 		if(fileName) target=fileName;
 		else target="./state.json";
 		
-		fs.readFile(target,(e,d) => {
+		fs.readFile(target,'utf8',(e,d) => {
 			if(e) {
 				console.error("Failed to load the state.\n" +
 				              "Creating new default one.");
@@ -41,7 +43,6 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
-				state.tl = new Map(state.tl);
 				tl = state.tl;
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
@@ -83,7 +84,7 @@ const stateCon = {
 			stateToSave = JSON.stringify(state);
 		}
 		
-		fs.writeFile(target,stateToSave, e => {
+		fs.writeFile(target,stateToSave,'utf8', e => {
 			if(e) {
 				console.error("Failed saving current state!\n\
 				Try manually copy the result with `JSON.stringify(state)`");
@@ -94,7 +95,7 @@ const stateCon = {
 		})
 	},
 	backup: () => {
-		fs.readFile(stateFileName,(e,d) => {
+		fs.readFile(stateFileName,'utf8',(e,d) => {
 			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
 			if(e) {
 				console.error("Failed loading the current state.\n" +

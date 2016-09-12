@@ -197,7 +197,7 @@ const loCon = {
 	},
 	updateMain: () => {
 		layout.main = dobj("section", [, "main"], "");
-		layout.main.appendChildren(tl.get(tlOrder[tlCurrent]).tweets);
+		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
 		loCon.updateScroll();
 	},
@@ -385,6 +385,7 @@ const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
 	make: () => {
+		loCon.init();
 		tlCon.tab.flush("Y");
 		tlCon.tab.add("Mention", {});
 		tlCon.tab.add("Home", {});
@@ -392,11 +393,11 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width": 80,
 			"height": 24,
-			"tl": tl,
+			"tl": JSON.stringify(tl),
 			"tlOrder": tlOrder,
 			"tlCurrent": tlCurrent
 		});
-		fs.writeFile("./state.json", defaultState, e => {
+		fs.writeFile("./state.json", defaultState, 'utf8', e => {
 			if (e) {
 				console.error("Failed creating the default one.\n" + "Any new changes made in this session won't be saved.");
 				return e;
@@ -404,12 +405,13 @@ const stateCon = {
 			stateFileName = "./state.json";
 			console.log("Created the default state.");
 		});
+		loCon.updateTabs();
 	},
 	load: fileName => {
 		let target;
 		if (fileName) target = fileName;else target = "./state.json";
 
-		fs.readFile(target, (e, d) => {
+		fs.readFile(target, 'utf8', (e, d) => {
 			if (e) {
 				console.error("Failed to load the state.\n" + "Creating new default one.");
 				stateCon.make();
@@ -417,7 +419,6 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
-				state.tl = new Map(state.tl);
 				tl = state.tl;
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
@@ -456,7 +457,7 @@ const stateCon = {
 			stateToSave = JSON.stringify(state);
 		}
 
-		fs.writeFile(target, stateToSave, e => {
+		fs.writeFile(target, stateToSave, 'utf8', e => {
 			if (e) {
 				console.error("Failed saving current state!\n\
 				Try manually copy the result with `JSON.stringify(state)`");
@@ -467,7 +468,7 @@ const stateCon = {
 		});
 	},
 	backup: () => {
-		fs.readFile(stateFileName, (e, d) => {
+		fs.readFile(stateFileName, 'utf8', (e, d) => {
 			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
 			if (e) {
 				console.error("Failed loading the current state.\n" + "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
@@ -587,12 +588,10 @@ let tlCon = {
 			delete tl[tabName];
 			tlOrder.splice(tlOrder.indexOf(tabName), 1);
 			if (!tlOrder[tlCurrent]) tlCurrent--;
-			if (!noUpdate) loCon.updateTabs();
+			if (noUpdate) {} else loCon.updateTabs();
 		},
 		flush: function (really) {
-			if (really === "y" || really === "Y") tl.forEach(function (v, k) {
-				tlCon.tab.remove(k, 1);
-			});
+			if (really === "y" || really === "Y") for (var i in tl) tlCon.tab.remove(tl[i], 1);
 		},
 		rename: function (tabName, alterName) {
 			if (typeof tabName !== "undefined" && typeof alterName !== "undefined" && tl.hasOwnProperty(tabName) && !tl.hasOwnProperty(alterName) && tlOrder.indexOf(tabName) > -1 && tlOrder.indexOf(alterName) === -1) {

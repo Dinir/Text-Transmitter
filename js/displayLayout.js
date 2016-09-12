@@ -36,7 +36,7 @@ const loCon = {
 	},
 	updateMain: () => {
 		layout.main = dobj("section",[,"main"],"");
-		layout.main.appendChildren(tl.get(tlOrder[tlCurrent]).tweets);
+		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
 		loCon.updateScroll();
 	},

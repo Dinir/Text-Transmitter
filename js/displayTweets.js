@@ -133,7 +133,7 @@ const display = {
 	},
 	tabObj: function(tlOrder) {
 		let dom = dobj("section",["hl","tabs"],"&nbsp;");
-		let notis = tlOrder.map(v => tl.get(v).notifications);
+		let notis = tlOrder.map(v => tl[v].notifications);
 		dom.tabDoms = [];
 		dom.make = function() {
 			for(let i=0;i<tlOrder.length;i++) {
