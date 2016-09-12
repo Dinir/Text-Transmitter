@@ -4,7 +4,7 @@ window.onload = () => {
 	// load state stored before.
 	// also build the screen.
 	console.groupCollapsed("Loading state...");
-	stateCon.load();
+	//stateCon.load();
 	console.groupEnd();
 	// add default event listeners globally.
 	document.addEventListener("keydown", keyPress);
