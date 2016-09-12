@@ -329,7 +329,7 @@ const display = {
 	},
 	tabObj: function (tlOrder) {
 		let dom = dobj("section", ["hl", "tabs"], "&nbsp;");
-		let notis = tlOrder.map(v => tl.get(v).notifications);
+		let notis = tlOrder.map(v => tl[v].notifications);
 		dom.tabDoms = [];
 		dom.make = function () {
 			for (let i = 0; i < tlOrder.length; i++) {
@@ -392,7 +392,7 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width": 80,
 			"height": 24,
-			"tl": Array.from(tl),
+			"tl": tl,
 			"tlOrder": tlOrder,
 			"tlCurrent": tlCurrent
 		});
@@ -416,7 +416,6 @@ const stateCon = {
 				return e;
 			}
 			try {
-				// It actually copies the references of the values obtained from JSON. It's great, but I'm not sure if it's okay to keep, as it's not intended at first.
 				state = JSON.parse(d);
 				state.tl = new Map(state.tl);
 				tl = state.tl;
@@ -447,11 +446,10 @@ const stateCon = {
 			stateToSave = contentOfState;
 		} else {
 			// overwrite the variable `state` below with the current state, which is used for saving and loading states.
-			// TODO: while converting `tl` to a array, it lost every tweet it contains. Would there be a good way to convert an array of HTMLDivElement to a string, and get it back to original HTMLDivElement?
 			state = {
 				width: Math.round(window.innerWidth / charWidth),
 				height: Math.round(window.innerHeight / charHeight),
-				tl: Array.from(tl),
+				tl: tl,
 				tlOrder: tlOrder,
 				tlCurrent: tlCurrent
 			};
@@ -538,7 +536,7 @@ let t = new Twit({
 	}
 ]
  */
-let tl = new Map();
+let tl = {};
 // valid argument on the need of this array though,
 // that because you can just directly move the order of elements (in this case, tabs) and save the order at the end of the process and reload it at the startup.
 let tlOrder = [];
@@ -573,36 +571,35 @@ let tlCon = {
 				tabName = nameAndAddress;
 				if (URI[nameAndAddress]) address = URI[nameAndAddress];else console.error("Need to specify the URI.");
 			}
-			if (!tl.has(tabName) && typeof tabName !== "undefined" && tlOrder.indexOf(tabName) === -1) {
+			if (!tl.hasOwnProperty(tabName) && typeof tabName !== "undefined" && tlOrder.indexOf(tabName) === -1) {
 				let newTabFrame = {
 					type: address,
 					params: parameters,
 					tweets: []
 				};
 				if (streamURI.hasOwnProperty(tabName)) newTabFrame.notifications = 0;
-				tl.set(tabName, newTabFrame);
+				tl[tabName] = newTabFrame;
 				if (typeof position === "undefined") tlOrder.push(tabName);else tlOrder.splice(position, 0, tabName);
 			}
 			loCon.updateTabs();
 		},
-		remove: function (tabName) {
-			tl.delete(tabName);
+		remove: function (tabName, noUpdate) {
+			delete tl[tabName];
 			tlOrder.splice(tlOrder.indexOf(tabName), 1);
 			if (!tlOrder[tlCurrent]) tlCurrent--;
-			loCon.updateTabs();
+			if (!noUpdate) loCon.updateTabs();
 		},
 		flush: function (really) {
 			if (really === "y" || really === "Y") tl.forEach(function (v, k) {
-				tlCon.tab.remove(k);
+				tlCon.tab.remove(k, 1);
 			});
-			loCon.updateTabs();
 		},
 		rename: function (tabName, alterName) {
-			if (typeof tabName !== "undefined" && typeof alterName !== "undefined" && tl.has(tabName) && !tl.has(alterName) && tlOrder.indexOf(tabName) > -1 && tlOrder.indexOf(alterName) === -1) {
-				let contents = tl.get(tabName);
-				tl.set(alterName, contents);
+			if (typeof tabName !== "undefined" && typeof alterName !== "undefined" && tl.hasOwnProperty(tabName) && !tl.hasOwnProperty(alterName) && tlOrder.indexOf(tabName) > -1 && tlOrder.indexOf(alterName) === -1) {
+				let contents = tl[tabName];
+				tl[alterName] = contents;
 				tlOrder.splice(tlOrder.indexOf(tabName), 1, alterName);
-				tl.delete(tabName);
+				delete tl[tabName];
 			}
 			loCon.updateTabs();
 		},
@@ -623,14 +620,14 @@ let tlCon = {
 	update: function (tabName, direction) {
 		if (tlCon.recentCall) {} else if (direction) {
 			let contents;
-			if (tabName) contents = tl.get(tabName);else if (tl.has("Home")) contents = tl.get("Home");else {
+			if (tabName) contents = tl[tabName];else if (tl.hasOwnProperty("Home")) contents = tl["Home"];else {
 				console.error("Specify the tab to update.");
 				return;
 			}
 
 			tlCon.recentCall = true;
-			let tweets = tl.get(tabName).tweets;
-			let params = tl.get(tabName).params;
+			let tweets = tl[tabName].tweets;
+			let params = tl[tabName].params;
 
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			// TODO Fix it. This part doesn't catch current end of loaded tweets!
@@ -676,7 +673,7 @@ let tlCon = {
 				}
 				contents.tweets = tweets;
 				contents.params = params;
-				tl.set(tabName, contents);
+				tl[tabName] = contents;
 				if (tlOrder[tlCurrent] === tabName) loCon.updateMain();
 				tlCon.recentCall = false;
 			}); // t.get

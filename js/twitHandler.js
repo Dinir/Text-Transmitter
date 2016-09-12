@@ -9,7 +9,7 @@
 	}
 ]
  */
-let tl = new Map();
+let tl = {};
 // valid argument on the need of this array though,
 // that because you can just directly move the order of elements (in this case, tabs) and save the order at the end of the process and reload it at the startup.
 let tlOrder = [];
@@ -45,7 +45,7 @@ let tlCon = {
 				if(URI[nameAndAddress]) address = URI[nameAndAddress];
 				else console.error("Need to specify the URI.");
 			}
-			if(!tl.has(tabName)
+			if(!tl.hasOwnProperty(tabName)
 			&& typeof tabName !== "undefined"
 			&& tlOrder.indexOf(tabName) === -1) {
 				let newTabFrame = {
@@ -55,7 +55,7 @@ let tlCon = {
 				};
 				if(streamURI.hasOwnProperty(tabName))
 					newTabFrame.notifications=0;
-				tl.set(tabName, newTabFrame);
+				tl[tabName] = newTabFrame;
 				if(typeof position==="undefined")
 					tlOrder.push(tabName);
 				else
@@ -63,28 +63,27 @@ let tlCon = {
 			}
 			loCon.updateTabs();
 		},
-		remove: function(tabName) {
-			tl.delete(tabName);
+		remove: function(tabName, noUpdate) {
+			delete tl[tabName];
 			tlOrder.splice(tlOrder.indexOf(tabName),1);
 			if(!tlOrder[tlCurrent]) tlCurrent--;
-			loCon.updateTabs();
+			if(!noUpdate) loCon.updateTabs();
 		},
 		flush: function(really) {
 			if(really === "y" || really === "Y")
-				tl.forEach(function(v, k) {tlCon.tab.remove(k);})
-			loCon.updateTabs();
+				tl.forEach(function(v, k) {tlCon.tab.remove(k, 1);});
 		},
 		rename: function(tabName, alterName) {
 			if(typeof tabName !== "undefined"
 			&& typeof alterName !== "undefined"
-			&& tl.has(tabName)
-			&& !tl.has(alterName)
+			&& tl.hasOwnProperty(tabName)
+			&& !tl.hasOwnProperty(alterName)
 			&& tlOrder.indexOf(tabName) > -1
 			&& tlOrder.indexOf(alterName) === -1) {
-				let contents = tl.get(tabName);
-				tl.set(alterName, contents);
+				let contents = tl[tabName];
+				tl[alterName] = contents;
 				tlOrder.splice(tlOrder.indexOf(tabName), 1, alterName);
-				tl.delete(tabName);
+				delete tl[tabName];
 			}
 			loCon.updateTabs();
 		},
@@ -105,16 +104,16 @@ let tlCon = {
 	update: function(tabName, direction) {
 		if(tlCon.recentCall) {} else if(direction) {
 			let contents;
-			if(tabName) contents = tl.get(tabName);
-			else if(tl.has("Home")) contents = tl.get("Home");
+			if(tabName) contents = tl[tabName];
+			else if(tl.hasOwnProperty("Home")) contents = tl["Home"];
 			else {
 				console.error("Specify the tab to update.");
 				return;
 			}
 			
 			tlCon.recentCall = true;
-			let tweets = tl.get(tabName).tweets;
-			let params = tl.get(tabName).params;
+			let tweets = tl[tabName].tweets;
+			let params = tl[tabName].params;
 
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			// TODO Fix it. This part doesn't catch current end of loaded tweets!
@@ -161,7 +160,7 @@ let tlCon = {
 				}
 				contents.tweets = tweets;
 				contents.params = params;
-				tl.set(tabName, contents);
+				tl[tabName] = contents;
 				if(tlOrder[tlCurrent] === tabName)
 					loCon.updateMain();
 				tlCon.recentCall = false;

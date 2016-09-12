@@ -13,7 +13,7 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width":80,
 			"height":24,
-			"tl":Array.from(tl),
+			"tl":tl,
 			"tlOrder":tlOrder,
 			"tlCurrent":tlCurrent
 		});
@@ -40,7 +40,6 @@ const stateCon = {
 				return e;
 			}
 			try {
-				// It actually copies the references of the values obtained from JSON. It's great, but I'm not sure if it's okay to keep, as it's not intended at first.
 				state = JSON.parse(d);
 				state.tl = new Map(state.tl);
 				tl = state.tl;
@@ -74,11 +73,10 @@ const stateCon = {
 			stateToSave = contentOfState;
 		} else {
 			// overwrite the variable `state` below with the current state, which is used for saving and loading states.
-			// TODO: while converting `tl` to a array, it lost every tweet it contains. Would there be a good way to convert an array of HTMLDivElement to a string, and get it back to original HTMLDivElement?
 			state = {
 				width: Math.round(window.innerWidth/charWidth),
 				height: Math.round(window.innerHeight/charHeight),
-				tl: Array.from(tl),
+				tl: tl,
 				tlOrder: tlOrder,
 				tlCurrent: tlCurrent
 			};
