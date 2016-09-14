@@ -1,10 +1,67 @@
 const fs = require('fs');
 
-let state = {};
-let stateFileName;
+// clone objects
+// http://stackoverflow.com/a/728694/4972931
+function cloneObj(obj) {
+	var copy;
+	
+	// Handle the 3 simple types, and null or undefined
+	if (null == obj || "object" != typeof obj) return obj;
+	
+	// Handle Date
+	if (obj instanceof Date) {
+		copy = new Date();
+		copy.setTime(obj.getTime());
+		return copy;
+	}
+	
+	// Handle Array
+	if (obj instanceof Array) {
+		copy = [];
+		for (var i = 0, len = obj.length; i < len; i++) {
+			copy[i] = cloneObj(obj[i]);
+		}
+		return copy;
+	}
+	
+	// Handle Object
+	if (obj instanceof Object) {
+		copy = {};
+		for (var attr in obj) {
+			if (obj.hasOwnProperty(attr)) copy[attr] = cloneObj(obj[attr]);
+		}
+		return copy;
+	}
+	
+	throw new Error("Unable to copy obj! Its type isn't supported.");
+}
+
+const defaultStateFileName = './state/state.json';
+let state;
+let stateFileName = './state/state.json';
 const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
+	storedTabs: {},
+	restoreStoredTabs: dobj("div"),
+	storeTweets: () => {
+		stateCon.storedTabs = cloneObj(tl);
+		for(var ts in stateCon.storedTabs)
+			stateCon.storedTabs[ts].tweets = tl[ts].tweets.map(v => v.outerHTML);
+		//return JSON.stringify(stateCon.storedTabs);
+		return stateCon.storedTabs;
+	},
+	restoreTweets: () => {
+		stateCon.storedTabs = state.tl;
+		for(let ts in stateCon.storedTabs) {
+			stateCon.storedTabs[ts].tweets = stateCon.storedTabs[ts].tweets.map(v => {
+				stateCon.restoreStoredTabs.innerHTML = v;
+				return stateCon.restoreStoredTabs.firstChild;
+			})
+		}
+		return stateCon.storedTabs;
+	},
+	
 	make: () => {
 		loCon.init();
 		tlCon.tab.flush("Y");
@@ -14,17 +71,19 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width":80,
 			"height":24,
-			"tl":JSON.stringify(tl),
+			"tl":stateCon.storeTweets(),
 			"tlOrder":tlOrder,
 			"tlCurrent":tlCurrent
 		});
-		fs.writeFile("./state.json",defaultState,'utf8',e => {
+		state = defaultState;
+		fs.writeFile(defaultStateFileName,JSON.stringify(state),'utf8',e => {
 			if(e) {
 				console.error("Failed creating the default one.\n" +
 				              "Any new changes made in this session won't be saved.");
+				console.log(e);
 				return e;
 			}
-			stateFileName = "./state.json";
+			stateFileName = defaultStateFileName;
 			console.log("Created the default state.");
 		});
 		loCon.updateTabs();
@@ -32,7 +91,7 @@ const stateCon = {
 	load: fileName => {
 		let target;
 		if(fileName) target=fileName;
-		else target="./state.json";
+		else target=defaultStateFileName;
 		
 		fs.readFile(target,'utf8',(e,d) => {
 			if(e) {
@@ -43,7 +102,7 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
-				tl = state.tl;
+				tl = stateCon.restoreTweets();
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
 				stateFileName = target;
@@ -55,21 +114,18 @@ const stateCon = {
 			}
 			catch(e) {
 				console.error("Failed parsing the state.\n" +
-				              "Does it succeed if you manually try parsing it with `JSON.parse()`?");
+				              "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
+				console.log(e);
 			}
 		})
 	},
-	forceSave: (fileName, contentOfState) => {
+	forceSave: (fileName, contentOfState, silent) => {
 		// assert `contentOfState` is already in a JSON form.
 		let target;
 		if(fileName) target = fileName;
-		else target="./state.json";
+		else target=defaultStateFileName;
 		let stateToSave;
 		
-		/* TODO: I might want to change from Map to just Object if I come to the point that this map converting isn't working anymore.
-		`tl` is a Map, and I use `Array.from()` to convert it to a format that `JSON.stringify` can be applied.
-		It's only valid when the keys and values are serialisable.
-		See: http://stackoverflow.com/questions/28918232/how-do-i-persist-a-es6-map-in-localstorage-or-elsewhere/35078054#35078054 . */
 		if(contentOfState) {
 			stateToSave = contentOfState;
 		} else {
@@ -77,21 +133,21 @@ const stateCon = {
 			state = {
 				width: Math.round(window.innerWidth/charWidth),
 				height: Math.round(window.innerHeight/charHeight),
-				tl: tl,
+				tl: stateCon.storeTweets(),
 				tlOrder: tlOrder,
 				tlCurrent: tlCurrent
 			};
-			stateToSave = JSON.stringify(state);
+			stateToSave = JSON.stringify(state); console.log(stateToSave);
 		}
 		
 		fs.writeFile(target,stateToSave,'utf8', e => {
 			if(e) {
 				console.error("Failed saving current state!\n\
-				Try manually copy the result with `JSON.stringify(state)`");
+				Try manually copy the result with `JSON.stringify(state)` and save it as `./state/state.json`.");
 				return e;
 			}
 			stateFileName = target;
-			console.log("Saved the state.");
+			if(!silent) console.log("Saved the state.");
 		})
 	},
 	backup: () => {
@@ -100,14 +156,16 @@ const stateCon = {
 			if(e) {
 				console.error("Failed loading the current state.\n" +
 				              "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
+				console.log(e);
 				return e;
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`./state${timestamp}.json`, d);
+				stateCon.forceSave(`./state/state${timestamp}.json`, d);
 				console.log(`Saved the current state in 'state${timestamp}.json'.`);
 			} catch(e) {
 				console.error("Failed making a backup of the current state.");
+				console.log(e);
 				return e;
 			}
 		});
@@ -116,11 +174,11 @@ const stateCon = {
 		// what it does is backup the old state with a new file name, and save current state with the designated file name so you can get back to old one.
 		let target;
 		if(fileName) target=fileName;
-		else target="./state.json";
+		else target=defaultStateFileName;
 		// save the old one loaded at the startup.
 		stateCon.backup();
 		// save the current state with the designated file name.
-		stateCon.forceSave(target);
+		stateCon.forceSave(target, "", 1);
 		stateFileName = target;
 	}
 };

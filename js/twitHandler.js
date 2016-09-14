@@ -72,7 +72,7 @@ let tlCon = {
 		flush: function(really) {
 			if(really === "y" || really === "Y")
 				for(var i in tl)
-					tlCon.tab.remove(tl[i], 1);
+					tlCon.tab.remove(i, 1);
 		},
 		rename: function(tabName, alterName) {
 			if(typeof tabName !== "undefined"
@@ -115,7 +115,8 @@ let tlCon = {
 			tlCon.recentCall = true;
 			let tweets = tl[tabName].tweets;
 			let params = tl[tabName].params;
-
+			
+			params.count = 20;
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch(direction) {
@@ -129,13 +130,17 @@ let tlCon = {
 				// 		params.since_id = tweets[0].id_str;
 				// 	break;
 				case -1:
-					if(tweets[tweets.length-1])
-						params.max_id = tweets[tweets.length-1].id_str;
+					if(tweets[tweets.length-1]) {
+						params.max_id = tweets[tweets.length-1].id;
+						delete params.since_id;
+					}
 					break;
 				case 1:
 				default:
-					if(tweets[0])
-						params.since_id = tweets[0].id_str;
+					if(tweets[0]) {
+						params.since_id = tweets[0].id;
+						delete params.max_id;
+					}
 					break;
 			}
 

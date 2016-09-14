@@ -1,6 +1,6 @@
 let cmd = {
 	resize: function(w,h) {
-		window.resizeTo(w*8, h*15+25);
+		window.resizeTo(w*8, h*15/*+25*/);
 	},
 	rs: function(w,h) { return this.resize(w>13?w:13,h>6?h:6) },
 

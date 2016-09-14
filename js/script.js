@@ -47,7 +47,7 @@ const replaceDobj = (to, from) => {
 };
 let cmd = {
 	resize: function (w, h) {
-		window.resizeTo(w * 8, h * 15 + 25);
+		window.resizeTo(w * 8, h * 15 /*+25*/);
 	},
 	rs: function (w, h) {
 		return this.resize(w > 13 ? w : 13, h > 6 ? h : 6);
@@ -186,6 +186,7 @@ const loCon = {
 			case "close":
 				tlCon.tab.remove(tlOrder[tlCurrent]);
 				loCon.updateTabs();
+				loCon.updateMain();
 				break;
 			default:
 				layout.tabs = new display.tabObj(tlOrder);
@@ -221,7 +222,8 @@ const loCon = {
 		layout.imgView = dobj("section", [, "imgView"], "", [dobj("div", "", "", [dobj("img")])]);
 
 		layout.wrapper.appendChildren(layout.tabs, layout.main, layout.controls, layout.imgView);
-		document.body.appendChild(layout.wrapper);
+		// document.body.appendChild(layout.wrapper);
+		replaceDobj(layout.wrapper, document.body.firstChild);
 		loCon.updateTabs();
 	}
 
@@ -368,6 +370,7 @@ window.onload = () => {
 	// also build the screen.
 	console.groupCollapsed("Loading state...");
 	stateCon.load();
+	//stateCon.make();
 	console.groupEnd();
 	// add default event listeners globally.
 	document.addEventListener("keydown", keyPress);
@@ -377,13 +380,80 @@ window.onload = () => {
 	});
 	document.body.addEventListener("mousewheel", scrollHandler, false);
 };
+
+/*
+
+var storedTabs = [];
+for(var ts in tl) {
+	storedTabs.push(tl[ts].tweets.map(v => v.outerHTML))
+}
+state.tl = JSON.stringify(storedTabs)
+
+state.tl = JSON.parse(d.tl).map(function(v){;
+ */
 const fs = require('fs');
 
-let state = {};
-let stateFileName;
+// clone objects
+// http://stackoverflow.com/a/728694/4972931
+function cloneObj(obj) {
+	var copy;
+
+	// Handle the 3 simple types, and null or undefined
+	if (null == obj || "object" != typeof obj) return obj;
+
+	// Handle Date
+	if (obj instanceof Date) {
+		copy = new Date();
+		copy.setTime(obj.getTime());
+		return copy;
+	}
+
+	// Handle Array
+	if (obj instanceof Array) {
+		copy = [];
+		for (var i = 0, len = obj.length; i < len; i++) {
+			copy[i] = cloneObj(obj[i]);
+		}
+		return copy;
+	}
+
+	// Handle Object
+	if (obj instanceof Object) {
+		copy = {};
+		for (var attr in obj) {
+			if (obj.hasOwnProperty(attr)) copy[attr] = cloneObj(obj[attr]);
+		}
+		return copy;
+	}
+
+	throw new Error("Unable to copy obj! Its type isn't supported.");
+}
+
+const defaultStateFileName = './state/state.json';
+let state;
+let stateFileName = './state/state.json';
 const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
+	storedTabs: {},
+	restoreStoredTabs: dobj("div"),
+	storeTweets: () => {
+		stateCon.storedTabs = cloneObj(tl);
+		for (var ts in stateCon.storedTabs) stateCon.storedTabs[ts].tweets = tl[ts].tweets.map(v => v.outerHTML);
+		//return JSON.stringify(stateCon.storedTabs);
+		return stateCon.storedTabs;
+	},
+	restoreTweets: () => {
+		stateCon.storedTabs = state.tl;
+		for (let ts in stateCon.storedTabs) {
+			stateCon.storedTabs[ts].tweets = stateCon.storedTabs[ts].tweets.map(v => {
+				stateCon.restoreStoredTabs.innerHTML = v;
+				return stateCon.restoreStoredTabs.firstChild;
+			});
+		}
+		return stateCon.storedTabs;
+	},
+
 	make: () => {
 		loCon.init();
 		tlCon.tab.flush("Y");
@@ -393,23 +463,25 @@ const stateCon = {
 		const defaultState = JSON.stringify({
 			"width": 80,
 			"height": 24,
-			"tl": JSON.stringify(tl),
+			"tl": stateCon.storeTweets(),
 			"tlOrder": tlOrder,
 			"tlCurrent": tlCurrent
 		});
-		fs.writeFile("./state.json", defaultState, 'utf8', e => {
+		state = defaultState;
+		fs.writeFile(defaultStateFileName, JSON.stringify(state), 'utf8', e => {
 			if (e) {
 				console.error("Failed creating the default one.\n" + "Any new changes made in this session won't be saved.");
+				console.log(e);
 				return e;
 			}
-			stateFileName = "./state.json";
+			stateFileName = defaultStateFileName;
 			console.log("Created the default state.");
 		});
 		loCon.updateTabs();
 	},
 	load: fileName => {
 		let target;
-		if (fileName) target = fileName;else target = "./state.json";
+		if (fileName) target = fileName;else target = defaultStateFileName;
 
 		fs.readFile(target, 'utf8', (e, d) => {
 			if (e) {
@@ -419,7 +491,7 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
-				tl = state.tl;
+				tl = stateCon.restoreTweets();
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
 				stateFileName = target;
@@ -429,20 +501,17 @@ const stateCon = {
 				}
 				loCon.init();
 			} catch (e) {
-				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse()`?");
+				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
+				console.log(e);
 			}
 		});
 	},
-	forceSave: (fileName, contentOfState) => {
+	forceSave: (fileName, contentOfState, silent) => {
 		// assert `contentOfState` is already in a JSON form.
 		let target;
-		if (fileName) target = fileName;else target = "./state.json";
+		if (fileName) target = fileName;else target = defaultStateFileName;
 		let stateToSave;
 
-		/* TODO: I might want to change from Map to just Object if I come to the point that this map converting isn't working anymore.
-  `tl` is a Map, and I use `Array.from()` to convert it to a format that `JSON.stringify` can be applied.
-  It's only valid when the keys and values are serialisable.
-  See: http://stackoverflow.com/questions/28918232/how-do-i-persist-a-es6-map-in-localstorage-or-elsewhere/35078054#35078054 . */
 		if (contentOfState) {
 			stateToSave = contentOfState;
 		} else {
@@ -450,21 +519,21 @@ const stateCon = {
 			state = {
 				width: Math.round(window.innerWidth / charWidth),
 				height: Math.round(window.innerHeight / charHeight),
-				tl: tl,
+				tl: stateCon.storeTweets(),
 				tlOrder: tlOrder,
 				tlCurrent: tlCurrent
 			};
-			stateToSave = JSON.stringify(state);
+			stateToSave = JSON.stringify(state);console.log(stateToSave);
 		}
 
 		fs.writeFile(target, stateToSave, 'utf8', e => {
 			if (e) {
 				console.error("Failed saving current state!\n\
-				Try manually copy the result with `JSON.stringify(state)`");
+				Try manually copy the result with `JSON.stringify(state)` and save it as `./state/state.json`.");
 				return e;
 			}
 			stateFileName = target;
-			console.log("Saved the state.");
+			if (!silent) console.log("Saved the state.");
 		});
 	},
 	backup: () => {
@@ -472,14 +541,16 @@ const stateCon = {
 			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
 			if (e) {
 				console.error("Failed loading the current state.\n" + "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
+				console.log(e);
 				return e;
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`./state${ timestamp }.json`, d);
+				stateCon.forceSave(`./state/state${ timestamp }.json`, d);
 				console.log(`Saved the current state in 'state${ timestamp }.json'.`);
 			} catch (e) {
 				console.error("Failed making a backup of the current state.");
+				console.log(e);
 				return e;
 			}
 		});
@@ -487,11 +558,11 @@ const stateCon = {
 	save: fileName => {
 		// what it does is backup the old state with a new file name, and save current state with the designated file name so you can get back to old one.
 		let target;
-		if (fileName) target = fileName;else target = "./state.json";
+		if (fileName) target = fileName;else target = defaultStateFileName;
 		// save the old one loaded at the startup.
 		stateCon.backup();
 		// save the current state with the designated file name.
-		stateCon.forceSave(target);
+		stateCon.forceSave(target, "", 1);
 		stateFileName = target;
 	}
 };
@@ -591,7 +662,7 @@ let tlCon = {
 			if (noUpdate) {} else loCon.updateTabs();
 		},
 		flush: function (really) {
-			if (really === "y" || really === "Y") for (var i in tl) tlCon.tab.remove(tl[i], 1);
+			if (really === "y" || really === "Y") for (var i in tl) tlCon.tab.remove(i, 1);
 		},
 		rename: function (tabName, alterName) {
 			if (typeof tabName !== "undefined" && typeof alterName !== "undefined" && tl.hasOwnProperty(tabName) && !tl.hasOwnProperty(alterName) && tlOrder.indexOf(tabName) > -1 && tlOrder.indexOf(alterName) === -1) {
@@ -628,6 +699,7 @@ let tlCon = {
 			let tweets = tl[tabName].tweets;
 			let params = tl[tabName].params;
 
+			params.count = 20;
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch (direction) {
@@ -641,11 +713,17 @@ let tlCon = {
 				// 		params.since_id = tweets[0].id_str;
 				// 	break;
 				case -1:
-					if (tweets[tweets.length - 1]) params.max_id = tweets[tweets.length - 1].id_str;
+					if (tweets[tweets.length - 1]) {
+						params.max_id = tweets[tweets.length - 1].id;
+						delete params.since_id;
+					}
 					break;
 				case 1:
 				default:
-					if (tweets[0]) params.since_id = tweets[0].id_str;
+					if (tweets[0]) {
+						params.since_id = tweets[0].id;
+						delete params.max_id;
+					}
 					break;
 			}
 
