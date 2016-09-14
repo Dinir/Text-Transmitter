@@ -25,6 +25,7 @@ const loCon = {
 			case "close":
 				tlCon.tab.remove(tlOrder[tlCurrent]);
 				loCon.updateTabs();
+				loCon.updateMain();
 				break;
 			default:
 				layout.tabs = new display.tabObj(tlOrder);
@@ -89,7 +90,8 @@ const loCon = {
 			layout.controls,
 			layout.imgView
 		);
-		document.body.appendChild(layout.wrapper);
+		// document.body.appendChild(layout.wrapper);
+		replaceDobj(layout.wrapper, document.body.firstChild);
 		loCon.updateTabs();
 	}
 	
