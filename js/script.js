@@ -249,16 +249,15 @@ const loCon = {
 				changeClass(layout.main.children[layout.selectorPos], "cursor");
 				break;
 		}
-		// if current pos is the first position
 		if (layout.selectorPos === 0) {
+			// if current pos is the first position
 			window.scrollTo(0, 0); // just scroll to the top
 		} else if (layout.main.children[layout.selectorPos].offsetTop - 15 < document.body.scrollTop) {
 			// if the current item is above the screen
 			window.scrollTo(0, layout.main.children[layout.selectorPos].offsetTop - 15); // just scroll up to the start position of the item
-		}
-		// if current pos is the last position
-		if (layout.selectorPos === tl[tlOrder[tlCurrent]].tweets.length - 1) {
-			window.scrollTo(0, layout.main.clientHeight);console.log("reached the bottom"); // just scroll to the end
+		} else if (layout.selectorPos === tl[tlOrder[tlCurrent]].tweets.length - 1) {
+			// if current pos is the last position
+			window.scrollTo(0, layout.main.clientHeight); // just scroll to the end
 		} else if (layout.main.children[layout.selectorPos + 1] && layout.main.children[layout.selectorPos + 1].offsetTop > document.body.scrollTop + window.innerHeight - 15) {
 			// if the next item is below the screen
 			window.scrollTo(0, layout.main.children[layout.selectorPos + 1].offsetTop - window.innerHeight + 15); // scroll to next item's start position - current window height
