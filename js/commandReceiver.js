@@ -40,6 +40,27 @@ function keyPress(e) {
 		// ':' or '/' to open buffer
 		if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
 			ctl.toggleCommand();
+		// if pressed arrow keys
+		if((e.keyCode>=37 && e.keyCode<=40) ||
+		   e.keyCode===72 || e.keyCode===74 || e.keyCode===75 || e.keyCode===76) {
+			const k = e.keyCode;
+			switch(k) {
+				case 37:
+				case 72: // left
+					break;
+				case 40:
+				case 74: // down
+					loCon.updateSelector(-1);
+					break;
+				case 38:
+				case 75: // up
+					loCon.updateSelector(1);
+					break;
+				case 39:
+				case 76: // right
+					break;
+			}
+		}
 
 	} else { // when the buffer is open
 

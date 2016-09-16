@@ -5,6 +5,7 @@ const layout = {
 	controls: null,
 	imgView: null,
 	
+	selectorPos: 0,
 	currentLine: dobj("span",[,"currentLine"],"BOT"),
 	cmdContext: dobj("div","left","",[dobj("div","rightText","")])
 };
@@ -39,13 +40,49 @@ const loCon = {
 		layout.main = dobj("section",[,"main"],"");
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
-		loCon.updateScroll();
+		loCon.updateSelector();
 	},
 	updateStatus: () => {
 		
 	},
+	updateSelector: direction => {
+		switch(direction) {
+			case 1: // going up
+				if(layout.selectorPos>0) {
+					changeClass(layout.main.children[layout.selectorPos--], "cursor", " ");
+					changeClass(layout.main.children[layout.selectorPos], "cursor");
+				}
+				break;
+			case -1: // going down
+				if(layout.selectorPos+1<tl[tlOrder[tlCurrent]].tweets.length) {
+					changeClass(layout.main.children[layout.selectorPos++], "cursor", " ");
+					changeClass(layout.main.children[layout.selectorPos], "cursor");
+				}
+				break;
+			default:
+				layout.selectorPos = 0;
+				changeClass(layout.main.children[layout.selectorPos], "cursor");
+				break;
+		}
+		// if current pos is the first position
+		if(layout.selectorPos===0) {
+			window.scrollTo(0, 0); // just scroll to the top
+		} else if(layout.main.children[layout.selectorPos].offsetTop-15<document.body.scrollTop) {
+			// if the current item is above the screen
+			window.scrollTo(0,layout.main.children[layout.selectorPos].offsetTop-15); // just scroll up to the start position of the item
+		}
+		// if current pos is the last position
+		if(layout.selectorPos===tl[tlOrder[tlCurrent]].tweets.length-1) {
+			window.scrollTo(0,layout.main.clientHeight); // just scroll to the end
+		} else if(layout.main.children[layout.selectorPos+1] && layout.main.children[layout.selectorPos+1].offsetTop>document.body.scrollTop+window.innerHeight-15) {
+			// if the next item is below the screen
+			window.scrollTo(0,layout.main.children[layout.selectorPos+1].offsetTop-window.innerHeight+15); // scroll to next item's start position - current window height
+		}
+		loCon.updateScroll();
+	},
 	updateScroll: () => {
-		const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-330)*10000)/100+"%";
+		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
+		const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
 		if(scrollPos==="100%")
 			layout.currentLine.innerHTML = "BOT";
 		else
