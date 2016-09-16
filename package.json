@@ -4,7 +4,7 @@
   "main": "./main.js",
   "scripts": {
     "start": "./node_modules/.bin/electron .",
-    "buildscripts": "babel js --out-file js/script.js --ignore=js/script.js",
+    "buildscripts": "babel js --out-file js/script.js --ignore js/script.js,js/twit.js",
     "gencss": "/home/dinir/.gem/ruby/2.3.0/bin/sass --update scss:css",
     "electron-rebuild": "electron-rebuild"
   },

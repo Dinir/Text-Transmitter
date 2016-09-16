@@ -249,16 +249,15 @@ const loCon = {
 				changeClass(layout.main.children[layout.selectorPos], "cursor");
 				break;
 		}
-		// if current pos is the first position
 		if (layout.selectorPos === 0) {
+			// if current pos is the first position
 			window.scrollTo(0, 0); // just scroll to the top
 		} else if (layout.main.children[layout.selectorPos].offsetTop - 15 < document.body.scrollTop) {
 			// if the current item is above the screen
 			window.scrollTo(0, layout.main.children[layout.selectorPos].offsetTop - 15); // just scroll up to the start position of the item
-		}
-		// if current pos is the last position
-		if (layout.selectorPos === tl[tlOrder[tlCurrent]].tweets.length - 1) {
-			window.scrollTo(0, layout.main.clientHeight);console.log("reached the bottom"); // just scroll to the end
+		} else if (layout.selectorPos === tl[tlOrder[tlCurrent]].tweets.length - 1) {
+			// if current pos is the last position
+			window.scrollTo(0, layout.main.clientHeight); // just scroll to the end
 		} else if (layout.main.children[layout.selectorPos + 1] && layout.main.children[layout.selectorPos + 1].offsetTop > document.body.scrollTop + window.innerHeight - 15) {
 			// if the next item is below the screen
 			window.scrollTo(0, layout.main.children[layout.selectorPos + 1].offsetTop - window.innerHeight + 15); // scroll to next item's start position - current window height
@@ -629,25 +628,6 @@ const stateCon = {
 		stateFileName = target;
 	}
 };
-let Twit = require('twit');
-const
-//ck  = "xnUHcbRQGzwW1X0eeq2tonOvO",
-//cks = "gHhGwNK4pjdNVq9qRgZM5yFSLLr92AnrzsTPJZVxR0I74HAwKJ";
-ck = "adyOv8nxxNwe4q7MdoAsLTgV8",
-      cks = "GUZIeiN6HNWN23JlCiR9HwrUhvAbMNEJasj7UWlwp5NKiDQY00";
-const
-//at = "990651260-YngPXwEFJvSSILGSgtiBOzq0X1VECs3gEfDTINB7",
-//ats = "AoAhBNkawjH93yFD0erDw8nbjecHPQOeTvp2IOpN5sXdi";
-at = "712975464332075008-SSkhEdwP1fPPlh1sxy3LCggliOTIzjs",
-      ats = "TUZkw1GxHBpCHdJq7X1SsPCnOEqCyfUceAC2ss5iR1pWP";
-
-let t = new Twit({
-	consumer_key: ck,
-	consumer_secret: cks,
-	access_token: at,
-	access_token_secret: ats,
-	timeout_ms: 30 * 1000
-});
 /*
 `tl` contains name of tab, contents of tab with some other information combined as key-value pair.
  like
