@@ -9,6 +9,7 @@
 
 
 let receivingCommand = false;
+let navigatingThroughTweets = true;
 let lastKeyCode = 0;
 let cmdContextText, cmdContextRightText;
 const setCmdContext = (texts) => {
@@ -38,8 +39,10 @@ function keyPress(e) {
 
 	if(!receivingCommand) { // when the buffer is closed
 		// ':' or '/' to open buffer
-		if(e.shiftKey && e.keyCode===186 || e.keyCode===191)
+		if(e.shiftKey && e.keyCode===186 || e.keyCode===191) {
 			ctl.toggleCommand();
+			navigatingThroughTweets = !navigatingThroughTweets;
+		}
 		// if pressed arrow keys
 		if((e.keyCode>=37 && e.keyCode<=40) ||
 		   e.keyCode===72 || e.keyCode===74 || e.keyCode===75 || e.keyCode===76) {
@@ -47,6 +50,9 @@ function keyPress(e) {
 			switch(k) {
 				case 37:
 				case 72: // left
+					if(tlCurrent != 0) {
+						loCon.updateTabs("change", tlCurrent-1);
+					}
 					break;
 				case 40:
 				case 74: // down
@@ -58,6 +64,9 @@ function keyPress(e) {
 					break;
 				case 39:
 				case 76: // right
+					if(tlCurrent < tlOrder.length) {
+						loCon.updateTabs("change", tlCurrent+1);
+					}
 					break;
 			}
 		}
@@ -68,6 +77,7 @@ function keyPress(e) {
 		if(e.keyCode===27 || e.keyCode===13) {
 			if(e.keyCode===13) execute(query.value);
 			ctl.toggleCommand();
+			navigatingThroughTweets = !navigatingThroughTweets;
 		}
 	}
 }

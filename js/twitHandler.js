@@ -62,6 +62,7 @@ let tlCon = {
 					tlOrder.splice(position, 0, tabName);
 			}
 			loCon.updateTabs();
+			tlCon.update(tabName,1);
 		},
 		remove: function(tabName, noUpdate) {
 			delete tl[tabName];
@@ -146,6 +147,16 @@ let tlCon = {
 
 			t.get(contents.type, params, function(err,data,response){
 				// TODO learn what errors and response are for.
+				if(err) {
+					if(tabName === tlOrder[tlCurrent]) {
+						layout.main.appendChild(
+							dobj("div", "error", err, [])
+						);
+					}
+					console.log(`An error occured while updating ${tabName}.`);
+					emitErrorMsg(err.code);
+					return err;
+				}
 				/*TODO check if received data should attach to or replace the previous data.
 				for some of the api address the `direction` is meaningless
 				and the data received should replace old datas instead of attaching to it.
@@ -178,3 +189,11 @@ let tlCon = {
 		tlCon.update(tabName, direction);
 	}
 };
+
+const emitErrorMsg = (errCode) => {
+	switch(errCode) {
+		case 215:
+			console.log("Authentication tokens is not set right. Check `js/twit.js` and update the token data.");
+			break;
+	}
+}

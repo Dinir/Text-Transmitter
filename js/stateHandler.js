@@ -63,10 +63,10 @@ const stateCon = {
 	},
 	
 	make: () => {
-		loCon.init();
 		tlCon.tab.flush("Y");
 		tlCon.tab.add("Mention",{});
 		tlCon.tab.add("Home",{});
+		loCon.init();
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width":80,
@@ -102,6 +102,7 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
+				if(typeof state === "string") state = JSON.parse(state);
 				tl = stateCon.restoreTweets();
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
@@ -110,13 +111,14 @@ const stateCon = {
 				for(let i=0;i<tlOrder.length;i++) {
 					tlCon.forceUpdate(tlOrder[i], 1);
 				}
-				loCon.init();
 			}
 			catch(e) {
 				console.error("Failed parsing the state.\n" +
 				              "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
 				console.log(e);
 			}
+			loCon.updateSelector(-2);
+			loCon.init();
 		})
 	},
 	forceSave: (fileName, contentOfState, silent) => {

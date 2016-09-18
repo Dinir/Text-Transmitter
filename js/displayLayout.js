@@ -34,9 +34,11 @@ const loCon = {
 				replaceDobj(layout.tabs, document.getElementById("tabs"));
 				break;
 		}
-		loCon.updateScroll();
 	},
 	updateMain: () => {
+		if(layout.main && layout.main.children[layout.selectorPos]) {
+			loCon.updateSelector(-2);
+		}
 		layout.main = dobj("section",[,"main"],"");
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
@@ -54,14 +56,21 @@ const loCon = {
 				}
 				break;
 			case -1: // going down
-				if(layout.selectorPos+1<tl[tlOrder[tlCurrent]].tweets.length) {
+				if(layout.selectorPos<tl[tlOrder[tlCurrent]].tweets.length-1) {
 					changeClass(layout.main.children[layout.selectorPos++], "cursor", " ");
 					changeClass(layout.main.children[layout.selectorPos], "cursor");
 				}
 				break;
-			default:
-				layout.selectorPos = 0;
-				changeClass(layout.main.children[layout.selectorPos], "cursor");
+			case -2: // remove current selector indicatior
+				if(layout.main && layout.main.children)
+				changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+				break;
+			default: // keep the position between tabs
+					// changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+				if(layout.selectorPos >= tl[tlOrder[tlCurrent]].tweets.length) {
+				layout.selectorPos = tl[tlOrder[tlCurrent]].tweets.length!=0?tl[tlOrder[tlCurrent]].tweets.length-1:0;
+			}
+					changeClass(layout.main.children[layout.selectorPos], "cursor");
 				break;
 		}
 		if(layout.selectorPos===0) {
@@ -81,11 +90,13 @@ const loCon = {
 	},
 	updateScroll: () => {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
-		const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
-		if(scrollPos==="100%")
-			layout.currentLine.innerHTML = "BOT";
-		else
-			layout.currentLine.innerHTML = scrollPos;
+		if(layout.main) {
+			const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
+			if(scrollPos==="100%")
+				layout.currentLine.innerHTML = "BOT";
+			else
+				layout.currentLine.innerHTML = scrollPos;
+		}
 	},
 	// what does it do is changing parts of string:
 	// from: abcde<div class='rightText'>fghij</div>

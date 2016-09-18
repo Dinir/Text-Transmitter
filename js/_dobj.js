@@ -46,7 +46,7 @@ const changeClass = (target, firstCl, secondCl) => {
 		} else {
 			target.className = firstCl==="*"?
 				secondCl:
-				target.className.replace(new RegExp('\\s?'+firstCl), secondCl);
+				target.className.replace(new RegExp('\\s?'+firstCl), secondCl===" "?"":secondCl);
 		}
 	}
 };

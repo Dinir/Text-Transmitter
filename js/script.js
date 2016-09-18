@@ -38,7 +38,7 @@ const changeClass = (target, firstCl, secondCl) => {
 		if (!secondCl) {
 			target.className += ` ${ firstCl }`;
 		} else {
-			target.className = firstCl === "*" ? secondCl : target.className.replace(new RegExp('\\s?' + firstCl), secondCl);
+			target.className = firstCl === "*" ? secondCl : target.className.replace(new RegExp('\\s?' + firstCl), secondCl === " " ? "" : secondCl);
 		}
 	}
 };
@@ -71,6 +71,7 @@ function execute(command) {
 
 
 let receivingCommand = false;
+let navigatingThroughTweets = true;
 let lastKeyCode = 0;
 let cmdContextText, cmdContextRightText;
 const setCmdContext = texts => {
@@ -101,7 +102,10 @@ function keyPress(e) {
 	if (!receivingCommand) {
 		// when the buffer is closed
 		// ':' or '/' to open buffer
-		if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) ctl.toggleCommand();
+		if (e.shiftKey && e.keyCode === 186 || e.keyCode === 191) {
+			ctl.toggleCommand();
+			navigatingThroughTweets = !navigatingThroughTweets;
+		}
 		// if pressed arrow keys
 		if (e.keyCode >= 37 && e.keyCode <= 40 || e.keyCode === 72 || e.keyCode === 74 || e.keyCode === 75 || e.keyCode === 76) {
 			const k = e.keyCode;
@@ -109,6 +113,9 @@ function keyPress(e) {
 				case 37:
 				case 72:
 					// left
+					if (tlCurrent != 0) {
+						loCon.updateTabs("change", tlCurrent - 1);
+					}
 					break;
 				case 40:
 				case 74:
@@ -123,6 +130,9 @@ function keyPress(e) {
 				case 39:
 				case 76:
 					// right
+					if (tlCurrent < tlOrder.length) {
+						loCon.updateTabs("change", tlCurrent + 1);
+					}
 					break;
 			}
 		}
@@ -133,6 +143,7 @@ function keyPress(e) {
 		if (e.keyCode === 27 || e.keyCode === 13) {
 			if (e.keyCode === 13) execute(query.value);
 			ctl.toggleCommand();
+			navigatingThroughTweets = !navigatingThroughTweets;
 		}
 	}
 }
@@ -219,9 +230,11 @@ const loCon = {
 				replaceDobj(layout.tabs, document.getElementById("tabs"));
 				break;
 		}
-		loCon.updateScroll();
 	},
 	updateMain: () => {
+		if (layout.main && layout.main.children[layout.selectorPos]) {
+			loCon.updateSelector(-2);
+		}
 		layout.main = dobj("section", [, "main"], "");
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
@@ -239,13 +252,21 @@ const loCon = {
 				break;
 			case -1:
 				// going down
-				if (layout.selectorPos + 1 < tl[tlOrder[tlCurrent]].tweets.length) {
+				if (layout.selectorPos < tl[tlOrder[tlCurrent]].tweets.length - 1) {
 					changeClass(layout.main.children[layout.selectorPos++], "cursor", " ");
 					changeClass(layout.main.children[layout.selectorPos], "cursor");
 				}
 				break;
+			case -2:
+				// remove current selector indicatior
+				if (layout.main && layout.main.children) changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+				break;
 			default:
-				layout.selectorPos = 0;
+				// keep the position between tabs
+				// changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+				if (layout.selectorPos >= tl[tlOrder[tlCurrent]].tweets.length) {
+					layout.selectorPos = tl[tlOrder[tlCurrent]].tweets.length != 0 ? tl[tlOrder[tlCurrent]].tweets.length - 1 : 0;
+				}
 				changeClass(layout.main.children[layout.selectorPos], "cursor");
 				break;
 		}
@@ -266,8 +287,10 @@ const loCon = {
 	},
 	updateScroll: () => {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
-		const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - (window.innerHeight - 30)) * 10000) / 100 + "%";
-		if (scrollPos === "100%") layout.currentLine.innerHTML = "BOT";else layout.currentLine.innerHTML = scrollPos;
+		if (layout.main) {
+			const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - (window.innerHeight - 30)) * 10000) / 100 + "%";
+			if (scrollPos === "100%") layout.currentLine.innerHTML = "BOT";else layout.currentLine.innerHTML = scrollPos;
+		}
 	},
 	// what does it do is changing parts of string:
 	// from: abcde<div class='rightText'>fghij</div>
@@ -517,10 +540,10 @@ const stateCon = {
 	},
 
 	make: () => {
-		loCon.init();
 		tlCon.tab.flush("Y");
 		tlCon.tab.add("Mention", {});
 		tlCon.tab.add("Home", {});
+		loCon.init();
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width": 80,
@@ -553,6 +576,7 @@ const stateCon = {
 			}
 			try {
 				state = JSON.parse(d);
+				if (typeof state === "string") state = JSON.parse(state);
 				tl = stateCon.restoreTweets();
 				tlOrder = state.tlOrder;
 				tlCurrent = state.tlCurrent;
@@ -561,11 +585,12 @@ const stateCon = {
 				for (let i = 0; i < tlOrder.length; i++) {
 					tlCon.forceUpdate(tlOrder[i], 1);
 				}
-				loCon.init();
 			} catch (e) {
 				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
 				console.log(e);
 			}
+			loCon.updateSelector(-2);
+			loCon.init();
 		});
 	},
 	forceSave: (fileName, contentOfState, silent) => {
@@ -685,6 +710,7 @@ let tlCon = {
 				if (typeof position === "undefined") tlOrder.push(tabName);else tlOrder.splice(position, 0, tabName);
 			}
 			loCon.updateTabs();
+			tlCon.update(tabName, 1);
 		},
 		remove: function (tabName, noUpdate) {
 			delete tl[tabName];
@@ -760,6 +786,14 @@ let tlCon = {
 
 			t.get(contents.type, params, function (err, data, response) {
 				// TODO learn what errors and response are for.
+				if (err) {
+					if (tabName === tlOrder[tlCurrent]) {
+						layout.main.appendChild(dobj("div", "error", err, []));
+					}
+					console.log(`An error occured while updating ${ tabName }.`);
+					emitErrorMsg(err.code);
+					return err;
+				}
 				/*TODO check if received data should attach to or replace the previous data.
     for some of the api address the `direction` is meaningless
     and the data received should replace old datas instead of attaching to it.
@@ -792,5 +826,13 @@ let tlCon = {
 			tlCon.recentCall = false;
 		}
 		tlCon.update(tabName, direction);
+	}
+};
+
+const emitErrorMsg = errCode => {
+	switch (errCode) {
+		case 215:
+			console.log("Authentication tokens is not set right. Check `js/twit.js` and update the token data.");
+			break;
 	}
 };
