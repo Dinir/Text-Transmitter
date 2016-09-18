@@ -34,11 +34,13 @@ const dobj = function (tag, names, inner, children, ...moreProps) {
 const changeClass = (target, firstCl, secondCl) => {
 	// if first exist = add it
 	// if both exist = change first to second
-	if (firstCl) {
-		if (!secondCl) {
-			target.className += ` ${ firstCl }`;
-		} else {
-			target.className = firstCl === "*" ? secondCl : target.className.replace(new RegExp('\\s?' + firstCl), secondCl === " " ? "" : secondCl);
+	if (target) {
+		if (firstCl) {
+			if (!secondCl) {
+				target.className += ` ${ firstCl }`;
+			} else {
+				target.className = firstCl === "*" ? secondCl : target.className.replace(new RegExp('\\s?' + firstCl), secondCl === " " ? "" : secondCl);
+			}
 		}
 	}
 };
@@ -260,6 +262,14 @@ const loCon = {
 			case -2:
 				// remove current selector indicatior
 				if (layout.main && layout.main.children) changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+				break;
+			case -3:
+				// remove selector through loop
+				if (layout.main && layout.main.children) {
+					for (let i in layout.main.children) {
+						changeClass(layout.main.children[i], "cursor", " ");
+					}
+				}
 				break;
 			default:
 				// keep the position between tabs
@@ -574,6 +584,7 @@ const stateCon = {
 				stateCon.make();
 				return e;
 			}
+			loCon.updateSelector(-2);
 			try {
 				state = JSON.parse(d);
 				if (typeof state === "string") state = JSON.parse(state);
@@ -589,8 +600,12 @@ const stateCon = {
 				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
 				console.log(e);
 			}
-			loCon.updateSelector(-2);
 			loCon.init();
+			// DAMN
+			let damn = setTimeout(function () {
+				loCon.updateSelector(-3);
+				clearTimeout(this);
+			}, 3000);
 		});
 	},
 	forceSave: (fileName, contentOfState, silent) => {

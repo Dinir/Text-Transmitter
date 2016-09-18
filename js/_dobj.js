@@ -40,13 +40,15 @@ const dobj = function(tag, names, inner, children, ...moreProps) {
 const changeClass = (target, firstCl, secondCl) => {
 	// if first exist = add it
 	// if both exist = change first to second
-	if(firstCl) {
-		if(!secondCl) {
-			target.className += ` ${firstCl}`;
-		} else {
-			target.className = firstCl==="*"?
-				secondCl:
-				target.className.replace(new RegExp('\\s?'+firstCl), secondCl===" "?"":secondCl);
+	if(target) {
+		if(firstCl) {
+			if(!secondCl) {
+				target.className += ` ${firstCl}`;
+			} else {
+				target.className = firstCl==="*"?
+					secondCl:
+					target.className.replace(new RegExp('\\s?'+firstCl), secondCl===" "?"":secondCl);
+			}
 		}
 	}
 };

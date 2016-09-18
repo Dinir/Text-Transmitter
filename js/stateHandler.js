@@ -100,6 +100,7 @@ const stateCon = {
 				stateCon.make();
 				return e;
 			}
+			loCon.updateSelector(-2);
 			try {
 				state = JSON.parse(d);
 				if(typeof state === "string") state = JSON.parse(state);
@@ -117,8 +118,12 @@ const stateCon = {
 				              "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
 				console.log(e);
 			}
-			loCon.updateSelector(-2);
 			loCon.init();
+			// DAMN
+			let damn = setTimeout(function(){
+				loCon.updateSelector(-3);
+				clearTimeout(this);
+			}, 3000);
 		})
 	},
 	forceSave: (fileName, contentOfState, silent) => {

@@ -65,6 +65,13 @@ const loCon = {
 				if(layout.main && layout.main.children)
 				changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
 				break;
+			case -3: // remove selector through loop
+				if(layout.main && layout.main.children) {
+					for(let i in layout.main.children){
+						changeClass(layout.main.children[i], "cursor", " ");
+					}
+				}
+				break;
 			default: // keep the position between tabs
 					// changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
 				if(layout.selectorPos >= tl[tlOrder[tlCurrent]].tweets.length) {
