@@ -241,6 +241,21 @@ const loCon = {
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
 		loCon.updateSelector();
+		loCon.updateTimestamps();
+	},
+	updateTimestamps: ifAll => {
+		if (ifAll) {
+			for (let i in tl) {
+				for (let j = 0; j < tl[i].tweets.length; j++) {
+					tl[i].tweets[j].updateTS();
+				}
+			}
+		} else {
+			const cur = tlOrder[tlCurrent];
+			for (let j = 0; j < tl[cur].tweets.length; j++) {
+				tl[cur].tweets[j].updateTS();
+			}
+		}
 	},
 	updateStatus: () => {},
 	updateSelector: direction => {
@@ -267,7 +282,7 @@ const loCon = {
 				// remove selector through loop
 				if (layout.main && layout.main.children) {
 					for (let i in layout.main.children) {
-						changeClass(layout.main.children[i], "cursor", " ");
+						if (layout.main.children[i].className) changeClass(layout.main.children[i], "cursor", " ");
 					}
 				}
 				break;
@@ -422,6 +437,12 @@ const display = {
 			dom.appendChild(dobj("span", "retweet", "", [dobj("span", "username", userRTed), dobj("span", "timestamp", simplifyTimestamp(timeRTed))]));
 		}
 
+		dom.updateTS = () => {
+			if (timestamp) dom.getElementsByClassName("timestamp")[0].innerHTML = simplifyTimestamp(timestamp);
+			if (timeRTed) dom.querySelector(".retweet .timestamp").innerHTML = simplifyTimestamp(timeRTed);
+			if (timeQuote) dom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(timeQuote);
+		};
+
 		return dom;
 	},
 	tabObj: function (tlOrder) {
@@ -453,6 +474,13 @@ const replaceTabs = () => {
 	replaceDobj(layout.tabs, document.getElementById("tabs"));
 };
 
+const updateTimestamps = () => {
+	for (let i in tl) {
+		for (let j in tl[i].tweets) {
+			tl[i].tweets[j].updateTS();
+		}
+	}
+};
 /*
 test script:
 

@@ -170,6 +170,11 @@ section#main {
 		}
 		&.cursor {
 			background-color: $gry;
+			.retweet {
+				.timestamp {
+					color: $blk;
+				}
+			}
 		}
 	}
 }

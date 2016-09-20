@@ -126,6 +126,8 @@ section#main {
       text-indent: -8px; }
   section#main div.cursor {
     background-color: #555753; }
+    section#main div.cursor .retweet .timestamp {
+      color: #000000; }
 
 section#controls {
   position: fixed;

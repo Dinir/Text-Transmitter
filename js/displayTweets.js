@@ -129,6 +129,12 @@ const display = {
 			])
 		)}
 		
+		dom.updateTS = () => {
+			if(timestamp) dom.getElementsByClassName("timestamp")[0].innerHTML = simplifyTimestamp(timestamp);
+			if(timeRTed) dom.querySelector(".retweet .timestamp").innerHTML = simplifyTimestamp(timeRTed);
+			if(timeQuote) dom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(timeQuote);
+		};
+		
 		return dom;
 	},
 	tabObj: function(tlOrder) {
@@ -172,7 +178,6 @@ const replaceTabs = () => {
 	layout.tabs.make();
 	replaceDobj(layout.tabs, document.getElementById("tabs"));
 };
-
 /*
 test script:
 

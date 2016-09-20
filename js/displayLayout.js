@@ -43,6 +43,26 @@ const loCon = {
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
 		loCon.updateSelector();
+		loCon.updateTimestamps();
+	},
+	updateTimestamps: (ifAll) => {
+		if(ifAll) {
+			for(let i in tl) {
+				for(let j=0;
+				    j<tl[i].tweets.length;
+				    j++) {
+					tl[i].tweets[j].updateTS();
+				}
+			}
+		} else {
+			const cur = tlOrder[tlCurrent];
+			for(let j=0;
+			    j<tl[cur].tweets.length;
+			    j++) {
+				tl[cur].tweets[j].updateTS();
+			}
+		}
+		
 	},
 	updateStatus: () => {
 		
@@ -68,7 +88,7 @@ const loCon = {
 			case -3: // remove selector through loop
 				if(layout.main && layout.main.children) {
 					for(let i in layout.main.children){
-						changeClass(layout.main.children[i], "cursor", " ");
+						if(layout.main.children[i].className) changeClass(layout.main.children[i], "cursor", " ");
 					}
 				}
 				break;
