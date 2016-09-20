@@ -64,7 +64,7 @@ function keyPress(e) {
 					break;
 				case 39:
 				case 76: // right
-					if(tlCurrent < tlOrder.length) {
+					if(tlCurrent < tlOrder.length-1) {
 						loCon.updateTabs("change", tlCurrent+1);
 					}
 					break;

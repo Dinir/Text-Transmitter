@@ -43,15 +43,15 @@ const loCon = {
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
 		loCon.updateSelector();
-		loCon.updateTimestamps();
+		loCon.updateTS();
 	},
-	updateTimestamps: (ifAll) => {
+	updateTS: (ifAll) => {
 		if(ifAll) {
 			for(let i in tl) {
 				for(let j=0;
 				    j<tl[i].tweets.length;
 				    j++) {
-					tl[i].tweets[j].updateTS();
+					updateTimestamps(tl[i].tweets[j]);
 				}
 			}
 		} else {
@@ -59,7 +59,7 @@ const loCon = {
 			for(let j=0;
 			    j<tl[cur].tweets.length;
 			    j++) {
-				tl[cur].tweets[j].updateTS();
+				updateTimestamps(tl[cur].tweets[j]);
 			}
 		}
 		

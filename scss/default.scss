@@ -164,7 +164,6 @@ section#main {
 				text-indent: 0;
 			}
 			.text {
-				display: inline-block;
 				text-indent: -8px;
 			}
 		}
@@ -174,6 +173,9 @@ section#main {
 				.timestamp {
 					color: $blk;
 				}
+			}
+			.quote {
+				color: $blk;
 			}
 		}
 	}

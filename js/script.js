@@ -132,7 +132,7 @@ function keyPress(e) {
 				case 39:
 				case 76:
 					// right
-					if (tlCurrent < tlOrder.length) {
+					if (tlCurrent < tlOrder.length - 1) {
 						loCon.updateTabs("change", tlCurrent + 1);
 					}
 					break;
@@ -241,19 +241,19 @@ const loCon = {
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
 		loCon.updateSelector();
-		loCon.updateTimestamps();
+		loCon.updateTS();
 	},
-	updateTimestamps: ifAll => {
+	updateTS: ifAll => {
 		if (ifAll) {
 			for (let i in tl) {
 				for (let j = 0; j < tl[i].tweets.length; j++) {
-					tl[i].tweets[j].updateTS();
+					updateTimestamps(tl[i].tweets[j]);
 				}
 			}
 		} else {
 			const cur = tlOrder[tlCurrent];
 			for (let j = 0; j < tl[cur].tweets.length; j++) {
-				tl[cur].tweets[j].updateTS();
+				updateTimestamps(tl[cur].tweets[j]);
 			}
 		}
 	},
@@ -362,13 +362,25 @@ const display = {
 		let timestamp = storeTimestamp(raw.created_at);
 		let username = raw.user.screen_name;
 		let text = raw.text;
+		let images;
 
 		// less original data
 		let isReply = raw.entities.user_mentions.length > 0 || raw.in_reply_to_status_id_str !== null;
 		let isRetweet = typeof raw.retweeted_status !== "undefined";
 		let isQuote = raw.is_quote_status;
-		let hasImage = typeof raw.entities.media !== "undefined";
-		let hasLink = raw.entities.urls.length > 0;
+		let hasImage = hasImageInRT = hasImageInQT = hasLink = false;
+		if (raw.extended_entities && raw.extended_entities.media) {
+			let hasImage = typeof raw.extended_entities.media !== "undefined";
+		}
+		if (raw.retweeted_status && raw.retweeted_status.extended_entities && raw.retweeted_status.extended_entities.media) {
+			let hasImageInRT = typeof raw.retweeted_status.extended_entities.media !== "undefined";
+		}
+		if (raw.quoted_status && raw.quoted_status.extended_entities && raw.quoted_status.extended_entities.media) {
+			let hasImageInQT = typeof raw.quoted_status.extended_entities.media !== "undefined";
+		}
+		if (raw.entities.urls) {
+			let hasLink = raw.entities.urls.length > 0;
+		}
 
 		// data I should produce
 		let doesPing = false;
@@ -408,7 +420,13 @@ const display = {
                                                                     */
 			}
 		}
-		if (hasImage) {
+		if (hasImageInQT) {}
+		if (hasImageInRT) {} else if (hasImage) {
+			images = raw.extended_entities.media.map(v => ({
+				indices: v.indices,
+				url: v.media_url_https,
+				display_url: v.display_url
+			}));
 			// let images = raw.extended_entities.media.map(function(v) {
 			// 	manipulationIndices.push([...v.indices,]);
 			// 	return {
@@ -429,19 +447,15 @@ const display = {
 		}
 		if (hasLink) {}
 
-		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "timestamp", simplifyTimestamp(timestamp)), dobj("span", `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`, username), dobj("pre", "text", text)]);
+		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "rawTS", timestamp.format(), [], "style", "display:none;"), dobj("span", "timestamp", simplifyTimestamp(timestamp)), dobj("span", `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`, username), dobj("pre", "text", text)]);
 		if (isQuote && (raw.quoted_status || raw.retweeted_status && raw.retweeted_status.quoted_status)) {
-			dom.appendChild(dobj("span", "quote", "", [dobj("span", "timestamp", simplifyTimestamp(timeQuote)), dobj("span", "username", userQuote), dobj("pre", "text", textQuote)]));
+			dom.appendChild(dobj("span", "quote", "", [dobj("span", "rawTS", timeQuote.format(), [], "style", "display:none;"), dobj("span", "timestamp", simplifyTimestamp(timeQuote)), dobj("span", "username", userQuote), dobj("pre", "text", textQuote)]));
 		}
 		if (isRetweet) {
-			dom.appendChild(dobj("span", "retweet", "", [dobj("span", "username", userRTed), dobj("span", "timestamp", simplifyTimestamp(timeRTed))]));
+			dom.appendChild(dobj("span", "retweet", "", [dobj("span", "rawTS", timeRTed.toString(), [], "style", "display:none;"), dobj("span", "username", userRTed), dobj("span", "timestamp", simplifyTimestamp(timeRTed))]));
 		}
-
-		dom.updateTS = () => {
-			if (timestamp) dom.getElementsByClassName("timestamp")[0].innerHTML = simplifyTimestamp(timestamp);
-			if (timeRTed) dom.querySelector(".retweet .timestamp").innerHTML = simplifyTimestamp(timeRTed);
-			if (timeQuote) dom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(timeQuote);
-		};
+		if (hasImageInQT) {}
+		if (hasImageInRT) {} else if (hasImage) {}
 
 		return dom;
 	},
@@ -473,13 +487,10 @@ const replaceTabs = () => {
 	layout.tabs.make();
 	replaceDobj(layout.tabs, document.getElementById("tabs"));
 };
-
-const updateTimestamps = () => {
-	for (let i in tl) {
-		for (let j in tl[i].tweets) {
-			tl[i].tweets[j].updateTS();
-		}
-	}
+const updateTimestamps = tweetDom => {
+	tweetDom.getElementsByClassName("timestamp")[0].innerHTML = simplifyTimestamp(moment(tweetDom.getElementsByClassName("rawTS")[0].innerHTML));
+	if (tweetDom.getElementsByClassName("retweet").length) tweetDom.querySelector(".retweet .timestamp").innerHTML = simplifyTimestamp(moment(tweetDom.querySelector(".retweet .rawTS").innerHTML));
+	if (tweetDom.getElementsByClassName("quote").length) tweetDom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(moment(tweetDom.querySelector(".quote .rawTS").innerHTML));
 };
 /*
 test script:
