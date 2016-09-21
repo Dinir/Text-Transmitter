@@ -31,7 +31,6 @@ const display = {
 		let timestamp = storeTimestamp(raw.created_at);
 		let username = raw.user.screen_name;
 		let text = raw.text;
-		let images;
 		
 		// less original data
 		let isReply =
@@ -39,33 +38,7 @@ const display = {
 			raw.in_reply_to_status_id_str !== null;
 		let isRetweet = typeof raw.retweeted_status !== "undefined";
 		let isQuote = raw.is_quote_status;
-		let hasImage
-			= hasImageInRT
-			= hasImageInQT
-			= hasLink
-			= false;
-		if(raw.extended_entities &&
-		   raw.extended_entities.media) {
-			let hasImage = typeof raw.extended_entities.media !== "undefined";
-		}
-		if(raw.retweeted_status &&
-		   raw.retweeted_status.extended_entities &&
-		   raw.retweeted_status.extended_entities.media) {
-			let hasImageInRT = typeof raw.retweeted_status.extended_entities.media !== "undefined";
-		}
-		if(raw.quoted_status &&
-		   raw.quoted_status.extended_entities &&
-		   raw.quoted_status.extended_entities.media) {
-			let hasImageInQT = typeof raw.quoted_status.extended_entities.media !== "undefined";
-		}
-		if(raw.entities.urls) {
-			let hasLink = raw.entities.urls.length > 0;
-		}
 		
-		// data I should produce
-		let doesPing = false;
-		let repliedTo = ['', '']; // type(username?status?), address
-
 		// make additional data related to the default data if needed
 		let userRTed, timeRTed, timeQuote, userQuote, textQuote;
 		if(raw.entities.user_mentions.length > 0) {
@@ -85,14 +58,14 @@ const display = {
 				userQuote = raw.quoted_status.user.screen_name;
 				textQuote = raw.quoted_status.text;
 			} else if(raw.retweeted_status &&
-			         raw.retweeted_status.quoted_status) {
+			          raw.retweeted_status.quoted_status) {
 				timeQuote = storeTimestamp(raw.retweeted_status.quoted_status.created_at);
 				userQuote = raw.retweeted_status.quoted_status.user.screen_name;
 				textQuote = raw.retweeted_status.quoted_status.text;
 				// it'll do the multiple quote tweet display.
-			/*} else if(raw.entities.urls.length !== 0) {
-				const urls = raw.entities.urls;
-				const isItStatusUrl = /https:\/\/twitter.com\/.*\/status\/\d*//*;
+				/*} else if(raw.entities.urls.length !== 0) {
+					const urls = raw.entities.urls;
+					const isItStatusUrl = /https:\/\/twitter.com\/.*\/status\/\d*//*;
 				if(urls.map(function(o){return o.expanded_url}).join().search(isItStatusUrl) !== -1) {
 					timeQuote = [];
 					userQuote = [];
@@ -104,38 +77,162 @@ const display = {
 				*/
 			}
 		}
+		
+		// check image/link/hashtag/mention
+		let hasImage = hasImageInRT = hasImageInQT
+			= hasLink = hasLinkInRT = hasLinkInQT
+			= hasHashtag = hasHashtagInRT = hasHashtagInQT
+			= hasMention = hasMentionInRT = hasMentionInQT
+			= false;
+		let images = links = hashtags = mentions
+			= imagesInRT = linksInRT = hashtagsInRT = mentionsInRT
+			= imagesInQT = linksInQT = hashtagsInQT = mentionsInQT
+			= [];
+		// check if it has images
+		if(raw.extended_entities &&
+		   raw.extended_entities.media) {
+			hasImage = typeof raw.extended_entities.media !== "undefined";
+		}
+		if(raw.retweeted_status &&
+		   raw.retweeted_status.extended_entities &&
+		   raw.retweeted_status.extended_entities.media) {
+			hasImageInRT = typeof raw.retweeted_status.extended_entities.media !== "undefined";
+		}
+		if(raw.quoted_status &&
+		   raw.quoted_status.extended_entities &&
+		   raw.quoted_status.extended_entities.media) {
+			hasImageInQT = typeof raw.quoted_status.extended_entities.media !== "undefined";
+		}
+		// check if it has links
+		if(raw.entities.urls) {
+			hasLink = raw.entities.urls.length > 0;
+		}
+		if(raw.retweeted_status &&
+		   raw.retweeted_status.entities.urls) {
+			hasLinkInRT = raw.retweeted_status.entities.urls.length>0;
+		}
+		if(raw.quoted_status &&
+		   raw.quoted_status.entities.urls) {
+			hasLinkInQT = raw.quoted_status.entities.urls.length>0;
+		}
+		// check if it has hashtags
+		if(raw.entities.hashtags) {
+			hasHashtag = raw.entities.hashtags.length > 0;
+		}
+		if(raw.retweeted_status &&
+		   raw.retweeted_status.entities.hashtags) {
+			hasHashtagInRT = raw.retweeted_status.entities.hashtags.length>0;
+		}
+		if(raw.quoted_status &&
+		   raw.quoted_status.entities.hashtags) {
+			hasHashtagInQT = raw.quoted_status.entities.hashtags.length>0;
+		}
+		// check if it has mentions
+		if(raw.entities.user_mentions) {
+			hasMention = raw.entities.user_mentions.length > 0;
+		}
+		if(raw.retweeted_status &&
+		   raw.retweeted_status.entities.user_mentions) {
+			hasMentionInRT = raw.retweeted_status.entities.user_mentions.length>0;
+		}
+		if(raw.quoted_status &&
+		   raw.quoted_status.entities.user_mentions) {
+			hasMentionInQT = raw.quoted_status.entities.user_mentions.length>0;
+		}
+		
 		if(hasImageInQT) {
-			
+			imagesInQT = raw.quoted_status.extended_entities.media.map(v => ({
+				indices: v.indices,
+				url: v.media_url_https,
+				display_url: v.display_url
+			}));
 		}
 		if(hasImageInRT) {
-			
+			imagesInRT = raw.retweeted_status.extended_entities.media.map(v => ({
+				indices: v.indices,
+				url: v.media_url_https,
+				display_url: v.display_url
+			}));
 		} else if(hasImage) {
 			images = raw.extended_entities.media.map(v => ({
 				indices: v.indices,
 				url: v.media_url_https,
 				display_url: v.display_url
 			}));
-			// let images = raw.extended_entities.media.map(function(v) {
-			// 	manipulationIndices.push([...v.indices,]);
-			// 	return {
-			// 		indices:v.indices,
-			// 		url:v.media_url_https
-			// 	}
-			// });
-			// raw.extended_entities.media.forEach(
-			// 	v => {
-			// 		manipulationIndices.push([
-			// 			...v.indices,
-			// 			(
-			// 				1
-			// 			)
-			// 		]);
-			// 	}
-			// );
 		}
-		if(hasLink) {
+		if(hasLinkInQT) {
+			linksInQT = raw.quoted_status.extended_entities.urls.map(v => ({
+				indices: v.indices,
+				url: v.expanded_url,
+				display_url: v.display_url
+			}));
+		}
+		if(hasLinkInRT) {
+			linksInRT = raw.retweeted_status.extended_entities.urls.map(v => ({
+				indices: v.indices,
+				url: v.expanded_url,
+				display_url: v.display_url
+			}));
+		} else if(hasLink) {
+			links = raw.extended_entities.urls.map(v => ({
+				indices: v.indices,
+				url: v.expanded_url,
+				display_url: v.display_url
+			}));
+		}
+		if(hasHashtagInQT) {
+			hashtagsInQT = raw.quoted_status.extended_entities.hashtag.map(v => ({
+				indices: v.indices,
+				text: v.text
+			}));
+		}
+		if(hasHashtagInRT) {
+			hashtagsInRT = raw.retweeted_status.extended_entities.hashtag.map(v => ({
+				indices: v.indices,
+				text: v.text
+			}));
+		} else if(hasHashtag) {
+			hashtags = raw.extended_entities.hashtag.map(v => ({
+				indices: v.indices,
+				text: v.text
+			}));
+		}
+		if(hasMentionInQT) {
+			mentionsInQT = raw.quoted_status.extended_entities.urls.map(v => ({
+				indices: v.indices,
+				id_str: v.id_str,
+				screen_name: v.screen_name
+			}));
+		}
+		if(hasMentionInRT) {
+			mentionsInRT = raw.retweeted_status.extended_entities.media.map(v => ({
+				indices: v.indices,
+				id_str: v.id_str,
+				screen_name: v.screen_name
+			}));
+		} else if(hasMention) {
+			mentions = raw.extended_entities.hashtag.map(v => ({
+				indices: v.indices,
+				id_str: v.id_str,
+				screen_name: v.screen_name
+			}));
+		}
+		// apply the image/link/hashtag/mention
+		if(isQuote) {
+			for(let i in imagesInQT) {
+				const ci = imagesInQT[ci];
+				text = replaceStr(text, ci.indices[0], ci.indices[1],
+					dobj("span","img",ci.display_url,[],"onclick","function(){alert(1);}").outerHTML
+				)
+			}
+		}
+		if(isRetweet) {
+			
+		} else {
 			
 		}
+		let doesPing = false;
+		let repliedTo = ['', '']; // type(username?status?), address
 		
 		const dom = dobj("div",["twitObj",id],"",[
 			
@@ -165,7 +262,8 @@ const display = {
 			])
 		)}
 		if(hasImageInQT) {
-			
+			dom.querySelector(".quote .text").innerHTML =
+				dom.querySelector(".quote .text").innerHTML.replace()
 		}
 		if(hasImageInRT) {
 			
@@ -221,6 +319,11 @@ const updateTimestamps = tweetDom => {
 	if(tweetDom.getElementsByClassName("retweet").length) tweetDom.querySelector(".retweet .timestamp").innerHTML = simplifyTimestamp(moment(tweetDom.querySelector(".retweet .rawTS").innerHTML));
 	if(tweetDom.getElementsByClassName("quote").length) tweetDom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(moment(tweetDom.querySelector(".quote .rawTS").innerHTML));
 };
+
+const replaceStr = (str, start, end, what) =>
+	(str.substring(0, start)
+	 + what
+	 + str.substring(end));
 /*
 test script:
 

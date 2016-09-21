@@ -162,25 +162,37 @@ let tlCon = {
 				and the data received should replace old datas instead of attaching to it.
 				but we're only testing for home, mention, user timeline at the moment
 				so the default behavior will be adding the data to the old one.*/
-				data = data.map(c => new display.twitObj(c));
-				switch(direction) {
-					case 1:
-						tweets = data.concat(tweets);
-						break;
-					case -1:
-						tweets.pop();
-						tweets = tweets.concat(data);
-						break;
-					case 0: // for those which doesn't need previous datas?
-						tweets = data;
-						break;
+				try {
+					data = data.map(c => new display.twitObj(c));
+					switch(direction) {
+						case 1:
+							tweets = data.concat(tweets);
+							break;
+						case -1:
+							tweets.pop();
+							tweets = tweets.concat(data);
+							break;
+						case 0: // for those which doesn't need previous datas?
+							tweets = data;
+							break;
+					}
+					contents.tweets = tweets;
+					contents.params = params;
+					tl[tabName] = contents;
+					if(tlOrder[tlCurrent]===tabName)
+						loCon.updateMain();
+					tlCon.recentCall = false;
+				} catch(e) {
+					if(tabName === tlOrder[tlCurrent]) {
+						// DAMN (2)
+						let damn = setTimeout(function(){
+							loCon.updateTabs("change", tlCurrent);
+							clearTimeout(this);
+						}, 1000);
+					}
+					console.log(`An error occured while updating ${tabName}.`);
+					emitErrorMsg(e.code);
 				}
-				contents.tweets = tweets;
-				contents.params = params;
-				tl[tabName] = contents;
-				if(tlOrder[tlCurrent] === tabName)
-					loCon.updateMain();
-				tlCon.recentCall = false;
 			}); // t.get
 		} // if-else tlCon.recentCall
 	}, // update
