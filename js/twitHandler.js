@@ -15,22 +15,6 @@ let tl = {};
 let tlOrder = [];
 let tlCurrent = 0;
 
-const URI = {
-	"Mention":'statuses/mentions_timeline',
-	"User":'statuses/user_timeline',
-	"Home":'statuses/home_timeline',
-	"RTed":'statuses/retweets_of_me',
-	"DM Sent":'direct_messages/sent',
-	"Search":'search/tweets',
-	"DM":'direct_messages',
-	"L":'lists/statuses'
-};
-const streamURI = {
-	"Filter":'statuses/filter',
-	"Sample":'statuses/sample',
-	"User":'user'
-};
-
 let tlCon = {
 	tab: {
 		// that address should not be encouraged to be filled manually by users. it's the one listed in https://dev.twitter.com/rest/public.
@@ -154,7 +138,7 @@ let tlCon = {
 						);
 					}
 					console.log(`An error occured while updating ${tabName}.`);
-					emitErrorMsg(err.code);
+					emitErrorMsgFromCode(err.code);
 					return err;
 				}
 				/*TODO check if received data should attach to or replace the previous data.
@@ -188,10 +172,10 @@ let tlCon = {
 						let damn = setTimeout(function(){
 							loCon.updateTabs("change", tlCurrent);
 							clearTimeout(this);
-						}, 1000);
+						}, 2000);
 					}
 					console.log(`An error occured while updating ${tabName}.`);
-					emitErrorMsg(e.code);
+					console.log(e.stack);
 				}
 			}); // t.get
 		} // if-else tlCon.recentCall
@@ -202,7 +186,7 @@ let tlCon = {
 	}
 };
 
-const emitErrorMsg = (errCode) => {
+const emitErrorMsgFromCode = (errCode) => {
 	switch(errCode) {
 		case 215:
 			console.log("Authentication tokens is not set right. Check `js/twit.js` and update the token data.");

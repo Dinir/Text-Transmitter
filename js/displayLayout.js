@@ -68,6 +68,9 @@ const loCon = {
 		
 	},
 	updateSelector: direction => {
+		// do not set variables for frequently used parts
+		// no curtl = tl[tlOrder[tlCurrent]],
+		// no listArray = layout.main.children
 		switch(direction) {
 			case 1: // going up
 				if(layout.selectorPos>0) {
@@ -119,9 +122,10 @@ const loCon = {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
 		if(layout.main) {
 			const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
-			if(scrollPos==="100%")
+			if(scrollPos==="100%") {
 				layout.currentLine.innerHTML = "BOT";
-			else
+				tlCon.update(tlOrder[tlCurrent], -1);
+			} else
 				layout.currentLine.innerHTML = scrollPos;
 		}
 	},

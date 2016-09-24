@@ -55,3 +55,17 @@ const changeClass = (target, firstCl, secondCl) => {
 const replaceDobj = (to, from) => {
 	from.parentNode.replaceChild(to,from);
 };
+const newImgAnchor = addresses => {
+	let address = [];
+	if(addresses.constructor === Array) {
+		if(addresses[0]) address[0] = addresses[0];
+		if(addresses[1]) address[1] = addresses[1];
+	} else {
+		address[0] = addresses;
+	}
+	const theAnchor = dobj("a","link img",address[0],[],
+		"href",`${address[1]?address[1]:address[0]}`,
+		"target","_blank"
+	);
+	return theAnchor.outerHTML;
+};

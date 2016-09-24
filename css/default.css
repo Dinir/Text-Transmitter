@@ -77,16 +77,16 @@ section#main {
       color: #fce94f; }
     section#main div .username:hover {
       text-decoration: underline; }
-  section#main div pre.text {
+  section#main div div.text {
     display: inline;
-    white-space: pre-wrap; }
-    section#main div pre.text:before {
+    /*white-space: pre-wrap;*/ }
+    section#main div div.text:before {
       content: " "; }
-    section#main div pre.text:after {
+    section#main div div.text:after {
       content: none; }
-    section#main div pre.text .link {
+    section#main div div.text .link {
       color: #3465a4; }
-      section#main div pre.text .link:hover {
+      section#main div div.text .link:hover {
         text-decoration: underline; }
   section#main div .timestamp {
     display: inline;
@@ -149,6 +149,10 @@ section#controls {
   	position: relative;
   	left: -8px;
   }*/ }
+    section#controls #commandInput #commandContext .contextCmdDict {
+      color: #ffffff;
+      background-color: #555753;
+      font-weight: bold; }
     section#controls #commandInput #commandContext .username {
       font-weight: bold; }
     section#controls #commandInput #commandContext .rightText {

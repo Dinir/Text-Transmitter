@@ -21,7 +21,10 @@ const setCmdContext = (texts) => {
 			if(texts[1] !== undefined) cmdContextRightText = texts[1];
 		} else {
 			cmdContextText = texts;
+			cmdContextRightText = "";
 		}
+	} else {
+		cmdContextText = cmdContextRightText = "";
 	}
 	loCon.cmdContextUpdate();
 };
@@ -35,6 +38,10 @@ function keyPress(e) {
 	// scroll a page when presses 'PgUp/Dn'
 	if(e.keyCode===33 || e.keyCode===34) {
 		document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
+		if(e.keyCode===33) // selector also goes up
+			loCon.updateSelector(2);
+		else // selector also goes down
+			loCon.updateSelector(-2);
 	}
 
 	if(!receivingCommand) { // when the buffer is closed
@@ -84,10 +91,27 @@ function keyPress(e) {
 
 function checkStates() {
 	const query = document.getElementById("query");
+	const context = document.getElementById("commandContext");
 	// 'backspace' or 'delete' to empty the buffer to close it
 	if((lastKeyCode===8 || lastKeyCode===46)
 	                      && query.value.length === 0)
 		ctl.toggleCommand();
+	
+	// shows related status above the query
+	if(query.value.length>=3) {
+		if(query.value.match(/:([\w\d]+)\s/)) {
+			currentCmdInQuery = query.value.match(/:([\w\d]+)\s/)[1];
+			if(cmd.hasOwnProperty(currentCmdInQuery)) {
+				switch(currentCmdInQuery) {
+					default:
+						setCmdContext(cmdDict.show(currentCmdInQuery));
+						break;
+				}
+			}
+		}
+	} else {
+		setCmdContext();
+	}
 }
 
 // it toggles what the bottom line shows every time it's invoked.

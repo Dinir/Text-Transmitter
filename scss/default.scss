@@ -117,10 +117,10 @@ section#main {
 				text-decoration: underline;
 			}
 		}
-		pre.text {
+		div.text {
 			@include addBlank(true, false);
-			display: inline; // removes line break at the start of pre
-			white-space: pre-wrap; // properly wrap texts inside the area
+			display: inline; // removes line break at the start of the text
+			/*white-space: pre-wrap;*/ // properly wrap texts inside the area
 			.link {
 				color: $blu;
 				&:hover {
@@ -200,6 +200,10 @@ section#controls {
 		display: none;
 		width: 105%;
 		#commandContext {
+			.contextCmdDict {
+				@include highlight($text, $gry);
+				font-weight: bold;
+			}
 			.username {
 				font-weight: bold;
 			}

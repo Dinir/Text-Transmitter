@@ -79,160 +79,138 @@ const display = {
 		}
 		
 		// check image/link/hashtag/mention
-		let hasImage = hasImageInRT = hasImageInQT
-			= hasLink = hasLinkInRT = hasLinkInQT
-			= hasHashtag = hasHashtagInRT = hasHashtagInQT
-			= hasMention = hasMentionInRT = hasMentionInQT
-			= false;
-		let images = links = hashtags = mentions
-			= imagesInRT = linksInRT = hashtagsInRT = mentionsInRT
-			= imagesInQT = linksInQT = hashtagsInQT = mentionsInQT
-			= [];
-		// check if it has images
-		if(raw.extended_entities &&
-		   raw.extended_entities.media) {
-			hasImage = typeof raw.extended_entities.media !== "undefined";
+		let hasImage = {T:false, RT:false, QT:false};
+		let hasLink = {T:false, RT:false, QT:false};
+		let hasHashtag = {T:false, RT:false, QT:false};
+		let hasMention = {T:false, RT:false, QT:false};
+		let images = {T:[], RT:[], QT:[]};
+		let links = {T:[], RT:[], QT:[]};
+		let hashtags = {T:[], RT:[], QT:[]};
+		let mentions = {T:[], RT:[], QT:[]};
+		// check if it has medias in its status
+		if(raw.extended_entities && raw.extended_entities.media)
+			hasImage["T"] = typeof raw.extended_entities.media !== "undefined";
+		if(raw.entities) {
+			if(raw.entities.urls)
+				hasLink["T"] = raw.entities.urls.length > 0;
+			if(raw.entities.hashtags)
+				hasHashtag["T"] = raw.entities.hashtags.length > 0;
+			if(raw.entities.user_mentions)
+				hasMention["T"] = raw.entities.user_mentions.length > 0;
 		}
-		if(raw.retweeted_status &&
-		   raw.retweeted_status.extended_entities &&
-		   raw.retweeted_status.extended_entities.media) {
-			hasImageInRT = typeof raw.retweeted_status.extended_entities.media !== "undefined";
-		}
-		if(raw.quoted_status &&
-		   raw.quoted_status.extended_entities &&
-		   raw.quoted_status.extended_entities.media) {
-			hasImageInQT = typeof raw.quoted_status.extended_entities.media !== "undefined";
-		}
-		// check if it has links
-		if(raw.entities.urls) {
-			hasLink = raw.entities.urls.length > 0;
-		}
-		if(raw.retweeted_status &&
-		   raw.retweeted_status.entities.urls) {
-			hasLinkInRT = raw.retweeted_status.entities.urls.length>0;
-		}
-		if(raw.quoted_status &&
-		   raw.quoted_status.entities.urls) {
-			hasLinkInQT = raw.quoted_status.entities.urls.length>0;
-		}
-		// check if it has hashtags
-		if(raw.entities.hashtags) {
-			hasHashtag = raw.entities.hashtags.length > 0;
-		}
-		if(raw.retweeted_status &&
-		   raw.retweeted_status.entities.hashtags) {
-			hasHashtagInRT = raw.retweeted_status.entities.hashtags.length>0;
-		}
-		if(raw.quoted_status &&
-		   raw.quoted_status.entities.hashtags) {
-			hasHashtagInQT = raw.quoted_status.entities.hashtags.length>0;
-		}
-		// check if it has mentions
-		if(raw.entities.user_mentions) {
-			hasMention = raw.entities.user_mentions.length > 0;
-		}
-		if(raw.retweeted_status &&
-		   raw.retweeted_status.entities.user_mentions) {
-			hasMentionInRT = raw.retweeted_status.entities.user_mentions.length>0;
-		}
-		if(raw.quoted_status &&
-		   raw.quoted_status.entities.user_mentions) {
-			hasMentionInQT = raw.quoted_status.entities.user_mentions.length>0;
-		}
-		
-		if(hasImageInQT) {
-			imagesInQT = raw.quoted_status.extended_entities.media.map(v => ({
-				indices: v.indices,
-				url: v.media_url_https,
-				display_url: v.display_url
-			}));
-		}
-		if(hasImageInRT) {
-			imagesInRT = raw.retweeted_status.extended_entities.media.map(v => ({
-				indices: v.indices,
-				url: v.media_url_https,
-				display_url: v.display_url
-			}));
-		} else if(hasImage) {
-			images = raw.extended_entities.media.map(v => ({
-				indices: v.indices,
-				url: v.media_url_https,
-				display_url: v.display_url
-			}));
-		}
-		if(hasLinkInQT) {
-			linksInQT = raw.quoted_status.extended_entities.urls.map(v => ({
-				indices: v.indices,
-				url: v.expanded_url,
-				display_url: v.display_url
-			}));
-		}
-		if(hasLinkInRT) {
-			linksInRT = raw.retweeted_status.extended_entities.urls.map(v => ({
-				indices: v.indices,
-				url: v.expanded_url,
-				display_url: v.display_url
-			}));
-		} else if(hasLink) {
-			links = raw.extended_entities.urls.map(v => ({
-				indices: v.indices,
-				url: v.expanded_url,
-				display_url: v.display_url
-			}));
-		}
-		if(hasHashtagInQT) {
-			hashtagsInQT = raw.quoted_status.extended_entities.hashtag.map(v => ({
-				indices: v.indices,
-				text: v.text
-			}));
-		}
-		if(hasHashtagInRT) {
-			hashtagsInRT = raw.retweeted_status.extended_entities.hashtag.map(v => ({
-				indices: v.indices,
-				text: v.text
-			}));
-		} else if(hasHashtag) {
-			hashtags = raw.extended_entities.hashtag.map(v => ({
-				indices: v.indices,
-				text: v.text
-			}));
-		}
-		if(hasMentionInQT) {
-			mentionsInQT = raw.quoted_status.extended_entities.urls.map(v => ({
-				indices: v.indices,
-				id_str: v.id_str,
-				screen_name: v.screen_name
-			}));
-		}
-		if(hasMentionInRT) {
-			mentionsInRT = raw.retweeted_status.extended_entities.media.map(v => ({
-				indices: v.indices,
-				id_str: v.id_str,
-				screen_name: v.screen_name
-			}));
-		} else if(hasMention) {
-			mentions = raw.extended_entities.hashtag.map(v => ({
-				indices: v.indices,
-				id_str: v.id_str,
-				screen_name: v.screen_name
-			}));
-		}
-		// apply the image/link/hashtag/mention
-		if(isQuote) {
-			for(let i in imagesInQT) {
-				const ci = imagesInQT[ci];
-				text = replaceStr(text, ci.indices[0], ci.indices[1],
-					dobj("span","img",ci.display_url,[],"onclick","function(){alert(1);}").outerHTML
-				)
+		// check if it has medias in its rted status
+		if(raw.retweeted_status) {
+			if(raw.retweeted_status.extended_entities && raw.retweeted_status.extended_entities.media)
+				hasImage["RT"] = typeof raw.retweeted_status.extended_entities.media!=="undefined";
+			if(raw.retweeted_status.entities) {
+				if(raw.retweeted_status.entities.urls)
+					hasLink["RT"] = raw.retweeted_status.entities.urls.length>0;
+				if(raw.retweeted_status.entities.hashtags)
+					hasHashtag["RT"] = raw.retweeted_status.entities.hashtags.length>0;
+				if(raw.retweeted_status.entities.user_mentions)
+					hasHashtag["RT"] = raw.retweeted_status.entities.user_mentions.length>0;
 			}
 		}
-		if(isRetweet) {
-			
-		} else {
-			
+		// check if it has medias in its qted status
+		if(raw.quoted_status) {
+			if(raw.quoted_status.extended_entities && raw.quoted_status.extended_entities.media)
+				hasImage["QT"] = typeof raw.quoted_status.extended_entities.media!=="undefined";
+			if(raw.quoted_status.entities) {
+				if(raw.quoted_status.entities.urls)
+					hasLink["QT"] = raw.quoted_status.entities.urls.length>0;
+				if(raw.quoted_status.entities.hashtags)
+					hasHashtag["QT"] = raw.quoted_status.entities.hashtags.length>0;
+				if(raw.quoted_status.entities.user_mentions)
+					hasMention["QT"] = raw.quoted_status.entities.user_mentions.length>0;
+			}
 		}
+		
+		// functions for exporting media data
+		const exportImages = r => r.map(v => ({
+			indices: v.indices,
+			url: v.media_url_https,
+			display_url: v.display_url
+		}));
+		const exportLinks = r => r.map(v => ({
+			indices: v.indices,
+			url: v.expanded_url,
+			display_url: v.display_url
+		}));
+		const exportHashtags = r => r.map(v => ({
+			indices: v.indices,
+			text: v.text
+		}));
+		const exportMentions = r => r.map(v => ({
+			indices: v.indices,
+			id_str: v.id_str,
+			screen_name: v.screen_name
+		}));
+		// export image data
+		if(hasImage["RT"]) {
+			images["RT"] = exportImages(raw.retweeted_status.extended_entities.media);
+		} else if(hasImage["T"]) {
+			images["T"] = exportImages(raw.extended_entities.media);
+		}
+		if(hasImage["QT"]) {
+			images["QT"] = exportImages(raw.quoted_status.extended_entities.media);
+		}
+		// export link data
+		if(hasLink["RT"]) {
+			links["RT"] = exportLinks(raw.retweeted_status.entities.urls);
+		} else if(hasLink["T"]) {
+			links["T"] = exportLinks(raw.entities.urls);
+		}
+		if(hasLink["QT"]) {
+			links["QT"] = exportLinks(raw.quoted_status.entities.urls);
+		}
+		// export hashtag data
+		if(hasHashtag["RT"]) {
+			links["RT"] = exportHashtags(raw.retweeted_status.entities.hashtags);
+		} else if(hasHashtag["T"]) {
+			links["T"] = exportHashtags(raw.entities.hashtags);
+		}
+		if(hasHashtag["QT"]) {
+			links["QT"] = exportHashtags(raw.quoted_status.entities.hashtags);
+		}
+		// export mention data
+		if(hasMention["RT"]) {
+			links["RT"] = exportMentions(raw.retweeted_status.entities.user_mentions);
+		} else if(hasMention["T"]) {
+			links["T"] = exportMentions(raw.entities.user_mentions);
+		}
+		if(hasMention["QT"]) {
+			links["QT"] = exportMentions(raw.quoted_status.entities.user_mentions);
+		}
+		// apply the image/link/hashtag/mention
+		const tplist = ["RT", "T", "QT"];
+		for(let tp in tplist) {
+			let curtp = tplist[tp];
+			if(hasImage[curtp]) {
+				for(let i in images[curtp]) {
+					const ci = images[curtp][i];
+					switch(curtp) {
+						case "RT":
+						case "T":
+							text = replaceStr(text, ci.indices[0], ci.indices[1],
+								//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
+								newImgAnchor([ci.display_url,ci.url]));
+							break;
+						case "QT":
+							textQuote = replaceStr(textQuote, ci.indices[0], ci.indices[1],
+								//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
+								newImgAnchor([ci.display_url,ci.url]));
+							break;
+					} // switch rt t qt
+				} // for i in tp
+			} // if has[tp]
+		} // for
 		let doesPing = false;
-		let repliedTo = ['', '']; // type(username?status?), address
+		
+		if(text.match("<br>") &&
+		   textQuote.match("<br>")) {} else {
+			text = convertLineBreaks(text);
+			if(textQuote) textQuote = convertLineBreaks(textQuote);
+		}
 		
 		const dom = dobj("div",["twitObj",id],"",[
 			
@@ -241,7 +219,7 @@ const display = {
 			dobj("span","timestamp",simplifyTimestamp(timestamp)),
 			dobj("span",
 				`username${isReply?" reply":""}${doesPing?" ping":""}`,username),
-			dobj("pre","text",text)
+			dobj("div","text",text)
 		]);
 		if(isQuote
 		   && ( raw.quoted_status
@@ -251,7 +229,7 @@ const display = {
 				dobj("span","rawTS",timeQuote.format(),[],"style","display:none;"),
 				dobj("span","timestamp",simplifyTimestamp(timeQuote)),
 				dobj("span","username",userQuote),
-				dobj("pre","text",textQuote)
+				dobj("div","text",textQuote)
 			])
 		)}
 		if(isRetweet) { dom.appendChild(
@@ -261,15 +239,15 @@ const display = {
 				dobj("span","timestamp",simplifyTimestamp(timeRTed))
 			])
 		)}
-		if(hasImageInQT) {
-			dom.querySelector(".quote .text").innerHTML =
-				dom.querySelector(".quote .text").innerHTML.replace()
-		}
-		if(hasImageInRT) {
-			
-		} else if(hasImage) {
-			
-		}
+		// if(hasImage["QT"]) {
+		// 	dom.querySelector(".quote .text").innerHTML =
+		// 		dom.querySelector(".quote .text").innerHTML.replace()
+		// }
+		// if(hasImage["RT"]) {
+		//
+		// } else if(hasImage["T"]) {
+		//
+		// }
 		
 		return dom;
 	},
@@ -320,10 +298,6 @@ const updateTimestamps = tweetDom => {
 	if(tweetDom.getElementsByClassName("quote").length) tweetDom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(moment(tweetDom.querySelector(".quote .rawTS").innerHTML));
 };
 
-const replaceStr = (str, start, end, what) =>
-	(str.substring(0, start)
-	 + what
-	 + str.substring(end));
 /*
 test script:
 
