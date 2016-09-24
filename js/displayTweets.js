@@ -185,20 +185,48 @@ const display = {
 		const tplist = ["RT", "T", "QT"];
 		for(let tp in tplist) {
 			let curtp = tplist[tp];
+			// store first length of the tweet text
+			let l = text.length;
+			let lq;
+			if(textQuote) lq = textQuote.length;
 			if(hasImage[curtp]) {
 				for(let i in images[curtp]) {
+					const la = text.length - l;
+					let lqa;
+					if(textQuote) lqa = textQuote.length - lq;
 					const ci = images[curtp][i];
 					switch(curtp) {
 						case "RT":
 						case "T":
-							text = replaceStr(text, ci.indices[0], ci.indices[1],
+							text = replaceStr(text, ci.indices[0]+la, ci.indices[1]+la,
 								//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
 								newImgAnchor([ci.display_url,ci.url]));
 							break;
 						case "QT":
-							textQuote = replaceStr(textQuote, ci.indices[0], ci.indices[1],
+							textQuote = replaceStr(textQuote, ci.indices[0]+lqa, ci.indices[1]+lqa,
 								//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
 								newImgAnchor([ci.display_url,ci.url]));
+							l = text.length;
+							lq = textQuote.length;
+							break;
+					} // switch rt t qt
+				} // for i in tp
+			} // if has[tp]
+		} // for
+		for(let tp in tplist) {
+			let curtp = tplist[tp];
+			if(hasLink[curtp]) {
+				for(let i in links[curtp]) {
+					const ci = links[curtp][i];
+					switch(curtp) {
+						case "RT":
+						case "T":
+							text = replaceStr(text, ci.indices[0], ci.indices[1],
+							newLinkAnchor([ci.display_url,ci.url]));
+							break;
+						case "QT":
+							textQuote = replaceStr(textQuote, ci.indices[0], ci.indices[1],
+							newLinkAnchor([ci.display_url,ci.url]));
 							break;
 					} // switch rt t qt
 				} // for i in tp

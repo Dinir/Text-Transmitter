@@ -69,3 +69,16 @@ const newImgAnchor = addresses => {
 	);
 	return theAnchor.outerHTML;
 };
+const newLinkAnchor = addresses => {
+	let address = [];
+	if(addresses.constructor === Array) {
+		if(addresses[0]) address[0] = addresses[0];
+		if(addresses[1]) address[1] = addresses[1];
+	} else {
+		address[0] = addresses;
+	}
+	let theAnchor = dobj("span","link img",address[0],[]);
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor,theAnchor.indexOf(">"),theAnchor.indexOf(">")+1,` onclick='window.open("${address[1]?address[1]:address[0]}")'>`);
+	return theAnchor;
+}

@@ -144,7 +144,7 @@ const scrollHandler = () => {
 const clickHandler = (element) => {
 	console.log(event);
 	
-	if(event.clientY < 15) {
+	if(event.clientY < charHeight) {
 		// clicked tabs line
 		if(event.target.id.match(/tab\d+/)) {
 			// clicked a tab
@@ -157,5 +157,14 @@ const clickHandler = (element) => {
 			loCon.updateTabs("close");
 		}
 			
+	}
+	if(event.clientY > charHeight &&
+	   event.clientY < window.innerHeight-charHeight) {
+		// clicked main layout
+		const theTweet = event.path.find(value => value.tagName === "DIV")
+		
+	}
+	if(event.clientY > window.innerHeight-charHeight) {
+		// clicked control line
 	}
 };
