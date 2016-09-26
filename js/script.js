@@ -1,4 +1,33 @@
-const replaceStr = (str, start, end, repl) => str.substring(0, start) + repl + str.substring(end);
+const sh = require('shell');
+// function that replaces string.
+// http://codepen.io/Dinir/pen/amJEzY
+// argument receive type:
+// 1: string, start, end, stringToReplace
+// 2: str, start1, end1, repl1, start2, end2, repl2, ...
+// 3: str, [start1,end1,start2,end2,...], [repl1,repl2,...]
+const replaceStr = function (str, start, end, repl) {
+	if (arguments.length === 4) {
+		// if arguments is simple as defined above, do this. One single replacement.
+		return str.substring(0, start) + repl + str.substring(end);
+	} else if (arguments.length % 3 - 1 === 0) {
+		// if arguments are little complex, as 'str, start1, end1, repl1, start2, end2, repl2, ...', do this.
+		let result = "";
+		for (let i = 0; i < arguments.length; i += 3) {
+			result += i === 0 ? str.slice(0, arguments[i + 1]) : arguments[i] + str.slice(arguments[i - 1], i === arguments.length - 1 ? str.length : arguments[i + 1]);
+		}
+		return result;
+	} else if (arguments.length === 3 && arguments[1].constructor === Array && arguments[2].constructor === Array) {
+		// first array [1] will contain indices, second array [2] will contain texts as replacement.
+		const s = str,
+		      is = arguments[1],
+		      t = arguments[2];
+		let result = "";
+		for (let i = 0; i < t.length; i++) {
+			result += (i === 0 ? s.slice(0, is[i]) : "") + t[i] + s.slice(is[2 * i + 1], i === t.length - 1 ? s.length : is[2 * i + 2]);
+		}
+		return result;
+	}
+};
 const convertLineBreaks = str => str.replace(/(?:\r\n|\r|\n)/g, "<br>");
 
 const URI = {
@@ -81,8 +110,10 @@ const newImgAnchor = addresses => {
 	} else {
 		address[0] = addresses;
 	}
-	const theAnchor = dobj("a", "link img", address[0], [], "href", `${ address[1] ? address[1] : address[0] }`, "target", "_blank");
-	return theAnchor.outerHTML;
+	let theAnchor = dobj("a", "link img", address[0], [], "href", `${ address[1] ? address[1] : address[0] }`, "target", "_blank");
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onmouseover="showImageOnMouseMove(event,'${ address[1] ? address[1] : address[0] }')" onmouseout="hideImageOnMouseOut()">`);
+	return theAnchor;
 };
 const newLinkAnchor = addresses => {
 	let address = [];
@@ -94,8 +125,22 @@ const newLinkAnchor = addresses => {
 	}
 	let theAnchor = dobj("span", "link img", address[0], []);
 	theAnchor = theAnchor.outerHTML;
-	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onclick='window.open("${ address[1] ? address[1] : address[0] }")'>`);
+	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onclick='sh.openExternal("${ address[1] ? address[1] : address[0] }")'>`);
 	return theAnchor;
+};
+const showImageOnMouseMove = function (e, a) {
+	var iv = document.getElementById('imgView').firstChild.firstChild;
+	iv.src = a;
+	iv.parentNode.parentNode.style.left = e.x + 'px';
+	iv.parentNode.parentNode.style.top = e.y + 'px';
+	console.log("in");
+	console.log(e.x + " and " + e.y);
+};
+const hideImageOnMouseOut = function (e, a) {
+	var iv = document.getElementById('imgView');
+	iv.style.top = "100%";
+	iv.style.left = 0;
+	console.log("out");
 };
 let cmd = {
 	resize: function (w, h) {
@@ -545,12 +590,14 @@ const display = {
 		// functions for exporting media data
 		const exportImages = r => r.map(v => ({
 			indices: v.indices,
-			url: v.media_url_https,
+			url: v.url,
+			media_url: v.media_url_https,
 			display_url: v.display_url
 		}));
 		const exportLinks = r => r.map(v => ({
 			indices: v.indices,
-			url: v.expanded_url,
+			url: v.url,
+			expanded_url: v.expanded_url,
 			display_url: v.display_url
 		}));
 		const exportHashtags = r => r.map(v => ({
@@ -607,6 +654,22 @@ const display = {
 			let lq;
 			if (textQuote) lq = textQuote.length;
 			if (hasImage[curtp]) {
+				/*for(let i in images[curtp]) {
+    	let indices = [], replacement = [];
+    	let indicesQT = [], replacementQT = [];
+    	const ci = images[curtp][i];
+    	switch(curtp) {
+    		case "RT":
+    		case "T":
+    			indices.push(ci.indices[0],ci.indices[1]);
+    			replacement.push(newImgAnchor([ci.display_url,ci.url]));
+    			break;
+    		case "QT":
+    			indicesQT.push(ci.indices[0],ci.indices[1]);
+    			replacementQT.push(newImgAnchor([ci.display_url,ci.url]));
+    			break;
+    	}
+    }*/
 				for (let i in images[curtp]) {
 					const la = text.length - l;
 					let lqa;
@@ -615,16 +678,12 @@ const display = {
 					switch (curtp) {
 						case "RT":
 						case "T":
-							text = replaceStr(text, ci.indices[0] + la, ci.indices[1] + la,
-							//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
-							newImgAnchor([ci.display_url, ci.url]));
+							let addedText = text.replace(ci.url, newImgAnchor([ci.display_url, ci.media_url]));
+							text = addedText;
 							break;
 						case "QT":
-							textQuote = replaceStr(textQuote, ci.indices[0] + lqa, ci.indices[1] + lqa,
-							//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
-							newImgAnchor([ci.display_url, ci.url]));
-							l = text.length;
-							lq = textQuote.length;
+							let addedTextQT = textQuote.replace(ci.url, newImgAnchor([ci.display_url, ci.media_url]));
+							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
 				} // for i in tp
@@ -638,10 +697,12 @@ const display = {
 					switch (curtp) {
 						case "RT":
 						case "T":
-							text = replaceStr(text, ci.indices[0], ci.indices[1], newLinkAnchor([ci.display_url, ci.url]));
+							let addedText = text.replace(ci.url, newLinkAnchor([ci.display_url, ci.expanded_url]));
+							text = addedText;
 							break;
 						case "QT":
-							textQuote = replaceStr(textQuote, ci.indices[0], ci.indices[1], newLinkAnchor([ci.display_url, ci.url]));
+							let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([ci.display_url, ci.expanded_url]));
+							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
 				} // for i in tp

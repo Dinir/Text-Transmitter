@@ -63,11 +63,13 @@ const newImgAnchor = addresses => {
 	} else {
 		address[0] = addresses;
 	}
-	const theAnchor = dobj("a","link img",address[0],[],
+	let theAnchor = dobj("a","link img",address[0],[],
 		"href",`${address[1]?address[1]:address[0]}`,
 		"target","_blank"
 	);
-	return theAnchor.outerHTML;
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor,theAnchor.indexOf(">"),theAnchor.indexOf(">")+1,` onmouseover="showImageOnMouseMove(event,'${address[1]?address[1]:address[0]}')" onmouseout="hideImageOnMouseOut()">`);
+	return theAnchor;
 };
 const newLinkAnchor = addresses => {
 	let address = [];
@@ -79,6 +81,20 @@ const newLinkAnchor = addresses => {
 	}
 	let theAnchor = dobj("span","link img",address[0],[]);
 	theAnchor = theAnchor.outerHTML;
-	theAnchor = replaceStr(theAnchor,theAnchor.indexOf(">"),theAnchor.indexOf(">")+1,` onclick='window.open("${address[1]?address[1]:address[0]}")'>`);
+	theAnchor = replaceStr(theAnchor,theAnchor.indexOf(">"),theAnchor.indexOf(">")+1,` onclick='sh.openExternal("${address[1]?address[1]:address[0]}")'>`);
 	return theAnchor;
+}
+const showImageOnMouseMove = function(e,a) {
+	var iv = document.getElementById('imgView').firstChild.firstChild;
+	iv.src = a;
+	iv.parentNode.parentNode.style.left = e.x+'px';
+	iv.parentNode.parentNode.style.top = e.y+'px';
+	console.log("in");
+	console.log(e.x +" and "+e.y);
+};
+const hideImageOnMouseOut = function(e,a) {
+	var iv = document.getElementById('imgView');
+	iv.style.top = "100%";
+	iv.style.left = 0;
+	console.log("out");
 }

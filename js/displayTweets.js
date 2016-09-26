@@ -128,12 +128,14 @@ const display = {
 		// functions for exporting media data
 		const exportImages = r => r.map(v => ({
 			indices: v.indices,
-			url: v.media_url_https,
+			url: v.url,
+			media_url: v.media_url_https,
 			display_url: v.display_url
 		}));
 		const exportLinks = r => r.map(v => ({
 			indices: v.indices,
-			url: v.expanded_url,
+			url: v.url,
+			expanded_url: v.expanded_url,
 			display_url: v.display_url
 		}));
 		const exportHashtags = r => r.map(v => ({
@@ -190,6 +192,22 @@ const display = {
 			let lq;
 			if(textQuote) lq = textQuote.length;
 			if(hasImage[curtp]) {
+				/*for(let i in images[curtp]) {
+					let indices = [], replacement = [];
+					let indicesQT = [], replacementQT = [];
+					const ci = images[curtp][i];
+					switch(curtp) {
+						case "RT":
+						case "T":
+							indices.push(ci.indices[0],ci.indices[1]);
+							replacement.push(newImgAnchor([ci.display_url,ci.url]));
+							break;
+						case "QT":
+							indicesQT.push(ci.indices[0],ci.indices[1]);
+							replacementQT.push(newImgAnchor([ci.display_url,ci.url]));
+							break;
+					}
+				}*/
 				for(let i in images[curtp]) {
 					const la = text.length - l;
 					let lqa;
@@ -198,16 +216,12 @@ const display = {
 					switch(curtp) {
 						case "RT":
 						case "T":
-							text = replaceStr(text, ci.indices[0]+la, ci.indices[1]+la,
-								//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
-								newImgAnchor([ci.display_url,ci.url]));
+							let addedText = text.replace(ci.url, newImgAnchor([ci.display_url,ci.media_url]));
+							text = addedText;
 							break;
 						case "QT":
-							textQuote = replaceStr(textQuote, ci.indices[0]+lqa, ci.indices[1]+lqa,
-								//dobj("a", "img", ci.display_url, [], "href", `window.open('${ci.url}','imgDetailView')`, "target", "_blank").outerHTML);
-								newImgAnchor([ci.display_url,ci.url]));
-							l = text.length;
-							lq = textQuote.length;
+							let addedTextQT = textQuote.replace(ci.url, newImgAnchor([ci.display_url,ci.media_url]));
+							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
 				} // for i in tp
@@ -221,12 +235,12 @@ const display = {
 					switch(curtp) {
 						case "RT":
 						case "T":
-							text = replaceStr(text, ci.indices[0], ci.indices[1],
-							newLinkAnchor([ci.display_url,ci.url]));
+							let addedText = text.replace(ci.url, newLinkAnchor([ci.display_url,ci.expanded_url]));
+							text = addedText;
 							break;
 						case "QT":
-							textQuote = replaceStr(textQuote, ci.indices[0], ci.indices[1],
-							newLinkAnchor([ci.display_url,ci.url]));
+							let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([ci.display_url,ci.expanded_url]));
+							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
 				} // for i in tp
