@@ -189,7 +189,7 @@ let tlCon = {
 const emitErrorMsgFromCode = (errCode) => {
 	switch(errCode) {
 		case 215:
-			console.log("Authentication tokens is not set right. Check `js/twit.js` and update the token data.");
+			console.log("Authentication tokens is not set right. Check `js/_twit.js` and update the token data.");
 			break;
 	}
 }

@@ -9,6 +9,7 @@
 
 
 let receivingCommand = false;
+let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
 let cmdContextText, cmdContextRightText;
@@ -50,7 +51,7 @@ function keyPress(e) {
 			ctl.toggleCommand();
 			navigatingThroughTweets = !navigatingThroughTweets;
 		}
-		// if pressed arrow keys
+		// if pressed arrow keys or hjkl
 		if((e.keyCode>=37 && e.keyCode<=40) ||
 		   e.keyCode===72 || e.keyCode===74 || e.keyCode===75 || e.keyCode===76) {
 			const k = e.keyCode;
@@ -77,6 +78,21 @@ function keyPress(e) {
 					break;
 			}
 		}
+		
+		// start of shortcut keys
+		
+		// write tweet
+		if(e.keyCode === 73) {
+			ctl.toggleCommand();
+			const query = document.getElementById("query");
+			query.value = ":compose ";
+			composing = !composing;
+		}
+		
+		// update current tab
+		if(e.keyCode === 85) {
+			cmd["update"]();
+		}
 
 	} else { // when the buffer is open
 
@@ -102,11 +118,7 @@ function checkStates() {
 		if(query.value.match(/:([\w\d]+)\s/)) {
 			currentCmdInQuery = query.value.match(/:([\w\d]+)\s/)[1];
 			if(cmd.hasOwnProperty(currentCmdInQuery)) {
-				switch(currentCmdInQuery) {
-					default:
-						setCmdContext(cmdDict.show(currentCmdInQuery));
-						break;
-				}
+				setCmdContext(cmdDict.show(currentCmdInQuery));
 			}
 		}
 	} else {
@@ -161,14 +173,23 @@ const clickHandler = (element) => {
 	if(event.clientY > charHeight &&
 	   event.clientY < window.innerHeight-charHeight) {
 		// clicked main layout
-		let theTweet = event.path.find(value => value.className === "twitObj");
+		selectTweetFrom(event);
+	}
+	if(event.clientY > window.innerHeight-charHeight) {
+		// clicked control line
+	}
+};
+
+const selectTweetFrom = source => {
+	if(source.path) { // then it's MouseEvent
+		let theTweet = source.path.find(value => value.className==="twitObj");
 		let order = 0;
-		while( (theTweet = theTweet.previousSibling) !== null ) order++;
+		while((theTweet = theTweet.previousSibling)!==null) order++;
 		loCon.updateSelector(-2);
 		layout.selectorPos = order;
 		loCon.updateSelector(2);
 	}
-	if(event.clientY > window.innerHeight-charHeight) {
-		// clicked control line
+	if(source.constructor === Array) {// then it'd be a position, [x,y]
+		let theTweet = document.elementFromPoint(...source);
 	}
 };
