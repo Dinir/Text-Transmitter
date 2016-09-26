@@ -142,7 +142,7 @@ const scrollHandler = () => {
 };
 
 const clickHandler = (element) => {
-	console.log(event);
+	//console.log(event);
 	
 	if(event.clientY < charHeight) {
 		// clicked tabs line
@@ -161,8 +161,12 @@ const clickHandler = (element) => {
 	if(event.clientY > charHeight &&
 	   event.clientY < window.innerHeight-charHeight) {
 		// clicked main layout
-		const theTweet = event.path.find(value => value.tagName === "DIV")
-		
+		let theTweet = event.path.find(value => value.className === "twitObj");
+		let order = 0;
+		while( (theTweet = theTweet.previousSibling) !== null ) order++;
+		loCon.updateSelector(-2);
+		layout.selectorPos = order;
+		loCon.updateSelector(2);
 	}
 	if(event.clientY > window.innerHeight-charHeight) {
 		// clicked control line

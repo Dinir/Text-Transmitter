@@ -89,12 +89,9 @@ const showImageOnMouseMove = function(e,a) {
 	iv.src = a;
 	iv.parentNode.parentNode.style.left = e.x+'px';
 	iv.parentNode.parentNode.style.top = e.y+'px';
-	console.log("in");
-	console.log(e.x +" and "+e.y);
 };
 const hideImageOnMouseOut = function(e,a) {
 	var iv = document.getElementById('imgView');
 	iv.style.top = "100%";
 	iv.style.left = 0;
-	console.log("out");
 }

@@ -101,7 +101,7 @@ let tlCon = {
 			let tweets = tl[tabName].tweets;
 			let params = tl[tabName].params;
 			
-			params.count = 20;
+			//params.count = 20;
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch(direction) {

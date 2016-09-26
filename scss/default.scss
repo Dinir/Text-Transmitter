@@ -21,7 +21,13 @@ $taba:#aa0000;
 $char: 13px;
 $charWidth: 8px;
 $charHeight: 15px;
-a { color: yellow; }
+a {
+	color: yellow;
+	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+	}
+}
 body {
 	background-color: $blk;
 	color: $text;

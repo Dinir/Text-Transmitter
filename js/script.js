@@ -133,14 +133,11 @@ const showImageOnMouseMove = function (e, a) {
 	iv.src = a;
 	iv.parentNode.parentNode.style.left = e.x + 'px';
 	iv.parentNode.parentNode.style.top = e.y + 'px';
-	console.log("in");
-	console.log(e.x + " and " + e.y);
 };
 const hideImageOnMouseOut = function (e, a) {
 	var iv = document.getElementById('imgView');
 	iv.style.top = "100%";
 	iv.style.left = 0;
-	console.log("out");
 };
 let cmd = {
 	resize: function (w, h) {
@@ -320,7 +317,7 @@ const scrollHandler = () => {
 };
 
 const clickHandler = element => {
-	console.log(event);
+	//console.log(event);
 
 	if (event.clientY < charHeight) {
 		// clicked tabs line
@@ -334,7 +331,12 @@ const clickHandler = element => {
 	}
 	if (event.clientY > charHeight && event.clientY < window.innerHeight - charHeight) {
 		// clicked main layout
-		const theTweet = event.path.find(value => value.tagName === "DIV");
+		let theTweet = event.path.find(value => value.className === "twitObj");
+		let order = 0;
+		while ((theTweet = theTweet.previousSibling) !== null) order++;
+		loCon.updateSelector(-2);
+		layout.selectorPos = order;
+		loCon.updateSelector(2);
 	}
 	if (event.clientY > window.innerHeight - charHeight) {
 		// clicked control line
@@ -432,6 +434,10 @@ const loCon = {
 					}
 				}
 				break;
+			case 2:
+				// add externally updated selectorPos (use with -2)
+				if (layout.main && layout.main.children) changeClass(layout.main.children[layout.selectorPos], "cursor");
+				break;
 			default:
 				// keep the position between tabs
 				// changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
@@ -462,7 +468,11 @@ const loCon = {
 			const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - (window.innerHeight - 30)) * 10000) / 100 + "%";
 			if (scrollPos === "100%") {
 				layout.currentLine.innerHTML = "BOT";
+				const curScr = document.body.scrollTop;
 				tlCon.update(tlOrder[tlCurrent], -1);
+				let scrBack = setTimeout(function () {
+					window.scrollTo(0, curScr);clearTimeout(scrBack);
+				}, 750);
 			} else layout.currentLine.innerHTML = scrollPos;
 		}
 	},
@@ -773,8 +783,6 @@ test script:
 
 var twitDoms = []; var twts = []; t.get('statuses/user_timeline', {}, function(e,d,r){ twts=d; for(var i=0;i<twts.length;i++) twitDoms[i] = new display.twitObj(twts[i]); console.log('done'); });
 */
-
-
 window.onload = () => {
 	// load state stored before.
 	// also build the screen.
@@ -790,17 +798,6 @@ window.onload = () => {
 	});
 	document.body.addEventListener("mousewheel", scrollHandler, false);
 };
-
-/*
-
-var storedTabs = [];
-for(var ts in tl) {
-	storedTabs.push(tl[ts].tweets.map(v => v.outerHTML))
-}
-state.tl = JSON.stringify(storedTabs)
-
-state.tl = JSON.parse(d.tl).map(function(v){;
- */
 const fs = require('fs');
 
 // clone objects
@@ -1070,7 +1067,7 @@ let tlCon = {
 			let tweets = tl[tabName].tweets;
 			let params = tl[tabName].params;
 
-			params.count = 20;
+			//params.count = 20;
 			// TODO make it check if the type can use `since_id` and `max_id` first.
 			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch (direction) {

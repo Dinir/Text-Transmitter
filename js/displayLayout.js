@@ -95,6 +95,10 @@ const loCon = {
 					}
 				}
 				break;
+			case 2: // add externally updated selectorPos (use with -2)
+				if(layout.main && layout.main.children)
+					changeClass(layout.main.children[layout.selectorPos], "cursor");
+				break;
 			default: // keep the position between tabs
 					// changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
 				if(layout.selectorPos >= tl[tlOrder[tlCurrent]].tweets.length) {
@@ -124,7 +128,10 @@ const loCon = {
 			const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
 			if(scrollPos==="100%") {
 				layout.currentLine.innerHTML = "BOT";
+				const curScr = document.body.scrollTop;
 				tlCon.update(tlOrder[tlCurrent], -1);
+				let scrBack = setTimeout(function(){window.scrollTo(0,curScr); clearTimeout(scrBack)},750);
+				
 			} else
 				layout.currentLine.innerHTML = scrollPos;
 		}
