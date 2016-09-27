@@ -29,9 +29,9 @@ let cmd = {
 const cmdDict = {
 	show: cmd => {
 		if(cmdDict[cmd].p) {
-			`<div><div class="contextCmdDict">${cmdDict[cmd].p}</div>${cmdDict[cmd].d}</div>`
+			return `<div><div class="contextCmdDict">${cmdDict[cmd].p}</div>${cmdDict[cmd].d}</div>`
 		} else {
-			`<div>${cmdDict[cmd].d}</div>`
+			return `<div>${cmdDict[cmd].d}</div>`
 		}
 	}
 	,

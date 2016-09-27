@@ -1,4 +1,4 @@
-js/_twit.js
+/js/_twit.js
 npm-debug.log
 js/SampleTimeline.js
 ignoreme.txt
@@ -6,5 +6,6 @@ frame.html
 displayTweetsOld.js
 /twts.txt
 /css/default.css.map
+/scss/default.css*
 /js/testFunctions.js
 state/*

@@ -178,9 +178,9 @@ let cmd = {
 const cmdDict = {
 	show: cmd => {
 		if (cmdDict[cmd].p) {
-			`<div><div class="contextCmdDict">${ cmdDict[cmd].p }</div>${ cmdDict[cmd].d }</div>`;
+			return `<div><div class="contextCmdDict">${ cmdDict[cmd].p }</div>${ cmdDict[cmd].d }</div>`;
 		} else {
-			`<div>${ cmdDict[cmd].d }</div>`;
+			return `<div>${ cmdDict[cmd].d }</div>`;
 		}
 	},
 
@@ -233,6 +233,7 @@ let receivingCommand = false;
 let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
+let currentCmdInQuery;
 let cmdContextText, cmdContextRightText;
 const setCmdContext = texts => {
 	if (texts) {
@@ -310,7 +311,9 @@ function keyPress(e) {
 			ctl.toggleCommand();
 			const query = document.getElementById("query");
 			query.value = ":compose ";
-			composing = !composing;
+			let d = setTimeout(function () {
+				query.value = query.value.substring(0, query.value.length - 1);clearTimeout(d);
+			}, 10);
 		}
 
 		// update current tab
@@ -321,7 +324,7 @@ function keyPress(e) {
 		// when the buffer is open
 
 		// 'esc' or 'enter' to close buffer.
-		if (e.keyCode === 27 || e.keyCode === 13) {
+		if (e.keyCode === 27 || !e.shiftKey && e.keyCode === 13) {
 			if (e.keyCode === 13) execute(query.value);
 			ctl.toggleCommand();
 			navigatingThroughTweets = !navigatingThroughTweets;
@@ -340,7 +343,11 @@ function checkStates() {
 		if (query.value.match(/:([\w\d]+)\s/)) {
 			currentCmdInQuery = query.value.match(/:([\w\d]+)\s/)[1];
 			if (cmd.hasOwnProperty(currentCmdInQuery)) {
-				setCmdContext(cmdDict.show(currentCmdInQuery));
+				if (currentCmdInQuery === "compose" || currentCmdInQuery === "reply" || currentCmdInQuery === "quote") {
+					setCmdContext([cmdDict.show(currentCmdInQuery), `${ query.value.length - currentCmdInQuery.length - 2 }/140`]);
+				} else {
+					setCmdContext(cmdDict.show(currentCmdInQuery));
+				}
 			}
 		}
 	} else {
