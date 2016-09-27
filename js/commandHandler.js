@@ -9,11 +9,25 @@ let cmd = {
 			if(e) {
 				console.error("Failed composing tweet.");
 				console.log(e);
+				return;
 			}
 			console.log("Composing succeed.");
 			composing = !composing;
 		})
 	},
+	delete: function(id) {
+		let idToDel=id?id:currentTweetId;
+		t.post('statuses/destroy/:id',{id:idToDel,trim_user:true},function(e,d,r){
+			if(e) {
+				console.error("Failed deleting tweet.");
+				console.log(e);
+				return;
+			}
+			console.log("Tweet has been deleted.");
+			console.log(d);
+		});
+	},
+	del: function(id) { return this.delete(id) },
 	
 	add: function(names,par,pos) {
 		tlCon.tab.add(names,par,pos);
@@ -47,20 +61,28 @@ const cmdDict = {
 		"p": "",
 		"d": "-- COMPOSE --"
 	},
+	delete: {
+		"p": "delete( id)",
+		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
+	},
+	del: {
+		"p": "delete( id)",
+		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
+	},
 	add: {
-		"p": "add [nameOfTab,(URI)](, parameters, position)",
+		"p": "add [nameOfTab,(URI)]( parameters position)",
 		"d": "Add new tab. You can specify the URI (the format should be an array: ['name', 'URI'], or skip URI and just choose one from below:<br>" +
 		     `${getURIListInString()}<BR>` +
 	       "If you know what is parameters, you can add them as a form of an object.<BR>" +
 	       "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
 	update: {
-		"p": "update tabName direction",
-		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'."
+		"p": "update( tabName direction)",
+		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets."
 	},
 	u: {
-		"p": "update tabName direction",
-		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'."
+		"p": "update( tabName direction)",
+		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets"
 	},
 };
 function execute(command) {

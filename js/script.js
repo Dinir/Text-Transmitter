@@ -152,10 +152,26 @@ let cmd = {
 			if (e) {
 				console.error("Failed composing tweet.");
 				console.log(e);
+				return;
 			}
 			console.log("Composing succeed.");
 			composing = !composing;
 		});
+	},
+	delete: function (id) {
+		let idToDel = id ? id : currentTweetId;
+		t.post('statuses/destroy/:id', { id: idToDel, trim_user: true }, function (e, d, r) {
+			if (e) {
+				console.error("Failed deleting tweet.");
+				console.log(e);
+				return;
+			}
+			console.log("Tweet has been deleted.");
+			console.log(d);
+		});
+	},
+	del: function (id) {
+		return this.delete(id);
 	},
 
 	add: function (names, par, pos) {
@@ -196,17 +212,25 @@ const cmdDict = {
 		"p": "",
 		"d": "-- COMPOSE --"
 	},
+	delete: {
+		"p": "delete( id)",
+		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
+	},
+	del: {
+		"p": "delete( id)",
+		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
+	},
 	add: {
-		"p": "add [nameOfTab,(URI)](, parameters, position)",
+		"p": "add [nameOfTab,(URI)]( parameters position)",
 		"d": "Add new tab. You can specify the URI (the format should be an array: ['name', 'URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what is parameters, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
 	update: {
-		"p": "update tabName direction",
-		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'."
+		"p": "update( tabName direction)",
+		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets."
 	},
 	u: {
-		"p": "update tabName direction",
-		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'."
+		"p": "update( tabName direction)",
+		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets"
 	}
 };
 function execute(command) {
@@ -234,6 +258,7 @@ let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
 let currentCmdInQuery;
+let currentTweetId;
 let cmdContextText, cmdContextRightText;
 const setCmdContext = texts => {
 	if (texts) {
@@ -397,7 +422,7 @@ const clickHandler = element => {
 	}
 	if (event.clientY > charHeight && event.clientY < window.innerHeight - charHeight) {
 		// clicked main layout
-		selectTweetFrom(event);
+		currentTweetId = selectTweetFrom(event);
 	}
 	if (event.clientY > window.innerHeight - charHeight) {
 		// clicked control line
@@ -408,14 +433,17 @@ const selectTweetFrom = source => {
 	if (source.path) {
 		// then it's MouseEvent
 		let theTweet = source.path.find(value => value.className === "twitObj");
+		const id = theTweet.id;
 		let order = 0;
 		while ((theTweet = theTweet.previousSibling) !== null) order++;
 		loCon.updateSelector(-2);
 		layout.selectorPos = order;
 		loCon.updateSelector(2);
+		return id;
 	}
 	if (source.constructor === Array) {
 		// then it'd be a position, [x,y]
+		// NOT FINISHED
 		let theTweet = document.elementFromPoint(...source);
 	}
 };
@@ -490,6 +518,7 @@ const loCon = {
 				if (layout.selectorPos > 0) {
 					changeClass(layout.main.children[layout.selectorPos--], "cursor", " ");
 					changeClass(layout.main.children[layout.selectorPos], "cursor");
+					currentTweetId = layout.main.children[layout.selectorPos].id;
 				}
 				break;
 			case -1:
@@ -497,11 +526,15 @@ const loCon = {
 				if (layout.selectorPos < tl[tlOrder[tlCurrent]].tweets.length - 1) {
 					changeClass(layout.main.children[layout.selectorPos++], "cursor", " ");
 					changeClass(layout.main.children[layout.selectorPos], "cursor");
+					currentTweetId = layout.main.children[layout.selectorPos].id;
 				}
 				break;
 			case -2:
 				// remove current selector indicatior
-				if (layout.main && layout.main.children) changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+				if (layout.main && layout.main.children) {
+					changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+					currentTweetId = "";
+				}
 				break;
 			case -3:
 				// remove selector through loop
@@ -509,11 +542,15 @@ const loCon = {
 					for (let i in layout.main.children) {
 						if (layout.main.children[i].className) changeClass(layout.main.children[i], "cursor", " ");
 					}
+					currentTweetId = "";
 				}
 				break;
 			case 2:
 				// add externally updated selectorPos (use with -2)
-				if (layout.main && layout.main.children) changeClass(layout.main.children[layout.selectorPos], "cursor");
+				if (layout.main && layout.main.children) {
+					changeClass(layout.main.children[layout.selectorPos], "cursor");
+					currentTweetId = layout.main.children[layout.selectorPos].id;
+				}
 				break;
 			default:
 				// keep the position between tabs
@@ -522,6 +559,7 @@ const loCon = {
 					layout.selectorPos = tl[tlOrder[tlCurrent]].tweets.length != 0 ? tl[tlOrder[tlCurrent]].tweets.length - 1 : 0;
 				}
 				changeClass(layout.main.children[layout.selectorPos], "cursor");
+				currentTweetId = layout.main.children[layout.selectorPos].id;
 				break;
 		}
 		if (layout.selectorPos === 0) {

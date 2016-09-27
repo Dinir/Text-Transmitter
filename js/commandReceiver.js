@@ -13,6 +13,7 @@ let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
 let currentCmdInQuery;
+let currentTweetId;
 let cmdContextText, cmdContextRightText;
 const setCmdContext = (texts) => {
 	if(texts) {
@@ -183,7 +184,7 @@ const clickHandler = (element) => {
 	if(event.clientY > charHeight &&
 	   event.clientY < window.innerHeight-charHeight) {
 		// clicked main layout
-		selectTweetFrom(event);
+		currentTweetId = selectTweetFrom(event);
 	}
 	if(event.clientY > window.innerHeight-charHeight) {
 		// clicked control line
@@ -193,13 +194,16 @@ const clickHandler = (element) => {
 const selectTweetFrom = source => {
 	if(source.path) { // then it's MouseEvent
 		let theTweet = source.path.find(value => value.className==="twitObj");
+		const id = theTweet.id;
 		let order = 0;
 		while((theTweet = theTweet.previousSibling)!==null) order++;
 		loCon.updateSelector(-2);
 		layout.selectorPos = order;
 		loCon.updateSelector(2);
+		return id;
 	}
 	if(source.constructor === Array) {// then it'd be a position, [x,y]
+		// NOT FINISHED
 		let theTweet = document.elementFromPoint(...source);
 	}
 };

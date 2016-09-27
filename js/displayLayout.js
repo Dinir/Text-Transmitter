@@ -76,35 +76,43 @@ const loCon = {
 				if(layout.selectorPos>0) {
 					changeClass(layout.main.children[layout.selectorPos--], "cursor", " ");
 					changeClass(layout.main.children[layout.selectorPos], "cursor");
+					currentTweetId = layout.main.children[layout.selectorPos].id;
 				}
 				break;
 			case -1: // going down
 				if(layout.selectorPos<tl[tlOrder[tlCurrent]].tweets.length-1) {
 					changeClass(layout.main.children[layout.selectorPos++], "cursor", " ");
 					changeClass(layout.main.children[layout.selectorPos], "cursor");
+					currentTweetId = layout.main.children[layout.selectorPos].id;
 				}
 				break;
 			case -2: // remove current selector indicatior
-				if(layout.main && layout.main.children)
-				changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+				if(layout.main && layout.main.children) {
+					changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
+					currentTweetId = "";
+				}
 				break;
 			case -3: // remove selector through loop
 				if(layout.main && layout.main.children) {
 					for(let i in layout.main.children){
 						if(layout.main.children[i].className) changeClass(layout.main.children[i], "cursor", " ");
 					}
+					currentTweetId = "";
 				}
 				break;
 			case 2: // add externally updated selectorPos (use with -2)
-				if(layout.main && layout.main.children)
+				if(layout.main && layout.main.children) {
 					changeClass(layout.main.children[layout.selectorPos], "cursor");
+					currentTweetId = layout.main.children[layout.selectorPos].id;
+				}
 				break;
 			default: // keep the position between tabs
 					// changeClass(layout.main.children[layout.selectorPos], "cursor", " ");
 				if(layout.selectorPos >= tl[tlOrder[tlCurrent]].tweets.length) {
-				layout.selectorPos = tl[tlOrder[tlCurrent]].tweets.length!=0?tl[tlOrder[tlCurrent]].tweets.length-1:0;
-			}
-					changeClass(layout.main.children[layout.selectorPos], "cursor");
+					layout.selectorPos = tl[tlOrder[tlCurrent]].tweets.length!=0?tl[tlOrder[tlCurrent]].tweets.length-1:0;
+				}
+				changeClass(layout.main.children[layout.selectorPos], "cursor");
+				currentTweetId = layout.main.children[layout.selectorPos].id;
 				break;
 		}
 		if(layout.selectorPos===0) {
