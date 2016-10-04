@@ -4,8 +4,16 @@ let cmd = {
 	},
 	rs: function(w,h) { return this.resize(w,h) },
 
-	compose: function(txt) {
-		t.post('statuses/update', {status:txt}, function(e,d,r){
+	compose: function(txt, params) {
+		let p;
+		if(params){
+			p = params;
+		} else {
+			p = {};
+		}
+		p.status = txt;
+		if(tToReply) p.in_reply_to_status_id = tToReply;
+		t.post('statuses/update', p, function(e,d,r){
 			if(e) {
 				console.error("Failed composing tweet.");
 				console.log(e);
@@ -13,9 +21,29 @@ let cmd = {
 			}
 			console.log("Composing succeed.");
 			composing = !composing;
+			cmd.update();
 		})
+		tToReply = "";
 	},
-	delete: function(id) {
+	reply: function(txt, id) {
+		// tToReply = id;
+		// cmd.compose(txt, {in_reply_to_status_id: id});
+		// cmd.update();
+	},
+	retweet: function(id) {
+		let idToRT=id?id:currentTweetId;
+		t.post('statuses/retweet/:id', {id:idToRT},function(e,d,r){
+			if(e) {
+				console.error("Failed retweeting the tweet.");
+				console.log(e);
+				return;
+			}
+			console.log("The tweet has been retweeted.");
+			console.log(d);
+			cmd.update();
+		});
+	},
+	del: function(id) {
 		let idToDel=id?id:currentTweetId;
 		t.post('statuses/destroy/:id',{id:idToDel,trim_user:true},function(e,d,r){
 			if(e) {
@@ -27,11 +55,34 @@ let cmd = {
 			console.log(d);
 		});
 	},
-	del: function(id) { return this.delete(id) },
 	
 	add: function(names,par,pos) {
-		tlCon.tab.add(names,par,pos);
+		switch(names) {
+			case "L":
+				changeCmdQueryTo("addlist");
+				break;
+			default:
+				tlCon.tab.add(names,par,pos);
+				break;
+		}
 	},
+	addlist: function(sname,lslug) {
+		let p = {
+			owner_screen_name: sname,
+			slug: lslug
+		};
+		tlCon.tab.add("L",p);
+		tlCon.tab.rename("L",`L_${lslug}`);
+	},
+	remove: function(tabName) {
+		tlCon.tab.remove(tabName);
+	},
+	rm: function(tabName) { return this.remove(tabName) },
+	rename: function(tabName, alterName) {
+		tlCon.tab.rename(tabName, alterName);
+	},
+	rn: function(tn,an) { return this.rename(tn,an) },
+	
 	update: function(tabName, direction) {
 		let tn, dr;
 		if(tabName) {} else {tn = tlOrder[tlCurrent]};
@@ -61,20 +112,46 @@ const cmdDict = {
 		"p": "",
 		"d": "-- COMPOSE --"
 	},
-	delete: {
-		"p": "delete( id)",
-		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
+	reply: {
+		"p": "",
+		"d": "-- REPLYING --"
+	},
+	retweet: {
+		"p": "retweet( id)",
+		"d": "Retweet a tweet with the id. omit id to retweet currently selected tweet."
 	},
 	del: {
-		"p": "delete( id)",
+		"p": "del( id)",
 		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
 	},
 	add: {
 		"p": "add [nameOfTab,(URI)]( parameters position)",
-		"d": "Add new tab. You can specify the URI (the format should be an array: ['name', 'URI'], or skip URI and just choose one from below:<br>" +
+		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" +
 		     `${getURIListInString()}<BR>` +
-	       "If you know what is parameters, you can add them as a form of an object.<BR>" +
+	       "If you know what parameters are, you can add them as a form of an object.<BR>" +
 	       "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
+	},
+	addlist: {
+		"p": "addlist screenName listSlug",
+		"d": "Add a list with the listSlug, made by screenName. <br>" +
+		     "screenName is the twitter username, <br>" +
+		     "listSlug is a name consist of lower-cases-alphabet-and-hyphens.<br>"
+	},
+	remove: {
+		"p": "remove( nameOfTab)",
+		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+	},
+	rm: {
+		"p": "remove( nameOfTab)",
+		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+	},
+	rename: {
+		"p": "rename nameOfTab nameToApply",
+		"d": "Rename a tab from nameOfTab to nameToApply."
+	},
+	rn: {
+		"p": "rename nameOfTab nameToApply",
+		"d": "Rename a tab from nameOfTab to nameToApply."
 	},
 	update: {
 		"p": "update( tabName direction)",
@@ -89,11 +166,18 @@ function execute(command) {
 	let prefix = command.slice(0,1);
 	let argv = command.trim().substr(1).split(" ");
 	let cmdName = argv.shift();
-	if(cmdName == "compose" ||
-	   cmdName == "reply" ||
-	   cmdName == "quote") {
+	if(cmdName == "compose") {
 		cmd[cmdName](argv.join(" "));
+	} else if(cmdName == "reply") {
+		let cmdTarget = argv.shift();
+		cmd[cmdName](cmdTarget, argv.join(" "));
 	} else {
 		cmd[cmdName](...argv);
 	}
+}
+function changeCmdQueryTo(command) {
+	ctl.toggleCommand();
+	let q = document.getElementById("query");
+	q.value = `:${command} `;
+	setCmdContext(cmdDict.show(command));
 }

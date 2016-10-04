@@ -62,19 +62,6 @@ const display = {
 				timeQuote = storeTimestamp(raw.retweeted_status.quoted_status.created_at);
 				userQuote = raw.retweeted_status.quoted_status.user.screen_name;
 				textQuote = raw.retweeted_status.quoted_status.text;
-				// it'll do the multiple quote tweet display.
-				/*} else if(raw.entities.urls.length !== 0) {
-					const urls = raw.entities.urls;
-					const isItStatusUrl = /https:\/\/twitter.com\/.*\/status\/\d*//*;
-				if(urls.map(function(o){return o.expanded_url}).join().search(isItStatusUrl) !== -1) {
-					timeQuote = [];
-					userQuote = [];
-					textQuote = [];
-					for(let i = 0; i<urls.length; i++) {
-						
-					}
-				}
-				*/
 			}
 		}
 		
@@ -167,30 +154,30 @@ const display = {
 		}
 		// export hashtag data
 		if(hasHashtag["RT"]) {
-			links["RT"] = exportHashtags(raw.retweeted_status.entities.hashtags);
+			hashtags["RT"] = exportHashtags(raw.retweeted_status.entities.hashtags);
 		} else if(hasHashtag["T"]) {
-			links["T"] = exportHashtags(raw.entities.hashtags);
+			hashtags["T"] = exportHashtags(raw.entities.hashtags);
 		}
 		if(hasHashtag["QT"]) {
-			links["QT"] = exportHashtags(raw.quoted_status.entities.hashtags);
+			hashtags["QT"] = exportHashtags(raw.quoted_status.entities.hashtags);
 		}
 		// export mention data
 		if(hasMention["RT"]) {
-			links["RT"] = exportMentions(raw.retweeted_status.entities.user_mentions);
+			mentions["RT"] = exportMentions(raw.retweeted_status.entities.user_mentions);
 		} else if(hasMention["T"]) {
-			links["T"] = exportMentions(raw.entities.user_mentions);
+			mentions["T"] = exportMentions(raw.entities.user_mentions);
 		}
 		if(hasMention["QT"]) {
-			links["QT"] = exportMentions(raw.quoted_status.entities.user_mentions);
+			mentions["QT"] = exportMentions(raw.quoted_status.entities.user_mentions);
 		}
 		// apply the image/link/hashtag/mention
 		const tplist = ["RT", "T", "QT"];
 		for(let tp in tplist) {
 			let curtp = tplist[tp];
 			// store first length of the tweet text
-			let l = text.length;
-			let lq;
-			if(textQuote) lq = textQuote.length;
+			// let l = text.length;
+			// let lq;
+			// if(textQuote) lq = textQuote.length;
 			if(hasImage[curtp]) {
 				/*for(let i in images[curtp]) {
 					let indices = [], replacement = [];
@@ -209,9 +196,9 @@ const display = {
 					}
 				}*/
 				for(let i in images[curtp]) {
-					const la = text.length - l;
-					let lqa;
-					if(textQuote) lqa = textQuote.length - lq;
+					// const la = text.length - l;
+					// let lqa;
+					// if(textQuote) lqa = textQuote.length - lq;
 					const ci = images[curtp][i];
 					switch(curtp) {
 						case "RT":
@@ -226,7 +213,7 @@ const display = {
 					} // switch rt t qt
 				} // for i in tp
 			} // if has[tp]
-		} // for
+		} // for images
 		for(let tp in tplist) {
 			let curtp = tplist[tp];
 			if(hasLink[curtp]) {
@@ -245,7 +232,45 @@ const display = {
 					} // switch rt t qt
 				} // for i in tp
 			} // if has[tp]
-		} // for
+		} // for links
+		for(let tp in tplist) {
+			let curtp = tplist[tp];
+			if(hasHashtag[curtp]) {
+				for(let i in hashtags[curtp]) {
+					const ci = hashtags[curtp][i];
+					switch(curtp) {
+						case "RT":
+						case "T":
+							let addedText = text.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							text = addedText;
+							break;
+						case "QT":
+							let addedTextQT = textQuote.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							textQuote = addedTextQT;
+							break;
+					} // switch rt t qt
+				} // for i in tp
+			} // if has[tp]
+		} // for hashtags
+		for(let tp in tplist) {
+			let curtp = tplist[tp];
+			if(hasMention[curtp]) {
+				for(let i in mentions[curtp]) {
+					const ci = mentions[curtp][i];
+					switch(curtp) {
+						case "RT":
+						case "T":
+							let addedText = text.replace(`@${ci.screen_name}`, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							text = addedText;
+							break;
+						case "QT":
+							let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							textQuote = addedTextQT;
+							break;
+					} // switch rt t qt
+				} // for i in tp
+			} // if has[tp]
+		} // for mentions
 		let doesPing = false;
 		
 		if(text.match("<br>") &&
@@ -253,12 +278,19 @@ const display = {
 			text = convertLineBreaks(text);
 			if(textQuote) textQuote = convertLineBreaks(textQuote);
 		}
+		// make it so clicking timestamp opens tweet page in host's web browser. the code below is the timestamp that can be clicked.
+		let tsDom = (function(){
+			const tw = document.createElement("span");
+			tw.innerHTML = newLinkAnchor([simplifyTimestamp(timestamp),`https://twitter.com/${username}/status/${id}`]);
+			tw.firstChild.className = "timestamp";
+			return tw.firstChild;
+		})();
 		
 		const dom = dobj("div",["twitObj",id],"",[
 			
 			dobj("span","rawTS",timestamp.format(),[],"style","display:none;"),
-			
-			dobj("span","timestamp",simplifyTimestamp(timestamp)),
+			tsDom,
+			//dobj("span","timestamp",simplifyTimestamp(timestamp)),
 			dobj("span",
 				`username${isReply?" reply":""}${doesPing?" ping":""}`,username),
 			dobj("div","text",text)
@@ -320,7 +352,11 @@ const display = {
 				dobj("span",[,"close"],"X")
 			);
 			dom.appendChildren(...dom.tabDoms);
-			document.body.firstElementChild.replaceChild(dom,document.getElementById("tabs"));
+			if(document.body.firstElementChild) {
+				document.body.firstElementChild.replaceChild(dom, document.getElementById("tabs"));
+			} else {
+				document.body.firstElementChild.appendChild(dom)
+			}
 		};
 		dom.updateNotification = function() {
 			

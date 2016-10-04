@@ -36,14 +36,16 @@ function cloneObj(obj) {
 	throw new Error("Unable to copy obj! Its type isn't supported.");
 }
 
-const defaultStateFileName = './state/state.json';
+const defaultStateFileName = `${__dirname}/state/state.json`;
 let state;
-let stateFileName = './state/state.json';
+let stateFileName = `${__dirname}/state/state.json`;
 const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
 	storedTabs: {},
 	restoreStoredTabs: dobj("div"),
+	// these code stores tweets along 'tl'.
+	// but I can't yet load tweets between preloaded tweets.
 	storeTweets: () => {
 		stateCon.storedTabs = cloneObj(tl);
 		for(var ts in stateCon.storedTabs)
@@ -64,9 +66,9 @@ const stateCon = {
 	
 	make: () => {
 		tlCon.tab.flush("Y");
+		loCon.init();
 		tlCon.tab.add("Mention",{});
 		tlCon.tab.add("Home",{});
-		loCon.init();
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width":80,
@@ -87,6 +89,7 @@ const stateCon = {
 			console.log("Created the default state.");
 		});
 		loCon.updateTabs();
+		loCon.updateMain();
 	},
 	load: fileName => {
 		let target;
@@ -149,8 +152,8 @@ const stateCon = {
 		
 		fs.writeFile(target,stateToSave,'utf8', e => {
 			if(e) {
-				console.error("Failed saving current state!\n\
-				Try manually copy the result with `JSON.stringify(state)` and save it as `./state/state.json`.");
+				console.error(`Failed saving current state!\n\
+				Try manually copy the result with \`JSON.stringify(state)\` and save it as \`${__dirname}/state/state.json\`.`);
 				return e;
 			}
 			stateFileName = target;
@@ -168,8 +171,8 @@ const stateCon = {
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`./state/state${timestamp}.json`, d);
-				console.log(`Saved the current state in 'state${timestamp}.json'.`);
+				stateCon.forceSave(`${__dirname}/state/state${timestamp}.json`, d);
+				console.log(`Saved the current state in '${__dirname}/state${timestamp}.json'.`);
 			} catch(e) {
 				console.error("Failed making a backup of the current state.");
 				console.log(e);

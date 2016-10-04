@@ -54,3 +54,17 @@ const getURIListInString = () => {
 	}
 	return urilist;
 };
+
+const getLists = () => {
+	let l;
+	t.get('lists/list',{},function(e,d,r){
+		if(e) {
+			console.error("An error occurred while fetching lists.");
+			return e;
+		}
+		l = d;
+		l.list = l.map(v=>
+		v.slug+"<span>("+v.description+")</span>").join(", ");
+		lists = l;
+	});
+};

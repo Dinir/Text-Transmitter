@@ -42,7 +42,9 @@ const loCon = {
 		layout.main = dobj("section",[,"main"],"");
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
-		loCon.updateSelector();
+		if(layout.main.children[layout.selectorPos]) {
+			loCon.updateSelector();
+		}
 		loCon.updateTS();
 	},
 	updateTS: (ifAll) => {

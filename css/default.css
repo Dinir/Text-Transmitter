@@ -1,6 +1,9 @@
 @charset "UTF-8";
 a {
-  color: yellow; }
+  color: yellow;
+  text-decoration: none; }
+  a:hover {
+    text-decoration: underline; }
 
 body {
   background-color: #000000;
@@ -85,17 +88,21 @@ section#main {
     section#main div div.text:after {
       content: none; }
     section#main div div.text .link {
-      color: #3465a4; }
+      color: #3465a4;
+      cursor: pointer; }
       section#main div div.text .link:hover {
         text-decoration: underline; }
   section#main div .timestamp {
     display: inline;
     clear: left;
-    color: #d3d7cf; }
+    color: #d3d7cf;
+    cursor: pointer; }
     section#main div .timestamp:before {
       content: none; }
     section#main div .timestamp:after {
       content: " "; }
+    section#main div .timestamp:hover {
+      text-decoration: underline; }
   section#main div .retweet {
     display: block;
     margin-left: 16px;
@@ -129,6 +136,8 @@ section#main {
       color: #000000; }
     section#main div.cursor .quote {
       color: #000000; }
+    section#main div.cursor div.text .link {
+      color: #739fcf; }
 
 section#controls {
   position: fixed;

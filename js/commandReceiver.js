@@ -7,14 +7,15 @@
 // ; 186
 // Backspace 8
 
-
 let receivingCommand = false;
 let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
+let tToReply = "";
 let currentCmdInQuery;
 let currentTweetId;
 let cmdContextText, cmdContextRightText;
+let lists = [];
 const setCmdContext = (texts) => {
 	if(texts) {
 		if(texts.constructor===Array) {
@@ -85,10 +86,16 @@ function keyPress(e) {
 		
 		// write tweet
 		if(e.keyCode === 73) {
+			tToReply = "";
 			ctl.toggleCommand();
 			const query = document.getElementById("query");
 			query.value = ":compose ";
 			let d = setTimeout(function(){query.value = query.value.substring(0,query.value.length-1); clearTimeout(d);}, 10);
+		}
+		
+		// reply
+		if(e.keyCode === 79) {
+			ctl.toggleCommand();
 		}
 		
 		// update current tab
@@ -116,13 +123,12 @@ function checkStates() {
 		ctl.toggleCommand();
 	
 	// shows related status above the query
-	if(query.value.length>=3) {
+	if(query && query.value.length>=3) {
 		if(query.value.match(/:([\w\d]+)\s/)) {
 			currentCmdInQuery = query.value.match(/:([\w\d]+)\s/)[1];
 			if(cmd.hasOwnProperty(currentCmdInQuery)) {
 				if(currentCmdInQuery === "compose"
-				   || currentCmdInQuery === "reply"
-				   || currentCmdInQuery === "quote") {
+				   || currentCmdInQuery === "reply") {
 					setCmdContext([
 						cmdDict.show(currentCmdInQuery),
 						`${query.value.length-currentCmdInQuery.length-2}/140`

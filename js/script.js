@@ -53,6 +53,75 @@ const getURIListInString = () => {
 	}
 	return urilist;
 };
+
+const getLists = () => {
+	let l;
+	t.get('lists/list', {}, function (e, d, r) {
+		if (e) {
+			console.error("An error occurred while fetching lists.");
+			return e;
+		}
+		l = d;
+		l.list = l.map(v => v.slug + "<span>(" + v.description + ")</span>").join(", ");
+		lists = l;
+	});
+};
+const newImgAnchor = addresses => {
+	let address = [];
+	if (addresses.constructor === Array) {
+		if (addresses[0]) address[0] = addresses[0];
+		if (addresses[1]) address[1] = addresses[1];
+	} else {
+		address[0] = addresses;
+	}
+	let theAnchor = dobj("a", "link img", address[0], [], "href", `${ address[1] ? address[1] : address[0] }`, "target", "_blank");
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onmouseover="showImageOnMouseMove(1,event,'${ address[1] ? address[1] : address[0] }')" onmouseout="showImageOnMouseMove(0)">`);
+	return theAnchor;
+};
+const newLinkAnchor = addresses => {
+	let address = [];
+	if (addresses.constructor === Array) {
+		if (addresses[0]) address[0] = addresses[0];
+		if (addresses[1]) address[1] = addresses[1];
+	} else {
+		address[0] = addresses;
+	}
+	let theAnchor = dobj("span", "link", address[0], []);
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onclick='sh.openExternal("${ address[1] ? address[1] : address[0] }")'>`);
+	return theAnchor;
+};
+const newHashtagAnchor = addresses => {
+	let address = [];
+	if (addresses.constructor === Array) {
+		if (addresses[0]) address[0] = addresses[0];
+		if (addresses[1]) address[1] = addresses[1];
+	} else {
+		address[0] = addresses;
+	}
+	let theAnchor = dobj("span", "link", address[0], []);
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onclick='sh.openExternal("${ address[1] ? address[1] : address[0] }")'>`);
+	return theAnchor;
+};
+
+const showImageOnMouseMove = function (t, e, a) {
+	switch (t) {
+		case 1:
+			var iv = document.getElementById('imgView').firstChild.firstChild;
+			iv.src = a;
+			iv.parentNode.parentNode.style.left = Math.floor((e.x + (e.x > window.innerWidth / 2 ? -1 * (iv.parentNode.parentNode.getBoundingClientRect().width + 3) : 5)) / charWidth) * charWidth + 'px'; // 3, 5: see scss file for section#imgView img!
+			iv.parentNode.parentNode.style.top = Math.floor((e.y + (e.y > window.innerHeight / 2 ? -1 * (iv.parentNode.parentNode.getBoundingClientRect().height - charHeight) : charHeight)) / charHeight) * charHeight + 'px';
+			break;
+		case 0:
+			var iv = document.getElementById('imgView');
+			iv.style.top = "100%";
+			iv.style.left = 0;
+			break;
+	}
+};
+const openNewTabFromLink = function () {};
 // quick dom creator
 // accept tag, [classname, id], innerHTML, [childrenNodes].
 const dobj = function (tag, names, inner, children, ...moreProps) {
@@ -102,43 +171,6 @@ const changeClass = (target, firstCl, secondCl) => {
 const replaceDobj = (to, from) => {
 	from.parentNode.replaceChild(to, from);
 };
-const newImgAnchor = addresses => {
-	let address = [];
-	if (addresses.constructor === Array) {
-		if (addresses[0]) address[0] = addresses[0];
-		if (addresses[1]) address[1] = addresses[1];
-	} else {
-		address[0] = addresses;
-	}
-	let theAnchor = dobj("a", "link img", address[0], [], "href", `${ address[1] ? address[1] : address[0] }`, "target", "_blank");
-	theAnchor = theAnchor.outerHTML;
-	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onmouseover="showImageOnMouseMove(event,'${ address[1] ? address[1] : address[0] }')" onmouseout="hideImageOnMouseOut()">`);
-	return theAnchor;
-};
-const newLinkAnchor = addresses => {
-	let address = [];
-	if (addresses.constructor === Array) {
-		if (addresses[0]) address[0] = addresses[0];
-		if (addresses[1]) address[1] = addresses[1];
-	} else {
-		address[0] = addresses;
-	}
-	let theAnchor = dobj("span", "link img", address[0], []);
-	theAnchor = theAnchor.outerHTML;
-	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onclick='sh.openExternal("${ address[1] ? address[1] : address[0] }")'>`);
-	return theAnchor;
-};
-const showImageOnMouseMove = function (e, a) {
-	var iv = document.getElementById('imgView').firstChild.firstChild;
-	iv.src = a;
-	iv.parentNode.parentNode.style.left = e.x + 'px';
-	iv.parentNode.parentNode.style.top = e.y + 'px';
-};
-const hideImageOnMouseOut = function (e, a) {
-	var iv = document.getElementById('imgView');
-	iv.style.top = "100%";
-	iv.style.left = 0;
-};
 let cmd = {
 	resize: function (w, h) {
 		window.resizeTo((w > 13 ? w : 13) * 8, (h > 6 ? h : 6) * 15 /*+25*/);
@@ -147,8 +179,16 @@ let cmd = {
 		return this.resize(w, h);
 	},
 
-	compose: function (txt) {
-		t.post('statuses/update', { status: txt }, function (e, d, r) {
+	compose: function (txt, params) {
+		let p;
+		if (params) {
+			p = params;
+		} else {
+			p = {};
+		}
+		p.status = txt;
+		if (tToReply) p.in_reply_to_status_id = tToReply;
+		t.post('statuses/update', p, function (e, d, r) {
 			if (e) {
 				console.error("Failed composing tweet.");
 				console.log(e);
@@ -156,9 +196,29 @@ let cmd = {
 			}
 			console.log("Composing succeed.");
 			composing = !composing;
+			cmd.update();
+		});
+		tToReply = "";
+	},
+	reply: function (txt, id) {
+		// tToReply = id;
+		// cmd.compose(txt, {in_reply_to_status_id: id});
+		// cmd.update();
+	},
+	retweet: function (id) {
+		let idToRT = id ? id : currentTweetId;
+		t.post('statuses/retweet/:id', { id: idToRT }, function (e, d, r) {
+			if (e) {
+				console.error("Failed retweeting the tweet.");
+				console.log(e);
+				return;
+			}
+			console.log("The tweet has been retweeted.");
+			console.log(d);
+			cmd.update();
 		});
 	},
-	delete: function (id) {
+	del: function (id) {
 		let idToDel = id ? id : currentTweetId;
 		t.post('statuses/destroy/:id', { id: idToDel, trim_user: true }, function (e, d, r) {
 			if (e) {
@@ -170,13 +230,38 @@ let cmd = {
 			console.log(d);
 		});
 	},
-	del: function (id) {
-		return this.delete(id);
-	},
 
 	add: function (names, par, pos) {
-		tlCon.tab.add(names, par, pos);
+		switch (names) {
+			case "L":
+				changeCmdQueryTo("addlist");
+				break;
+			default:
+				tlCon.tab.add(names, par, pos);
+				break;
+		}
 	},
+	addlist: function (sname, lslug) {
+		let p = {
+			owner_screen_name: sname,
+			slug: lslug
+		};
+		tlCon.tab.add("L", p);
+		tlCon.tab.rename("L", `L_${ lslug }`);
+	},
+	remove: function (tabName) {
+		tlCon.tab.remove(tabName);
+	},
+	rm: function (tabName) {
+		return this.remove(tabName);
+	},
+	rename: function (tabName, alterName) {
+		tlCon.tab.rename(tabName, alterName);
+	},
+	rn: function (tn, an) {
+		return this.rename(tn, an);
+	},
+
 	update: function (tabName, direction) {
 		let tn, dr;
 		if (tabName) {} else {
@@ -212,17 +297,41 @@ const cmdDict = {
 		"p": "",
 		"d": "-- COMPOSE --"
 	},
-	delete: {
-		"p": "delete( id)",
-		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
+	reply: {
+		"p": "",
+		"d": "-- REPLYING --"
+	},
+	retweet: {
+		"p": "retweet( id)",
+		"d": "Retweet a tweet with the id. omit id to retweet currently selected tweet."
 	},
 	del: {
-		"p": "delete( id)",
+		"p": "del( id)",
 		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
 	},
 	add: {
 		"p": "add [nameOfTab,(URI)]( parameters position)",
-		"d": "Add new tab. You can specify the URI (the format should be an array: ['name', 'URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what is parameters, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
+		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what parameters are, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
+	},
+	addlist: {
+		"p": "addlist screenName listSlug",
+		"d": "Add a list with the listSlug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "listSlug is a name consist of lower-cases-alphabet-and-hyphens.<br>"
+	},
+	remove: {
+		"p": "remove( nameOfTab)",
+		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+	},
+	rm: {
+		"p": "remove( nameOfTab)",
+		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+	},
+	rename: {
+		"p": "rename nameOfTab nameToApply",
+		"d": "Rename a tab from nameOfTab to nameToApply."
+	},
+	rn: {
+		"p": "rename nameOfTab nameToApply",
+		"d": "Rename a tab from nameOfTab to nameToApply."
 	},
 	update: {
 		"p": "update( tabName direction)",
@@ -237,11 +346,20 @@ function execute(command) {
 	let prefix = command.slice(0, 1);
 	let argv = command.trim().substr(1).split(" ");
 	let cmdName = argv.shift();
-	if (cmdName == "compose" || cmdName == "reply" || cmdName == "quote") {
+	if (cmdName == "compose") {
 		cmd[cmdName](argv.join(" "));
+	} else if (cmdName == "reply") {
+		let cmdTarget = argv.shift();
+		cmd[cmdName](cmdTarget, argv.join(" "));
 	} else {
 		cmd[cmdName](...argv);
 	}
+}
+function changeCmdQueryTo(command) {
+	ctl.toggleCommand();
+	let q = document.getElementById("query");
+	q.value = `:${ command } `;
+	setCmdContext(cmdDict.show(command));
 }
 //import {execute} from "./commandHandler.js";
 
@@ -252,14 +370,15 @@ function execute(command) {
 // ; 186
 // Backspace 8
 
-
 let receivingCommand = false;
 let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
+let tToReply = "";
 let currentCmdInQuery;
 let currentTweetId;
 let cmdContextText, cmdContextRightText;
+let lists = [];
 const setCmdContext = texts => {
 	if (texts) {
 		if (texts.constructor === Array) {
@@ -333,12 +452,18 @@ function keyPress(e) {
 
 		// write tweet
 		if (e.keyCode === 73) {
+			tToReply = "";
 			ctl.toggleCommand();
 			const query = document.getElementById("query");
 			query.value = ":compose ";
 			let d = setTimeout(function () {
 				query.value = query.value.substring(0, query.value.length - 1);clearTimeout(d);
 			}, 10);
+		}
+
+		// reply
+		if (e.keyCode === 79) {
+			ctl.toggleCommand();
 		}
 
 		// update current tab
@@ -364,11 +489,11 @@ function checkStates() {
 	if ((lastKeyCode === 8 || lastKeyCode === 46) && query.value.length === 0) ctl.toggleCommand();
 
 	// shows related status above the query
-	if (query.value.length >= 3) {
+	if (query && query.value.length >= 3) {
 		if (query.value.match(/:([\w\d]+)\s/)) {
 			currentCmdInQuery = query.value.match(/:([\w\d]+)\s/)[1];
 			if (cmd.hasOwnProperty(currentCmdInQuery)) {
-				if (currentCmdInQuery === "compose" || currentCmdInQuery === "reply" || currentCmdInQuery === "quote") {
+				if (currentCmdInQuery === "compose" || currentCmdInQuery === "reply") {
 					setCmdContext([cmdDict.show(currentCmdInQuery), `${ query.value.length - currentCmdInQuery.length - 2 }/140`]);
 				} else {
 					setCmdContext(cmdDict.show(currentCmdInQuery));
@@ -490,7 +615,9 @@ const loCon = {
 		layout.main = dobj("section", [, "main"], "");
 		layout.main.appendChildren(...tl[tlOrder[tlCurrent]].tweets);
 		replaceDobj(layout.main, document.getElementById("main"));
-		loCon.updateSelector();
+		if (layout.main.children[layout.selectorPos]) {
+			loCon.updateSelector();
+		}
 		loCon.updateTS();
 	},
 	updateTS: ifAll => {
@@ -662,18 +789,6 @@ const display = {
 				timeQuote = storeTimestamp(raw.retweeted_status.quoted_status.created_at);
 				userQuote = raw.retweeted_status.quoted_status.user.screen_name;
 				textQuote = raw.retweeted_status.quoted_status.text;
-				// it'll do the multiple quote tweet display.
-				/*} else if(raw.entities.urls.length !== 0) {
-    	const urls = raw.entities.urls;
-    	const isItStatusUrl = /https:\/\/twitter.com\/.*\/status\/\d*/ /*;
-                                                                    if(urls.map(function(o){return o.expanded_url}).join().search(isItStatusUrl) !== -1) {
-                                                                    timeQuote = [];
-                                                                    userQuote = [];
-                                                                    textQuote = [];
-                                                                    for(let i = 0; i<urls.length; i++) {
-                                                                    }
-                                                                    }
-                                                                    */
 			}
 		}
 
@@ -754,30 +869,30 @@ const display = {
 		}
 		// export hashtag data
 		if (hasHashtag["RT"]) {
-			links["RT"] = exportHashtags(raw.retweeted_status.entities.hashtags);
+			hashtags["RT"] = exportHashtags(raw.retweeted_status.entities.hashtags);
 		} else if (hasHashtag["T"]) {
-			links["T"] = exportHashtags(raw.entities.hashtags);
+			hashtags["T"] = exportHashtags(raw.entities.hashtags);
 		}
 		if (hasHashtag["QT"]) {
-			links["QT"] = exportHashtags(raw.quoted_status.entities.hashtags);
+			hashtags["QT"] = exportHashtags(raw.quoted_status.entities.hashtags);
 		}
 		// export mention data
 		if (hasMention["RT"]) {
-			links["RT"] = exportMentions(raw.retweeted_status.entities.user_mentions);
+			mentions["RT"] = exportMentions(raw.retweeted_status.entities.user_mentions);
 		} else if (hasMention["T"]) {
-			links["T"] = exportMentions(raw.entities.user_mentions);
+			mentions["T"] = exportMentions(raw.entities.user_mentions);
 		}
 		if (hasMention["QT"]) {
-			links["QT"] = exportMentions(raw.quoted_status.entities.user_mentions);
+			mentions["QT"] = exportMentions(raw.quoted_status.entities.user_mentions);
 		}
 		// apply the image/link/hashtag/mention
 		const tplist = ["RT", "T", "QT"];
 		for (let tp in tplist) {
 			let curtp = tplist[tp];
 			// store first length of the tweet text
-			let l = text.length;
-			let lq;
-			if (textQuote) lq = textQuote.length;
+			// let l = text.length;
+			// let lq;
+			// if(textQuote) lq = textQuote.length;
 			if (hasImage[curtp]) {
 				/*for(let i in images[curtp]) {
     	let indices = [], replacement = [];
@@ -796,9 +911,9 @@ const display = {
     	}
     }*/
 				for (let i in images[curtp]) {
-					const la = text.length - l;
-					let lqa;
-					if (textQuote) lqa = textQuote.length - lq;
+					// const la = text.length - l;
+					// let lqa;
+					// if(textQuote) lqa = textQuote.length - lq;
 					const ci = images[curtp][i];
 					switch (curtp) {
 						case "RT":
@@ -813,7 +928,7 @@ const display = {
 					} // switch rt t qt
 				} // for i in tp
 			} // if has[tp]
-		} // for
+		} // for images
 		for (let tp in tplist) {
 			let curtp = tplist[tp];
 			if (hasLink[curtp]) {
@@ -832,15 +947,61 @@ const display = {
 					} // switch rt t qt
 				} // for i in tp
 			} // if has[tp]
-		} // for
+		} // for links
+		for (let tp in tplist) {
+			let curtp = tplist[tp];
+			if (hasHashtag[curtp]) {
+				for (let i in hashtags[curtp]) {
+					const ci = hashtags[curtp][i];
+					switch (curtp) {
+						case "RT":
+						case "T":
+							let addedText = text.replace(`#${ ci.text }`, newLinkAnchor([`#${ ci.text }`, `https://twitter.com/hashtag/${ ci.text }?src=hash`]));
+							text = addedText;
+							break;
+						case "QT":
+							let addedTextQT = textQuote.replace(`#${ ci.text }`, newLinkAnchor([`#${ ci.text }`, `https://twitter.com/hashtag/${ ci.text }?src=hash`]));
+							textQuote = addedTextQT;
+							break;
+					} // switch rt t qt
+				} // for i in tp
+			} // if has[tp]
+		} // for hashtags
+		for (let tp in tplist) {
+			let curtp = tplist[tp];
+			if (hasMention[curtp]) {
+				for (let i in mentions[curtp]) {
+					const ci = mentions[curtp][i];
+					switch (curtp) {
+						case "RT":
+						case "T":
+							let addedText = text.replace(`@${ ci.screen_name }`, newLinkAnchor([`@${ ci.screen_name }`, `https://twitter.com/${ ci.screen_name }`]));
+							text = addedText;
+							break;
+						case "QT":
+							let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([`@${ ci.screen_name }`, `https://twitter.com/${ ci.screen_name }`]));
+							textQuote = addedTextQT;
+							break;
+					} // switch rt t qt
+				} // for i in tp
+			} // if has[tp]
+		} // for mentions
 		let doesPing = false;
 
 		if (text.match("<br>") && textQuote.match("<br>")) {} else {
 			text = convertLineBreaks(text);
 			if (textQuote) textQuote = convertLineBreaks(textQuote);
 		}
+		let tsDom = function () {
+			const tw = document.createElement("span");
+			tw.innerHTML = newLinkAnchor([simplifyTimestamp(timestamp), `https://twitter.com/${ username }/status/${ id }`]);
+			tw.firstChild.className = "timestamp";
+			return tw.firstChild;
+		}();
 
-		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "rawTS", timestamp.format(), [], "style", "display:none;"), dobj("span", "timestamp", simplifyTimestamp(timestamp)), dobj("span", `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`, username), dobj("div", "text", text)]);
+		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "rawTS", timestamp.format(), [], "style", "display:none;"), tsDom,
+		//dobj("span","timestamp",simplifyTimestamp(timestamp)),
+		dobj("span", `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`, username), dobj("div", "text", text)]);
 		if (isQuote && (raw.quoted_status || raw.retweeted_status && raw.retweeted_status.quoted_status)) {
 			dom.appendChild(dobj("span", "quote", "", [dobj("span", "rawTS", timeQuote.format(), [], "style", "display:none;"), dobj("span", "timestamp", simplifyTimestamp(timeQuote)), dobj("span", "username", userQuote), dobj("div", "text", textQuote)]));
 		}
@@ -875,7 +1036,11 @@ const display = {
 			}
 			dom.tabDoms.push(dobj("span", [, "close"], "X"));
 			dom.appendChildren(...dom.tabDoms);
-			document.body.firstElementChild.replaceChild(dom, document.getElementById("tabs"));
+			if (document.body.firstElementChild) {
+				document.body.firstElementChild.replaceChild(dom, document.getElementById("tabs"));
+			} else {
+				document.body.firstElementChild.appendChild(dom);
+			}
 		};
 		dom.updateNotification = function () {};
 		return dom;
@@ -912,6 +1077,8 @@ window.onload = () => {
 		clickHandler(window.event.target);
 	});
 	document.body.addEventListener("mousewheel", scrollHandler, false);
+
+	lists = getLists();
 };
 const fs = require('fs');
 
@@ -951,14 +1118,16 @@ function cloneObj(obj) {
 	throw new Error("Unable to copy obj! Its type isn't supported.");
 }
 
-const defaultStateFileName = './state/state.json';
+const defaultStateFileName = `${ __dirname }/state/state.json`;
 let state;
-let stateFileName = './state/state.json';
+let stateFileName = `${ __dirname }/state/state.json`;
 const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
 	storedTabs: {},
 	restoreStoredTabs: dobj("div"),
+	// these code stores tweets along 'tl'.
+	// but I can't yet load tweets between preloaded tweets.
 	storeTweets: () => {
 		stateCon.storedTabs = cloneObj(tl);
 		for (var ts in stateCon.storedTabs) stateCon.storedTabs[ts].tweets = tl[ts].tweets.map(v => v.outerHTML);
@@ -978,9 +1147,9 @@ const stateCon = {
 
 	make: () => {
 		tlCon.tab.flush("Y");
+		loCon.init();
 		tlCon.tab.add("Mention", {});
 		tlCon.tab.add("Home", {});
-		loCon.init();
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width": 80,
@@ -1000,6 +1169,7 @@ const stateCon = {
 			console.log("Created the default state.");
 		});
 		loCon.updateTabs();
+		loCon.updateMain();
 	},
 	load: fileName => {
 		let target;
@@ -1057,8 +1227,8 @@ const stateCon = {
 
 		fs.writeFile(target, stateToSave, 'utf8', e => {
 			if (e) {
-				console.error("Failed saving current state!\n\
-				Try manually copy the result with `JSON.stringify(state)` and save it as `./state/state.json`.");
+				console.error(`Failed saving current state!\n\
+				Try manually copy the result with \`JSON.stringify(state)\` and save it as \`${ __dirname }/state/state.json\`.`);
 				return e;
 			}
 			stateFileName = target;
@@ -1075,8 +1245,8 @@ const stateCon = {
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`./state/state${ timestamp }.json`, d);
-				console.log(`Saved the current state in 'state${ timestamp }.json'.`);
+				stateCon.forceSave(`${ __dirname }/state/state${ timestamp }.json`, d);
+				console.log(`Saved the current state in '${ __dirname }/state${ timestamp }.json'.`);
 			} catch (e) {
 				console.error("Failed making a backup of the current state.");
 				console.log(e);
@@ -1123,7 +1293,10 @@ let tlCon = {
 				nameAndAddress[1] ? address = nameAndAddress[1] : "";
 			} else {
 				tabName = nameAndAddress;
-				if (URI[nameAndAddress]) address = URI[nameAndAddress];else console.error("Need to specify the URI.");
+				if (URI[nameAndAddress]) address = URI[nameAndAddress];else {
+					console.error("Need to specify the URI.");
+					return;
+				}
 			}
 			if (!tl.hasOwnProperty(tabName) && typeof tabName !== "undefined" && tlOrder.indexOf(tabName) === -1) {
 				let newTabFrame = {
@@ -1139,10 +1312,18 @@ let tlCon = {
 			tlCon.update(tabName, 1);
 		},
 		remove: function (tabName, noUpdate) {
+			//let tabToDelete;
+			//if(tabName) tabToDelete = tabName;
+			//else tabToDelete = tlOrder[tlCurrent];
+			//console.log(tabName);
+			//console.log(tabToDelete);
 			delete tl[tabName];
 			tlOrder.splice(tlOrder.indexOf(tabName), 1);
-			if (!tlOrder[tlCurrent]) tlCurrent--;
-			if (noUpdate) {} else loCon.updateTabs();
+			if (tlOrder[tlCurrent - 1]) tlCurrent--;
+			if (noUpdate) {} else {
+				loCon.updateTabs();
+				if (tlOrder.length !== 0) loCon.updateMain();
+			}
 		},
 		flush: function (really) {
 			if (really === "y" || really === "Y") for (var i in tl) tlCon.tab.remove(i, 1);

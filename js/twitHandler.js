@@ -27,7 +27,10 @@ let tlCon = {
 			} else {
 				tabName = nameAndAddress;
 				if(URI[nameAndAddress]) address = URI[nameAndAddress];
-				else console.error("Need to specify the URI.");
+				else {
+					console.error("Need to specify the URI.");
+					return;
+				}
 			}
 			if(!tl.hasOwnProperty(tabName)
 			&& typeof tabName !== "undefined"
@@ -49,10 +52,18 @@ let tlCon = {
 			tlCon.update(tabName,1);
 		},
 		remove: function(tabName, noUpdate) {
+			//let tabToDelete;
+			//if(tabName) tabToDelete = tabName;
+			//else tabToDelete = tlOrder[tlCurrent];
+			//console.log(tabName);
+			//console.log(tabToDelete);
 			delete tl[tabName];
 			tlOrder.splice(tlOrder.indexOf(tabName),1);
-			if(!tlOrder[tlCurrent]) tlCurrent--;
-			if(noUpdate) {} else loCon.updateTabs();
+			if(tlOrder[tlCurrent-1]) tlCurrent--;
+			if(noUpdate) {} else {
+				loCon.updateTabs();
+				if(tlOrder.length!==0) loCon.updateMain();
+			}
 		},
 		flush: function(really) {
 			if(really === "y" || really === "Y")
