@@ -11,7 +11,8 @@ let receivingCommand = false;
 let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
-let tToReply = "";
+let tToReply = ""; // tweet to reply
+let iToReply = ""; // id to reply
 let currentCmdInQuery;
 let currentTweetId;
 let cmdContextText, cmdContextRightText;
@@ -87,15 +88,16 @@ function keyPress(e) {
 		// write tweet
 		if(e.keyCode === 73) {
 			tToReply = "";
-			ctl.toggleCommand();
-			const query = document.getElementById("query");
-			query.value = ":compose ";
+			changeCmdQueryTo("compose");
 			let d = setTimeout(function(){query.value = query.value.substring(0,query.value.length-1); clearTimeout(d);}, 10);
 		}
 		
 		// reply
 		if(e.keyCode === 79) {
-			ctl.toggleCommand();
+			tToReply = layout.main.children[layout.selectorPos].id;
+			iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
+			changeCmdQueryTo(`reply ${tToReply} @${iToReply}`);
+			let d = setTimeout(function(){query.value = query.value.substring(0,query.value.length-1); clearTimeout(d);}, 10);
 		}
 		
 		// update current tab
@@ -127,11 +129,16 @@ function checkStates() {
 		if(query.value.match(/:([\w\d]+)\s/)) {
 			currentCmdInQuery = query.value.match(/:([\w\d]+)\s/)[1];
 			if(cmd.hasOwnProperty(currentCmdInQuery)) {
-				if(currentCmdInQuery === "compose"
-				   || currentCmdInQuery === "reply") {
+				if(currentCmdInQuery === "compose") {
 					setCmdContext([
 						cmdDict.show(currentCmdInQuery),
 						`${query.value.length-currentCmdInQuery.length-2}/140`
+					]);
+				} else if(currentCmdInQuery === "reply") {
+					let wc = query.value.length-currentCmdInQuery.length-tToReply.length-3;
+					setCmdContext([
+						''+cmdDict.show(currentCmdInQuery)+`<span style="position: absolute; top: 0; left: 94px;">TO @${iToReply?iToReply:tToReply} --</span>`,
+						`${wc>=0?wc:0}/140`
 					]);
 				} else {
 					setCmdContext(cmdDict.show(currentCmdInQuery));

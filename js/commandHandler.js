@@ -12,7 +12,7 @@ let cmd = {
 			p = {};
 		}
 		p.status = txt;
-		if(tToReply) p.in_reply_to_status_id = tToReply;
+		//if(tToReply) p.in_reply_to_status_id = tToReply;
 		t.post('statuses/update', p, function(e,d,r){
 			if(e) {
 				console.error("Failed composing tweet.");
@@ -25,10 +25,10 @@ let cmd = {
 		})
 		tToReply = "";
 	},
-	reply: function(txt, id) {
-		// tToReply = id;
-		// cmd.compose(txt, {in_reply_to_status_id: id});
-		// cmd.update();
+	reply: function(id,txt) {
+		// tToReply and iToReply are set in commandReceiver, when the key is pressed.
+		cmd.compose(txt, {in_reply_to_status_id: id});
+		cmd.update();
 	},
 	retweet: function(id) {
 		let idToRT=id?id:currentTweetId;
@@ -114,7 +114,7 @@ const cmdDict = {
 	},
 	reply: {
 		"p": "",
-		"d": "-- REPLYING --"
+		"d": "-- REPLYING&nbsp;"
 	},
 	retweet: {
 		"p": "retweet( id)",
@@ -171,13 +171,21 @@ function execute(command) {
 	} else if(cmdName == "reply") {
 		let cmdTarget = argv.shift();
 		cmd[cmdName](cmdTarget, argv.join(" "));
+		
 	} else {
 		cmd[cmdName](...argv);
+		console.log(cmdName);
+		console.log(argv.join(" "));
 	}
 }
 function changeCmdQueryTo(command) {
 	ctl.toggleCommand();
 	let q = document.getElementById("query");
 	q.value = `:${command} `;
-	setCmdContext(cmdDict.show(command));
+	let cp = command.match(/([\w\d]+)\s/);
+	if(cp) {
+		setCmdContext(cmdDict.show(cp[1]));
+	} else {
+		setCmdContext(cmdDict.show(command));
+	}
 }

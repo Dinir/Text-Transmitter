@@ -136,7 +136,8 @@ const loCon = {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
 		if(layout.main) {
 			const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
-			if(scrollPos==="100%") {
+			if(scrollPos==="100%" ||
+			   layout.main.clientHeight <= window.innerHeight-30) {
 				layout.currentLine.innerHTML = "BOT";
 				const curScr = document.body.scrollTop;
 				tlCon.update(tlOrder[tlCurrent], -1);

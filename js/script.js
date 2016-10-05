@@ -187,7 +187,7 @@ let cmd = {
 			p = {};
 		}
 		p.status = txt;
-		if (tToReply) p.in_reply_to_status_id = tToReply;
+		//if(tToReply) p.in_reply_to_status_id = tToReply;
 		t.post('statuses/update', p, function (e, d, r) {
 			if (e) {
 				console.error("Failed composing tweet.");
@@ -200,10 +200,10 @@ let cmd = {
 		});
 		tToReply = "";
 	},
-	reply: function (txt, id) {
-		// tToReply = id;
-		// cmd.compose(txt, {in_reply_to_status_id: id});
-		// cmd.update();
+	reply: function (id, txt) {
+		// tToReply and iToReply are set in commandReceiver, when the key is pressed.
+		cmd.compose(txt, { in_reply_to_status_id: id });
+		cmd.update();
 	},
 	retweet: function (id) {
 		let idToRT = id ? id : currentTweetId;
@@ -299,7 +299,7 @@ const cmdDict = {
 	},
 	reply: {
 		"p": "",
-		"d": "-- REPLYING --"
+		"d": "-- REPLYING&nbsp;"
 	},
 	retweet: {
 		"p": "retweet( id)",
@@ -353,13 +353,20 @@ function execute(command) {
 		cmd[cmdName](cmdTarget, argv.join(" "));
 	} else {
 		cmd[cmdName](...argv);
+		console.log(cmdName);
+		console.log(argv.join(" "));
 	}
 }
 function changeCmdQueryTo(command) {
 	ctl.toggleCommand();
 	let q = document.getElementById("query");
 	q.value = `:${ command } `;
-	setCmdContext(cmdDict.show(command));
+	let cp = command.match(/([\w\d]+)\s/);
+	if (cp) {
+		setCmdContext(cmdDict.show(cp[1]));
+	} else {
+		setCmdContext(cmdDict.show(command));
+	}
 }
 //import {execute} from "./commandHandler.js";
 
@@ -374,7 +381,8 @@ let receivingCommand = false;
 let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
-let tToReply = "";
+let tToReply = ""; // tweet to reply
+let iToReply = ""; // id to reply
 let currentCmdInQuery;
 let currentTweetId;
 let cmdContextText, cmdContextRightText;
@@ -453,9 +461,7 @@ function keyPress(e) {
 		// write tweet
 		if (e.keyCode === 73) {
 			tToReply = "";
-			ctl.toggleCommand();
-			const query = document.getElementById("query");
-			query.value = ":compose ";
+			changeCmdQueryTo("compose");
 			let d = setTimeout(function () {
 				query.value = query.value.substring(0, query.value.length - 1);clearTimeout(d);
 			}, 10);
@@ -463,7 +469,12 @@ function keyPress(e) {
 
 		// reply
 		if (e.keyCode === 79) {
-			ctl.toggleCommand();
+			tToReply = layout.main.children[layout.selectorPos].id;
+			iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
+			changeCmdQueryTo(`reply ${ tToReply } @${ iToReply }`);
+			let d = setTimeout(function () {
+				query.value = query.value.substring(0, query.value.length - 1);clearTimeout(d);
+			}, 10);
 		}
 
 		// update current tab
@@ -493,8 +504,11 @@ function checkStates() {
 		if (query.value.match(/:([\w\d]+)\s/)) {
 			currentCmdInQuery = query.value.match(/:([\w\d]+)\s/)[1];
 			if (cmd.hasOwnProperty(currentCmdInQuery)) {
-				if (currentCmdInQuery === "compose" || currentCmdInQuery === "reply") {
+				if (currentCmdInQuery === "compose") {
 					setCmdContext([cmdDict.show(currentCmdInQuery), `${ query.value.length - currentCmdInQuery.length - 2 }/140`]);
+				} else if (currentCmdInQuery === "reply") {
+					let wc = query.value.length - currentCmdInQuery.length - tToReply.length - 3;
+					setCmdContext(['' + cmdDict.show(currentCmdInQuery) + `<span style="position: absolute; top: 0; left: 94px;">TO @${ iToReply ? iToReply : tToReply } --</span>`, `${ wc >= 0 ? wc : 0 }/140`]);
 				} else {
 					setCmdContext(cmdDict.show(currentCmdInQuery));
 				}
@@ -708,7 +722,7 @@ const loCon = {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
 		if (layout.main) {
 			const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - (window.innerHeight - 30)) * 10000) / 100 + "%";
-			if (scrollPos === "100%") {
+			if (scrollPos === "100%" || layout.main.clientHeight <= window.innerHeight - 30) {
 				layout.currentLine.innerHTML = "BOT";
 				const curScr = document.body.scrollTop;
 				tlCon.update(tlOrder[tlCurrent], -1);
@@ -992,6 +1006,7 @@ const display = {
 			text = convertLineBreaks(text);
 			if (textQuote) textQuote = convertLineBreaks(textQuote);
 		}
+		// make it so clicking timestamp opens tweet page in host's web browser. the code below is the timestamp that can be clicked.
 		let tsDom = function () {
 			const tw = document.createElement("span");
 			tw.innerHTML = newLinkAnchor([simplifyTimestamp(timestamp), `https://twitter.com/${ username }/status/${ id }`]);
