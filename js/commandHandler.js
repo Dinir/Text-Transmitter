@@ -72,7 +72,11 @@ let cmd = {
 			slug: lslug
 		};
 		tlCon.tab.add("L",p);
-		tlCon.tab.rename("L",`L_${lslug}`);
+		tlCon.tab.rename("L",`${lslug}`);
+		let damn = setTimeout(function() {
+			tlCon.tab.remove("L");
+			clearTimeout(this);
+		}, 2000)
 	},
 	remove: function(tabName) {
 		tlCon.tab.remove(tabName);

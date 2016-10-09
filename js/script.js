@@ -247,7 +247,11 @@ let cmd = {
 			slug: lslug
 		};
 		tlCon.tab.add("L", p);
-		tlCon.tab.rename("L", `L_${ lslug }`);
+		tlCon.tab.rename("L", `${ lslug }`);
+		let damn = setTimeout(function () {
+			tlCon.tab.remove("L");
+			clearTimeout(this);
+		}, 2000);
 	},
 	remove: function (tabName) {
 		tlCon.tab.remove(tabName);
@@ -722,6 +726,7 @@ const loCon = {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
 		if (layout.main) {
 			const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - (window.innerHeight - 30)) * 10000) / 100 + "%";
+			// update older tweets when reaches the bottom or first 20 tweets don't reach the bottom
 			if (scrollPos === "100%" || layout.main.clientHeight <= window.innerHeight - 30) {
 				layout.currentLine.innerHTML = "BOT";
 				const curScr = document.body.scrollTop;
@@ -1332,12 +1337,16 @@ let tlCon = {
 			//else tabToDelete = tlOrder[tlCurrent];
 			//console.log(tabName);
 			//console.log(tabToDelete);
-			delete tl[tabName];
-			tlOrder.splice(tlOrder.indexOf(tabName), 1);
-			if (tlOrder[tlCurrent - 1]) tlCurrent--;
-			if (noUpdate) {} else {
-				loCon.updateTabs();
-				if (tlOrder.length !== 0) loCon.updateMain();
+			if (tl[tabName]) {
+				delete tl[tabName];
+			}
+			if (tlOrder.indexOf(tabName) !== -1) {
+				if (tlOrder[tlCurrent - 1] && tlOrder[tlCurrent] === tabName) tlCurrent--;
+				tlOrder.splice(tlOrder.indexOf(tabName), 1);
+				if (noUpdate) {} else {
+					loCon.updateTabs();
+					if (tlOrder.length !== 0) loCon.updateMain();
+				}
 			}
 		},
 		flush: function (really) {

@@ -57,12 +57,18 @@ let tlCon = {
 			//else tabToDelete = tlOrder[tlCurrent];
 			//console.log(tabName);
 			//console.log(tabToDelete);
-			delete tl[tabName];
-			tlOrder.splice(tlOrder.indexOf(tabName),1);
-			if(tlOrder[tlCurrent-1]) tlCurrent--;
-			if(noUpdate) {} else {
-				loCon.updateTabs();
-				if(tlOrder.length!==0) loCon.updateMain();
+			if(tl[tabName]) {
+				delete tl[tabName];
+			}
+			if(tlOrder.indexOf(tabName)!==-1) {
+				if(tlOrder[tlCurrent-1] &&
+				   tlOrder[tlCurrent] === tabName)
+					tlCurrent--;
+				tlOrder.splice(tlOrder.indexOf(tabName), 1);
+				if(noUpdate) {} else {
+					loCon.updateTabs();
+					if(tlOrder.length!==0) loCon.updateMain();
+				}
 			}
 		},
 		flush: function(really) {

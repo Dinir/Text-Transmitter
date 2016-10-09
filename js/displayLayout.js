@@ -136,6 +136,7 @@ const loCon = {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
 		if(layout.main) {
 			const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
+			// update older tweets when reaches the bottom or first 20 tweets don't reach the bottom
 			if(scrollPos==="100%" ||
 			   layout.main.clientHeight <= window.innerHeight-30) {
 				layout.currentLine.innerHTML = "BOT";
