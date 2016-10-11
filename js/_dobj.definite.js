@@ -56,6 +56,9 @@ const showImageOnMouseMove = function(t,e,a) {
 			break;
 	}
 };
-const openNewTabFromLink = function() {
-	
+const doCommandFromLink = function(displayText, cmdQuery) {
+	let theAnchor = dobj("span","link",displayText,[]);
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor,theAnchor.indexOf(">"),theAnchor.indexOf(">")+1,` onclick='execute("${cmdQuery}")'>`);
+	return theAnchor;
 };

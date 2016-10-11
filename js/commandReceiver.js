@@ -42,12 +42,14 @@ function keyPress(e) {
 
 	// scroll a page when presses 'PgUp/Dn'
 	if(e.keyCode===33 || e.keyCode===34) {
-		document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-2*charHeight);
-		if(e.keyCode===33) // selector also goes up
-			loCon.updateSelector(2);
-		else // selector also goes down
-			loCon.updateSelector(-2);
+		document.body.scrollTop += (e.code===33?-1:1)*(window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height);
+		// if(e.code==="PageUp") // selector also goes up
+		// 	loCon.updateSelector(2);
+		// else // selector also goes down
+		// 	loCon.updateSelector(-2);
 	}
+	
+	// scroll to the end when presses 'Home/End'
 
 	if(!receivingCommand) { // when the buffer is closed
 		// ':' or '/' to open buffer
@@ -180,7 +182,7 @@ const scrollHandler = () => {
 const clickHandler = (element) => {
 	//console.log(event);
 	
-	if(event.clientY < charHeight) {
+	if(event.clientY < layout.tabs.getBoundingClientRect().height) {
 		// clicked tabs line
 		if(event.target.id.match(/tab\d+/)) {
 			// clicked a tab
@@ -194,7 +196,7 @@ const clickHandler = (element) => {
 		}
 			
 	}
-	if(event.clientY > charHeight &&
+	if(event.clientY > layout.tabs.getBoundingClientRect().height &&
 	   event.clientY < window.innerHeight-charHeight) {
 		// clicked main layout
 		currentTweetId = selectTweetFrom(event);
@@ -207,13 +209,17 @@ const clickHandler = (element) => {
 const selectTweetFrom = source => {
 	if(source.path) { // then it's MouseEvent
 		let theTweet = source.path.find(value => value.className==="twitObj");
-		const id = theTweet.id;
-		let order = 0;
-		while((theTweet = theTweet.previousSibling)!==null) order++;
-		loCon.updateSelector(-2);
-		layout.selectorPos = order;
-		loCon.updateSelector(2);
-		return id;
+		if(theTweet) {
+			const id = theTweet.id;
+			let order = 0;
+			while((theTweet = theTweet.previousSibling)!==null) order++;
+			loCon.updateSelector(-2);
+			layout.selectorPos = order;
+			loCon.updateSelector(2);
+			return id;
+		} else {
+			return;
+		}
 	}
 	if(source.constructor === Array) {// then it'd be a position, [x,y]
 		// NOT FINISHED

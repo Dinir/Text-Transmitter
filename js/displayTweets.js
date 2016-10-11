@@ -278,21 +278,13 @@ const display = {
 			text = convertLineBreaks(text);
 			if(textQuote) textQuote = convertLineBreaks(textQuote);
 		}
-		// make it so clicking timestamp opens tweet page in host's web browser. the code below is the timestamp that can be clicked.
-		let tsDom = (function(){
-			const tw = document.createElement("span");
-			tw.innerHTML = newLinkAnchor([simplifyTimestamp(timestamp),`https://twitter.com/${username}/status/${id}`]);
-			tw.firstChild.className = "timestamp";
-			return tw.firstChild;
-		})();
 		
 		const dom = dobj("div",["twitObj",id],"",[
-			
 			dobj("span","rawTS",timestamp.format(),[],"style","display:none;"),
-			tsDom,
+			clickableTimestamp(timestamp,username,id),
+			//tsDom,
 			//dobj("span","timestamp",simplifyTimestamp(timestamp)),
-			dobj("span",
-				`username${isReply?" reply":""}${doesPing?" ping":""}`,username),
+			clickableUserDom(username, isReply, doesPing),
 			dobj("div","text",text)
 		]);
 		if(isQuote
@@ -301,16 +293,20 @@ const display = {
 		   )) { dom.appendChild(
 			dobj("span","quote","",[
 				dobj("span","rawTS",timeQuote.format(),[],"style","display:none;"),
-				dobj("span","timestamp",simplifyTimestamp(timeQuote)),
-				dobj("span","username",userQuote),
+				clickableTimestamp(timeQuote,userQuote,id),
+				//dobj("span","timestamp",simplifyTimestamp(timeQuote)),
+				//dobj("span","username",userQuote),
+				clickableUserDom(userQuote),
 				dobj("div","text",textQuote)
 			])
 		)}
 		if(isRetweet) { dom.appendChild(
 			dobj("span","retweet","",[
 				dobj("span","rawTS",timeRTed.format(),[],"style","display:none;"),
-				dobj("span","username",userRTed),
-				dobj("span","timestamp",simplifyTimestamp(timeRTed))
+				// dobj("span","username",userRTed),
+				clickableUserDom(userRTed),
+				clickableTimestamp(timeRTed,userRTed,id)
+				//dobj("span","timestamp",simplifyTimestamp(timeRTed))
 			])
 		)}
 		// if(hasImage["QT"]) {
@@ -376,8 +372,25 @@ const updateTimestamps = tweetDom => {
 	if(tweetDom.getElementsByClassName("quote").length) tweetDom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(moment(tweetDom.querySelector(".quote .rawTS").innerHTML));
 };
 
-/*
-test script:
-
-var twitDoms = []; var twts = []; t.get('statuses/user_timeline', {}, function(e,d,r){ twts=d; for(var i=0;i<twts.length;i++) twitDoms[i] = new display.twitObj(twts[i]); console.log('done'); });
-*/
+// make it so clicking timestamp opens tweet page in host's web browser. the code below is the timestamp that can be clicked.
+const clickableTimestamp = function(timestamp, uname, id){
+	const tw = document.createElement("span");
+	tw.innerHTML = newLinkAnchor([
+		simplifyTimestamp(timestamp),
+		`https://twitter.com/${uname}/status/${id}`
+	]);
+	tw.firstChild.className = "timestamp";
+	return tw.firstChild;
+};
+// make it so clicking username opens a tab of tweets of that user.
+const clickableUserDom = function(uname, isReply, doesPing){
+	const uw = document.createElement("span");
+	uw.innerHTML = doCommandFromLink(
+		uname, `:adduser ${uname}`
+	);
+	if(isReply && doesPing)
+		uw.firstChild.className = `username${isReply?" reply":""}${doesPing?" ping":""}`;
+	else
+		uw.firstChild.className = `username`;
+	return uw.firstChild;
+};

@@ -36,7 +36,7 @@ const URI = {
 	"User":'statuses/user_timeline',
 	"Home":'statuses/home_timeline',
 	"RTed":'statuses/retweets_of_me',
-	"DM Sent":'direct_messages/sent',
+	"DM_Sent":'direct_messages/sent',
 	"Search":'search/tweets',
 	"DM":'direct_messages',
 	"L":'lists/statuses'

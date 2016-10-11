@@ -139,6 +139,11 @@ const stateCon = {
 		if(contentOfState) {
 			stateToSave = contentOfState;
 		} else {
+			// wipe stored tweets
+			for(var tab in tl){
+				if(tl.hasOwnProperty(tab))
+					tl[tab].tweets = [];
+			}
 			// overwrite the variable `state` below with the current state, which is used for saving and loading states.
 			state = {
 				width: Math.round(window.innerWidth/charWidth),

@@ -61,6 +61,9 @@ let cmd = {
 			case "L":
 				changeCmdQueryTo("addlist");
 				break;
+			case "User":
+				changeCmdQueryTo("adduser");
+				break;
 			default:
 				tlCon.tab.add(names,par,pos);
 				break;
@@ -75,6 +78,17 @@ let cmd = {
 		tlCon.tab.rename("L",`${lslug}`);
 		let damn = setTimeout(function() {
 			tlCon.tab.remove("L");
+			clearTimeout(this);
+		}, 2000)
+	},
+	adduser: function(sname) {
+		let p = {
+			screen_name: sname
+		};
+		tlCon.tab.add("User",p);
+		tlCon.tab.rename("User",`@${sname}`);
+		let damn = setTimeout(function() {
+			tlCon.tab.remove("User");
 			clearTimeout(this);
 		}, 2000)
 	},
@@ -122,32 +136,36 @@ const cmdDict = {
 	},
 	retweet: {
 		"p": "retweet( id)",
-		"d": "Retweet a tweet with the id. omit id to retweet currently selected tweet."
+		"d": "Retweet a tweet with the id. Omit id to retweet currently selected tweet."
 	},
 	del: {
 		"p": "del( id)",
 		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
 	},
 	add: {
-		"p": "add [nameOfTab,(URI)]( parameters position)",
+		"p": "add [nameOfTab(,URI)]( parameters position)",
 		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" +
 		     `${getURIListInString()}<BR>` +
 	       "If you know what parameters are, you can add them as a form of an object.<BR>" +
 	       "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
 	addlist: {
-		"p": "addlist screenName listSlug",
-		"d": "Add a list with the listSlug, made by screenName. <br>" +
+		"p": "addlist screenName list-slug",
+		"d": "Add a list with the list-slug, made by screenName. <br>" +
 		     "screenName is the twitter username, <br>" +
-		     "listSlug is a name consist of lower-cases-alphabet-and-hyphens.<br>"
+		     "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
+	},
+	adduser: {
+		"p": "adduser screenName",
+		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
 	},
 	remove: {
-		"p": "remove( nameOfTab)",
-		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+		"p": "remove nameOfTab",
+		"d": "Remove a tab with the name. To quickly close a tab, click 'X' at the end of the tab list, or in the top-right corner of the screen."
 	},
 	rm: {
-		"p": "remove( nameOfTab)",
-		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+		"p": "remove nameOfTab",
+		"d": "Remove a tab with the name. To quickly close a tab, click 'X' at the end of the tab list, or in the top-right corner of the screen."
 	},
 	rename: {
 		"p": "rename nameOfTab nameToApply",

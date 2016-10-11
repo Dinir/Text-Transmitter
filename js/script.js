@@ -121,7 +121,12 @@ const showImageOnMouseMove = function (t, e, a) {
 			break;
 	}
 };
-const openNewTabFromLink = function () {};
+const doCommandFromLink = function (displayText, cmdQuery) {
+	let theAnchor = dobj("span", "link", displayText, []);
+	theAnchor = theAnchor.outerHTML;
+	theAnchor = replaceStr(theAnchor, theAnchor.indexOf(">"), theAnchor.indexOf(">") + 1, ` onclick='execute("${ cmdQuery }")'>`);
+	return theAnchor;
+};
 // quick dom creator
 // accept tag, [classname, id], innerHTML, [childrenNodes].
 const dobj = function (tag, names, inner, children, ...moreProps) {
@@ -236,6 +241,9 @@ let cmd = {
 			case "L":
 				changeCmdQueryTo("addlist");
 				break;
+			case "User":
+				changeCmdQueryTo("adduser");
+				break;
 			default:
 				tlCon.tab.add(names, par, pos);
 				break;
@@ -250,6 +258,17 @@ let cmd = {
 		tlCon.tab.rename("L", `${ lslug }`);
 		let damn = setTimeout(function () {
 			tlCon.tab.remove("L");
+			clearTimeout(this);
+		}, 2000);
+	},
+	adduser: function (sname) {
+		let p = {
+			screen_name: sname
+		};
+		tlCon.tab.add("User", p);
+		tlCon.tab.rename("User", `@${ sname }`);
+		let damn = setTimeout(function () {
+			tlCon.tab.remove("User");
 			clearTimeout(this);
 		}, 2000);
 	},
@@ -318,8 +337,12 @@ const cmdDict = {
 		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what parameters are, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
 	addlist: {
-		"p": "addlist screenName listSlug",
-		"d": "Add a list with the listSlug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "listSlug is a name consist of lower-cases-alphabet-and-hyphens.<br>"
+		"p": "addlist screenName list-slug",
+		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "listSlug is a name consist of lower-cases-alphabet-and-hyphens.<br>"
+	},
+	adduser: {
+		"p": "adduser screenName",
+		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
 	},
 	remove: {
 		"p": "remove( nameOfTab)",
@@ -416,11 +439,14 @@ function keyPress(e) {
 
 	// scroll a page when presses 'PgUp/Dn'
 	if (e.keyCode === 33 || e.keyCode === 34) {
-		document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - 2 * charHeight);
-		if (e.keyCode === 33) // selector also goes up
-			loCon.updateSelector(2);else // selector also goes down
-			loCon.updateSelector(-2);
+		document.body.scrollTop += (e.code === 33 ? -1 : 1) * (window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height);
+		// if(e.code==="PageUp") // selector also goes up
+		// 	loCon.updateSelector(2);
+		// else // selector also goes down
+		// 	loCon.updateSelector(-2);
 	}
+
+	// scroll to the end when presses 'Home/End'
 
 	if (!receivingCommand) {
 		// when the buffer is closed
@@ -553,7 +579,7 @@ const scrollHandler = () => {
 const clickHandler = element => {
 	//console.log(event);
 
-	if (event.clientY < charHeight) {
+	if (event.clientY < layout.tabs.getBoundingClientRect().height) {
 		// clicked tabs line
 		if (event.target.id.match(/tab\d+/)) {
 			// clicked a tab
@@ -563,7 +589,7 @@ const clickHandler = element => {
 			loCon.updateTabs("close");
 		}
 	}
-	if (event.clientY > charHeight && event.clientY < window.innerHeight - charHeight) {
+	if (event.clientY > layout.tabs.getBoundingClientRect().height && event.clientY < window.innerHeight - charHeight) {
 		// clicked main layout
 		currentTweetId = selectTweetFrom(event);
 	}
@@ -576,13 +602,17 @@ const selectTweetFrom = source => {
 	if (source.path) {
 		// then it's MouseEvent
 		let theTweet = source.path.find(value => value.className === "twitObj");
-		const id = theTweet.id;
-		let order = 0;
-		while ((theTweet = theTweet.previousSibling) !== null) order++;
-		loCon.updateSelector(-2);
-		layout.selectorPos = order;
-		loCon.updateSelector(2);
-		return id;
+		if (theTweet) {
+			const id = theTweet.id;
+			let order = 0;
+			while ((theTweet = theTweet.previousSibling) !== null) order++;
+			loCon.updateSelector(-2);
+			layout.selectorPos = order;
+			loCon.updateSelector(2);
+			return id;
+		} else {
+			return;
+		}
 	}
 	if (source.constructor === Array) {
 		// then it'd be a position, [x,y]
@@ -625,6 +655,8 @@ const loCon = {
 				replaceDobj(layout.tabs, document.getElementById("tabs"));
 				break;
 		}
+		// if tab line height changes, set margin of main respecting that. (so its first line isn't hidden behind tab line)
+		if (layout.main && layout.tabs) layout.main.style.marginTop = layout.tabs.getBoundingClientRect().height;
 	},
 	updateMain: () => {
 		if (layout.main && layout.main.children[layout.selectorPos]) {
@@ -725,15 +757,17 @@ const loCon = {
 	updateScroll: () => {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
 		if (layout.main) {
-			const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - (window.innerHeight - 30)) * 10000) / 100 + "%";
+			const scrollPos = parseInt(document.body.scrollTop / (layout.main.clientHeight - (window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height)) * 10000) / 100 + "%";
 			// update older tweets when reaches the bottom or first 20 tweets don't reach the bottom
-			if (scrollPos === "100%" || layout.main.clientHeight <= window.innerHeight - 30) {
-				layout.currentLine.innerHTML = "BOT";
+			if (scrollPos === "100%" || layout.main.clientHeight <= window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height) {
+				layout.currentLine.innerHTML = "Bot";
 				const curScr = document.body.scrollTop;
 				tlCon.update(tlOrder[tlCurrent], -1);
 				let scrBack = setTimeout(function () {
-					window.scrollTo(0, curScr);clearTimeout(scrBack);
-				}, 750);
+					window.scrollTo(0, curScr);
+					loCon.updateScroll();
+					clearTimeout(scrBack);
+				}, 1300);
 			} else layout.currentLine.innerHTML = scrollPos;
 		}
 	},
@@ -1011,22 +1045,23 @@ const display = {
 			text = convertLineBreaks(text);
 			if (textQuote) textQuote = convertLineBreaks(textQuote);
 		}
-		// make it so clicking timestamp opens tweet page in host's web browser. the code below is the timestamp that can be clicked.
-		let tsDom = function () {
-			const tw = document.createElement("span");
-			tw.innerHTML = newLinkAnchor([simplifyTimestamp(timestamp), `https://twitter.com/${ username }/status/${ id }`]);
-			tw.firstChild.className = "timestamp";
-			return tw.firstChild;
-		}();
 
-		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "rawTS", timestamp.format(), [], "style", "display:none;"), tsDom,
+		const dom = dobj("div", ["twitObj", id], "", [dobj("span", "rawTS", timestamp.format(), [], "style", "display:none;"), clickableTimestamp(timestamp, username, id),
+		//tsDom,
 		//dobj("span","timestamp",simplifyTimestamp(timestamp)),
-		dobj("span", `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`, username), dobj("div", "text", text)]);
+		clickableUserDom(username, isReply, doesPing), dobj("div", "text", text)]);
 		if (isQuote && (raw.quoted_status || raw.retweeted_status && raw.retweeted_status.quoted_status)) {
-			dom.appendChild(dobj("span", "quote", "", [dobj("span", "rawTS", timeQuote.format(), [], "style", "display:none;"), dobj("span", "timestamp", simplifyTimestamp(timeQuote)), dobj("span", "username", userQuote), dobj("div", "text", textQuote)]));
+			dom.appendChild(dobj("span", "quote", "", [dobj("span", "rawTS", timeQuote.format(), [], "style", "display:none;"), clickableTimestamp(timeQuote, userQuote, id),
+			//dobj("span","timestamp",simplifyTimestamp(timeQuote)),
+			//dobj("span","username",userQuote),
+			clickableUserDom(userQuote), dobj("div", "text", textQuote)]));
 		}
 		if (isRetweet) {
-			dom.appendChild(dobj("span", "retweet", "", [dobj("span", "rawTS", timeRTed.format(), [], "style", "display:none;"), dobj("span", "username", userRTed), dobj("span", "timestamp", simplifyTimestamp(timeRTed))]));
+			dom.appendChild(dobj("span", "retweet", "", [dobj("span", "rawTS", timeRTed.format(), [], "style", "display:none;"),
+			// dobj("span","username",userRTed),
+			clickableUserDom(userRTed), clickableTimestamp(timeRTed, userRTed, id)
+			//dobj("span","timestamp",simplifyTimestamp(timeRTed))
+			]));
 		}
 		// if(hasImage["QT"]) {
 		// 	dom.querySelector(".quote .text").innerHTML =
@@ -1078,11 +1113,20 @@ const updateTimestamps = tweetDom => {
 	if (tweetDom.getElementsByClassName("quote").length) tweetDom.querySelector(".quote .timestamp").innerHTML = simplifyTimestamp(moment(tweetDom.querySelector(".quote .rawTS").innerHTML));
 };
 
-/*
-test script:
-
-var twitDoms = []; var twts = []; t.get('statuses/user_timeline', {}, function(e,d,r){ twts=d; for(var i=0;i<twts.length;i++) twitDoms[i] = new display.twitObj(twts[i]); console.log('done'); });
-*/
+// make it so clicking timestamp opens tweet page in host's web browser. the code below is the timestamp that can be clicked.
+const clickableTimestamp = function (timestamp, uname, id) {
+	const tw = document.createElement("span");
+	tw.innerHTML = newLinkAnchor([simplifyTimestamp(timestamp), `https://twitter.com/${ uname }/status/${ id }`]);
+	tw.firstChild.className = "timestamp";
+	return tw.firstChild;
+};
+// make it so clicking username opens a tab of tweets of that user.
+const clickableUserDom = function (uname, isReply, doesPing) {
+	const uw = document.createElement("span");
+	uw.innerHTML = doCommandFromLink(uname, `:adduser ${ uname }`);
+	if (isReply && doesPing) uw.firstChild.className = `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`;else uw.firstChild.className = `username`;
+	return uw.firstChild;
+};
 window.onload = () => {
 	// load state stored before.
 	// also build the screen.
@@ -1234,6 +1278,10 @@ const stateCon = {
 		if (contentOfState) {
 			stateToSave = contentOfState;
 		} else {
+			// wipe stored tweets
+			for (var tab in tl) {
+				if (tl.hasOwnProperty(tab)) tl[tab].tweets = [];
+			}
 			// overwrite the variable `state` below with the current state, which is used for saving and loading states.
 			state = {
 				width: Math.round(window.innerWidth / charWidth),
@@ -1389,17 +1437,7 @@ let tlCon = {
 
 			//params.count = 20;
 			// TODO make it check if the type can use `since_id` and `max_id` first.
-			// TODO Fix it. This part doesn't catch current end of loaded tweets!
 			switch (direction) {
-				// case -1:
-				// 	if(tweets[tweets.length-1])
-				// 		params.max_id = tweets[tweets.length-1].id_str;
-				// 	break;
-				// case 1:
-				// default:
-				// 	if(tweets[0])
-				// 		params.since_id = tweets[0].id_str;
-				// 	break;
 				case -1:
 					if (tweets[tweets.length - 1]) {
 						params.max_id = tweets[tweets.length - 1].id;
@@ -1411,10 +1449,18 @@ let tlCon = {
 					if (tweets[0]) {
 						params.since_id = tweets[0].id;
 						delete params.max_id;
+						// } else {
+						// 	if(params.hasOwnProperty(since_id))
+						// 		delete params.since_id;
+						// 	if(params.hasOwnProperty(max_id))
+						// 		delete params.max_id;
 					}
 					break;
 			}
 
+			console.log("Updating...:");
+			console.log(contents.type);
+			console.log(params);
 			t.get(contents.type, params, function (err, data, response) {
 				// TODO learn what errors and response are for.
 				if (err) {

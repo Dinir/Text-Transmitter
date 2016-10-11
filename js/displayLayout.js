@@ -34,6 +34,9 @@ const loCon = {
 				replaceDobj(layout.tabs, document.getElementById("tabs"));
 				break;
 		}
+		// if tab line height changes, set margin of main respecting that. (so its first line isn't hidden behind tab line)
+		if(layout.main && layout.tabs)
+			layout.main.style.marginTop = layout.tabs.getBoundingClientRect().height;
 	},
 	updateMain: () => {
 		if(layout.main && layout.main.children[layout.selectorPos]) {
@@ -135,14 +138,18 @@ const loCon = {
 	updateScroll: () => {
 		// 30 is from each end of the screen: tab line, status line: 2 line makes 30 pixel height.
 		if(layout.main) {
-			const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-30))*10000)/100+"%";
+			const scrollPos = parseInt(document.body.scrollTop/(layout.main.clientHeight-(window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height))*10000)/100+"%";
 			// update older tweets when reaches the bottom or first 20 tweets don't reach the bottom
 			if(scrollPos==="100%" ||
-			   layout.main.clientHeight <= window.innerHeight-30) {
-				layout.currentLine.innerHTML = "BOT";
+			   layout.main.clientHeight <= window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height) {
+				layout.currentLine.innerHTML = "Bot";
 				const curScr = document.body.scrollTop;
 				tlCon.update(tlOrder[tlCurrent], -1);
-				let scrBack = setTimeout(function(){window.scrollTo(0,curScr); clearTimeout(scrBack)},750);
+				let scrBack = setTimeout(function(){
+					window.scrollTo(0,curScr);
+					loCon.updateScroll();
+					clearTimeout(scrBack)
+				},1300);
 				
 			} else
 				layout.currentLine.innerHTML = scrollPos;
