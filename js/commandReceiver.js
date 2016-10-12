@@ -95,11 +95,22 @@ function keyPress(e) {
 		}
 		
 		// reply
-		if(e.keyCode === 79) {
+		if(!e.shiftKey && e.keyCode === 79) {
 			tToReply = layout.main.children[layout.selectorPos].id;
 			iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
 			changeCmdQueryTo(`reply ${tToReply} @${iToReply}`);
 			let d = setTimeout(function(){query.value = query.value.substring(0,query.value.length-1); clearTimeout(d);}, 10);
+		}
+		
+		// quote
+		if(e.shiftKey && e.keyCode === 79) {
+			const tToQuote = layout.main.children[layout.selectorPos].getElementsByClassName("timestamp")[0].outerHTML.match(/(https.+)&quot\;\)\"\>/)[1];
+			changeCmdQueryTo(`compose `+` ${tToQuote}`);
+			let d = setTimeout(function(){
+				query.value = query.value.substring(0,query.value.length-1);
+				query.setSelectionRange(9,9);
+				clearTimeout(d);
+			}, 10);
 		}
 		
 		// update current tab
