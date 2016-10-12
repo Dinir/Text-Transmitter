@@ -101,6 +101,12 @@ rename nameOfTab nameToApply
 ```
 (rn for short) Rename a tab from nameOfTab to nameToApply.
 
+### reorder
+```
+reorder oldIndex newIndex swap
+```
+(ro for short) Move a tab in oldIndex-th position to newIndex-th position. If swap is true, only swap the two position. Otherwise(give no swap argument) the oldIndex-th tab will be picked up and inserted into the newIndex-th position. 
+
 ### update
 ```
 update( tabName direction)

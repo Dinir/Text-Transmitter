@@ -100,6 +100,10 @@ let cmd = {
 		tlCon.tab.rename(tabName, alterName);
 	},
 	rn: function(tn,an) { return this.rename(tn,an) },
+	reorder: function(from,to,swap) {
+		tlCon.tab.reorder(from,to,swap);
+	},
+	ro: function(fr,to,sw) { return this.reorder(fr,to,sw) },
 	
 	update: function(tabName, direction) {
 		let tn, dr;
@@ -174,6 +178,14 @@ const cmdDict = {
 	rn: {
 		"p": "rename nameOfTab nameToApply",
 		"d": "Rename a tab from nameOfTab to nameToApply."
+	},
+	reorder: {
+		"p": "reorder oldIndex newIndex swap",
+		"d": "Move a tab in oldIndex to newIndex. If swap is true(anything considered as true in javascript is okay), only move two tabs, one in oldIndex and the other in newIndex."
+	},
+	ro: {
+		"p": "reorder oldIndex newIndex swap",
+		"d": "Move a tab in oldIndex to newIndex. If swap is true(anything considered as true in javascript is okay), only move two tabs, one in oldIndex and the other in newIndex."
 	},
 	update: {
 		"p": "update( tabName direction)",

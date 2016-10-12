@@ -90,17 +90,53 @@ let tlCon = {
 			}
 			loCon.updateTabs();
 		},
-		reorder: function(tabName, place, swap) {
-			if(typeof tabName !== "undefined") {
-				if(typeof swap !== "undefined") {
-					tlOrder.splice(place, 0, ...tlOrder.splice(tlOrder.indexOf(tabName), 1));
+		reorder: function(fromIndex, toIndex, swap) {
+			const beforePos = tlOrder[tlCurrent];
+			if(typeof fromIndex !== "undefined" &&
+			   typeof toIndex !== "undefined") {
+				let fr, to;
+				if(parseInt(fromIndex)>=0) {
+					// if fromIndex is number
+					if(fromIndex<0)
+						fr = 0;
+					else if(fromIndex>=tlOrder.length)
+						fr = tlOrder.length-1;
+					else
+						fr = fromIndex;
 				} else {
-					let placeSwap = tlOrder.indexOf(tabName);
-					tlCon.tab.reorder(tabName, place);
-					tlCon.tab.reorder(tlOrder[place-1], placeSwap);
+					// if fromIndex is string
+					fr = tlOrder.indexOf(fromIndex);
+				}
+				if(parseInt(toIndex)>=0) {
+					// if toIndex is number
+					if(toIndex<0)
+						to = 0;
+					else if(toIndex>=tlOrder.length)
+						to = tlOrder.length-1;
+					else
+						to = toIndex;
+				} else {
+					// if toIndex is string
+					to = tlOrder.indexOf(toIndex);
+				}
+				if(fr!==to) {
+					if(typeof swap!=="undefined") {
+						const tt = tlOrder[fr];
+						tlOrder[fr] = tlOrder[to];
+						tlOrder[to] = tt;
+					} else {
+						moveInArray(tlOrder,fr,to);
+					}
 				}
 			}
+			const currentViewChanged = tlCurrent !== tlOrder.indexOf(beforePos);
+			if(currentViewChanged) {
+				tlCurrent = tlOrder.indexOf(beforePos);
+			}
 			loCon.updateTabs();
+			if(!currentViewChanged) {
+				loCon.updateMain();
+			}
 		}
 	},
 	recentCall: false,

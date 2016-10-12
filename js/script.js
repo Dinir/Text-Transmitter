@@ -30,12 +30,31 @@ const replaceStr = function (str, start, end, repl) {
 };
 const convertLineBreaks = str => str.replace(/(?:\r\n|\r|\n)/g, "<br>");
 
+// Move an array element from one position to another
+// http://stackoverflow.com/a/5306832/4972931
+const moveInArray = function (arr, old_index, new_index) {
+	while (old_index < 0) {
+		old_index += arr.length;
+	}
+	while (new_index < 0) {
+		new_index += arr.length;
+	}
+	if (new_index >= arr.length) {
+		var k = new_index - arr.length;
+		while (k-- + 1) {
+			arr.push(undefined);
+		}
+	}
+	arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+	return arr; // for testing purposes
+};
+
 const URI = {
 	"Mention": 'statuses/mentions_timeline',
 	"User": 'statuses/user_timeline',
 	"Home": 'statuses/home_timeline',
 	"RTed": 'statuses/retweets_of_me',
-	"DM Sent": 'direct_messages/sent',
+	"DM_Sent": 'direct_messages/sent',
 	"Search": 'search/tweets',
 	"DM": 'direct_messages',
 	"L": 'lists/statuses'
@@ -284,6 +303,12 @@ let cmd = {
 	rn: function (tn, an) {
 		return this.rename(tn, an);
 	},
+	reorder: function (from, to, swap) {
+		tlCon.tab.reorder(from, to, swap);
+	},
+	ro: function (fr, to, sw) {
+		return this.reorder(fr, to, sw);
+	},
 
 	update: function (tabName, direction) {
 		let tn, dr;
@@ -326,31 +351,31 @@ const cmdDict = {
 	},
 	retweet: {
 		"p": "retweet( id)",
-		"d": "Retweet a tweet with the id. omit id to retweet currently selected tweet."
+		"d": "Retweet a tweet with the id. Omit id to retweet currently selected tweet."
 	},
 	del: {
 		"p": "del( id)",
 		"d": "Delete a tweet with the id. Omit id to delete currently selected tweet."
 	},
 	add: {
-		"p": "add [nameOfTab,(URI)]( parameters position)",
+		"p": "add [nameOfTab(,URI)]( parameters position)",
 		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what parameters are, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
 	addlist: {
 		"p": "addlist screenName list-slug",
-		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "listSlug is a name consist of lower-cases-alphabet-and-hyphens.<br>"
+		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
 	},
 	adduser: {
 		"p": "adduser screenName",
 		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
 	},
 	remove: {
-		"p": "remove( nameOfTab)",
-		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+		"p": "remove nameOfTab",
+		"d": "Remove a tab with the name. To quickly close a tab, click 'X' at the end of the tab list, or in the top-right corner of the screen."
 	},
 	rm: {
-		"p": "remove( nameOfTab)",
-		"d": "Remove a tab with the name. Omit nameOfTab to remove current tab."
+		"p": "remove nameOfTab",
+		"d": "Remove a tab with the name. To quickly close a tab, click 'X' at the end of the tab list, or in the top-right corner of the screen."
 	},
 	rename: {
 		"p": "rename nameOfTab nameToApply",
@@ -359,6 +384,14 @@ const cmdDict = {
 	rn: {
 		"p": "rename nameOfTab nameToApply",
 		"d": "Rename a tab from nameOfTab to nameToApply."
+	},
+	reorder: {
+		"p": "reorder oldIndex newIndex swap",
+		"d": "Move a tab in oldIndex to newIndex. If swap is true(anything considered as true in javascript is okay), only move two tabs, one in oldIndex and the other in newIndex."
+	},
+	ro: {
+		"p": "reorder oldIndex newIndex swap",
+		"d": "Move a tab in oldIndex to newIndex. If swap is true(anything considered as true in javascript is okay), only move two tabs, one in oldIndex and the other in newIndex."
 	},
 	update: {
 		"p": "update( tabName direction)",
@@ -1409,17 +1442,42 @@ let tlCon = {
 			}
 			loCon.updateTabs();
 		},
-		reorder: function (tabName, place, swap) {
-			if (typeof tabName !== "undefined") {
-				if (typeof swap !== "undefined") {
-					tlOrder.splice(place, 0, ...tlOrder.splice(tlOrder.indexOf(tabName), 1));
+		reorder: function (fromIndex, toIndex, swap) {
+			const beforePos = tlOrder[tlCurrent];
+			if (typeof fromIndex !== "undefined" && typeof toIndex !== "undefined") {
+				let fr, to;
+				if (parseInt(fromIndex) >= 0) {
+					// if fromIndex is number
+					if (fromIndex < 0) fr = 0;else if (fromIndex >= tlOrder.length) fr = tlOrder.length - 1;else fr = fromIndex;
 				} else {
-					let placeSwap = tlOrder.indexOf(tabName);
-					tlCon.tab.reorder(tabName, place);
-					tlCon.tab.reorder(tlOrder[place - 1], placeSwap);
+					// if fromIndex is string
+					fr = tlOrder.indexOf(fromIndex);
+				}
+				if (parseInt(toIndex) >= 0) {
+					// if toIndex is number
+					if (toIndex < 0) to = 0;else if (toIndex >= tlOrder.length) to = tlOrder.length - 1;else to = toIndex;
+				} else {
+					// if toIndex is string
+					to = tlOrder.indexOf(toIndex);
+				}
+				if (fr !== to) {
+					if (typeof swap !== "undefined") {
+						const tt = tlOrder[fr];
+						tlOrder[fr] = tlOrder[to];
+						tlOrder[to] = tt;
+					} else {
+						moveInArray(tlOrder, fr, to);
+					}
 				}
 			}
+			const currentViewChanged = tlCurrent !== tlOrder.indexOf(beforePos);
+			if (currentViewChanged) {
+				tlCurrent = tlOrder.indexOf(beforePos);
+			}
 			loCon.updateTabs();
+			if (!currentViewChanged) {
+				loCon.updateMain();
+			}
 		}
 	},
 	recentCall: false,
