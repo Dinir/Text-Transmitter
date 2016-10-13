@@ -82,7 +82,7 @@ const stateCon = {
 			if(e) {
 				console.error("Failed creating the default one.\n" +
 				              "Any new changes made in this session won't be saved.");
-				console.log(e);
+				console.dir(e);
 				return e;
 			}
 			stateFileName = defaultStateFileName;
@@ -93,7 +93,7 @@ const stateCon = {
 	},
 	load: fileName => {
 		let target;
-		if(fileName) target=fileName;
+		if(fileName) target=`${__dirname}/state/${fileName}.json`;
 		else target=defaultStateFileName;
 		
 		fs.readFile(target,'utf8',(e,d) => {
@@ -118,8 +118,8 @@ const stateCon = {
 			}
 			catch(e) {
 				console.error("Failed parsing the state.\n" +
-				              "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
-				console.log(e);
+				              "Does it succeed if you manually try parsing it with `JSON.parse(fileName)`?");
+				console.dir(e);
 			}
 			loCon.init();
 			// DAMN
@@ -132,7 +132,12 @@ const stateCon = {
 	forceSave: (fileName, contentOfState, silent) => {
 		// assert `contentOfState` is already in a JSON form.
 		let target;
-		if(fileName) target = fileName;
+		if(fileName) {
+			if(fileName.match(__dirname))
+				target = fileName;
+			else
+				target = `${__dirname}/state/${fileName}.json`;
+		}
 		else target=defaultStateFileName;
 		let stateToSave;
 		
@@ -152,13 +157,12 @@ const stateCon = {
 				tlOrder: tlOrder,
 				tlCurrent: tlCurrent
 			};
-			stateToSave = JSON.stringify(state); console.log(stateToSave);
+			stateToSave = JSON.stringify(state);
 		}
 		
 		fs.writeFile(target,stateToSave,'utf8', e => {
 			if(e) {
-				console.error(`Failed saving current state!\n\
-				Try manually copy the result with \`JSON.stringify(state)\` and save it as \`${__dirname}/state/state.json\`.`);
+				console.error(`Failed saving current state!\n`+`Try manually copy the state with \`JSON.stringify(state)\` and save it as \`${fileName}\`.`);
 				return e;
 			}
 			stateFileName = target;
@@ -171,16 +175,16 @@ const stateCon = {
 			if(e) {
 				console.error("Failed loading the current state.\n" +
 				              "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
-				console.log(e);
+				console.dir(e);
 				return e;
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`${__dirname}/state/state${timestamp}.json`, d);
-				console.log(`Saved the current state in '${__dirname}/state${timestamp}.json'.`);
+				stateCon.forceSave(`state${timestamp}`, d);
+				console.log(`Saved the last state in '${__dirname}/state${timestamp}.json'.`);
 			} catch(e) {
 				console.error("Failed making a backup of the current state.");
-				console.log(e);
+				console.dir(e);
 				return e;
 			}
 		});

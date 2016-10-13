@@ -3,6 +3,12 @@ let cmd = {
 		window.resizeTo((w>13?w:13)*8, (h>6?h:6)*15/*+25*/);
 	},
 	rs: function(w,h) { return this.resize(w,h) },
+	save: function(fileName) {
+		stateCon.save(fileName?fileName:"");
+	},
+	load: function(fileName) {
+		stateCon.load(fileName?fileName:"");
+	},
 
 	compose: function(txt, params) {
 		let p;
@@ -53,6 +59,9 @@ let cmd = {
 			}
 			console.log("Tweet has been deleted.");
 			console.log(d);
+			if(currentTweetId === d.id_str) {
+				layout.main.removeChild(layout.main.children[layout.selectorPos]);
+			}
 		});
 	},
 	
@@ -107,8 +116,8 @@ let cmd = {
 	
 	update: function(tabName, direction) {
 		let tn, dr;
-		if(tabName) {} else {tn = tlOrder[tlCurrent]};
-		if(direction) {} else {dr = 1};
+		if(tabName) {} else {tn = tlOrder[tlCurrent]}
+		if(direction) {} else {dr = 1}
 		tlCon.update(tn, dr);
 	},
 	u: function(tabName,direction) { return this.update(tabName,direction) },
@@ -129,6 +138,14 @@ const cmdDict = {
 	rs: {
 		"p": "resize width height",
 		"d": "Resize the window."
+	},
+	save: {
+		"p": "save( fileName)",
+		"d": "Save current app state."
+	},
+	load: {
+		"p": "load( fileName)",
+		"d": "Load the last saved(or specified) app state."
 	},
 	compose: {
 		"p": "",

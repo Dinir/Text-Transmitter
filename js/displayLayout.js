@@ -143,14 +143,13 @@ const loCon = {
 			if(scrollPos==="100%" ||
 			   layout.main.clientHeight <= window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height) {
 				layout.currentLine.innerHTML = "Bot";
-				const curScr = document.body.scrollTop;
-				tlCon.update(tlOrder[tlCurrent], -1);
-				let scrBack = setTimeout(function(){
-					window.scrollTo(0,curScr);
-					loCon.updateScroll();
-					clearTimeout(scrBack)
-				},1300);
-				
+				// const curScr = document.body.scrollTop;
+				// tlCon.update(tlOrder[tlCurrent], -1);
+				// let scrBack = setTimeout(function(){
+				// 	window.scrollTo(0,curScr);
+				// 	loCon.updateScroll();
+				// 	clearTimeout(scrBack)
+				// },1300);
 			} else
 				layout.currentLine.innerHTML = scrollPos;
 		}

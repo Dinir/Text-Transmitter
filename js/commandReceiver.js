@@ -14,7 +14,7 @@ let lastKeyCode = 0;
 let tToReply = ""; // tweet to reply
 let iToReply = ""; // id to reply
 let currentCmdInQuery;
-let currentTweetId;
+let currentTweetId; // handled in displayLayout.js and this file. Each handles keyboard movement cases and mouse click cases.
 let cmdContextText, cmdContextRightText;
 let lists = [];
 const setCmdContext = (texts) => {
@@ -94,28 +94,48 @@ function keyPress(e) {
 			let d = setTimeout(function(){query.value = query.value.substring(0,query.value.length-1); clearTimeout(d);}, 10);
 		}
 		
-		// reply
-		if(!e.shiftKey && e.keyCode === 79) {
-			tToReply = layout.main.children[layout.selectorPos].id;
-			iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
-			changeCmdQueryTo(`reply ${tToReply} @${iToReply}`);
-			let d = setTimeout(function(){query.value = query.value.substring(0,query.value.length-1); clearTimeout(d);}, 10);
+		// reply & quote
+		if(e.keyCode === 79) {
+			if(!e.shiftKey) {
+				tToReply = layout.main.children[layout.selectorPos].id;
+				iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
+				changeCmdQueryTo(`reply ${tToReply} @${iToReply}`);
+				let d = setTimeout(function() {
+					query.value = query.value.substring(0, query.value.length-1);
+					clearTimeout(d);
+				}, 10);
+			} else if(e.shiftKey) {
+				const tToQuote = layout.main.children[layout.selectorPos].getElementsByClassName("timestamp")[0].outerHTML.match(/(https.+)&quot\;\)\"\>/)[1];
+				changeCmdQueryTo(`compose `+` ${tToQuote}`);
+				let d = setTimeout(function(){
+					query.value = query.value.substring(0,query.value.length-1);
+					query.setSelectionRange(9,9);
+					clearTimeout(d);
+				}, 10);
+			}
 		}
 		
-		// quote
-		if(e.shiftKey && e.keyCode === 79) {
-			const tToQuote = layout.main.children[layout.selectorPos].getElementsByClassName("timestamp")[0].outerHTML.match(/(https.+)&quot\;\)\"\>/)[1];
-			changeCmdQueryTo(`compose `+` ${tToQuote}`);
-			let d = setTimeout(function(){
-				query.value = query.value.substring(0,query.value.length-1);
-				query.setSelectionRange(9,9);
-				clearTimeout(d);
-			}, 10);
+		// retweet
+		if(e.keyCode === 82) {
+			if(e.shiftKey) {
+				cmd["retweet"](layout.main.children[layout.selectorPos].id);
+			}
 		}
 		
 		// update current tab
 		if(e.keyCode === 85) {
-			cmd["update"]();
+			if(!e.shiftKey) {
+				cmd["update"]();
+			} else if(e.shiftKey) {
+				const curScr = document.body.scrollTop;
+				// cmd.update(tlOrder[tlCurrent], -1);
+				tlCon.update(tlOrder[tlCurrent], -1);
+				let scrBack = setTimeout(function(){
+					window.scrollTo(0,curScr);
+					loCon.updateScroll();
+					clearTimeout(scrBack)
+				},1300);
+			}
 		}
 
 	} else { // when the buffer is open

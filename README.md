@@ -44,13 +44,18 @@ reply tweetIdToReply message
 ```
 Reply to a tweet with id of tweetIdToReply. The id can be obtained by selecting a tweet you want to reply to and pressing 'o'.
 
-### retweet
+### quote 'O'
+(command pattern is same as 'compose')
+
+Pressing 'O' will open a buffer for composing and will include the address of the current selected tweet. Sending the tweet will include the address as a quote.
+
+### retweet `R`
 ```
 retweet( id)
 ```
 Retweet a tweet with the id. Omit id to retweet currently selected tweet. 
 
-### del
+### del `D`
 ```
 del( id)
 ```

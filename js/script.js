@@ -202,6 +202,12 @@ let cmd = {
 	rs: function (w, h) {
 		return this.resize(w, h);
 	},
+	save: function (fileName) {
+		stateCon.save(fileName ? fileName : "");
+	},
+	load: function (fileName) {
+		stateCon.load(fileName ? fileName : "");
+	},
 
 	compose: function (txt, params) {
 		let p;
@@ -252,6 +258,9 @@ let cmd = {
 			}
 			console.log("Tweet has been deleted.");
 			console.log(d);
+			if (currentTweetId === d.id_str) {
+				layout.main.removeChild(layout.main.children[layout.selectorPos]);
+			}
 		});
 	},
 
@@ -314,10 +323,10 @@ let cmd = {
 		let tn, dr;
 		if (tabName) {} else {
 			tn = tlOrder[tlCurrent];
-		};
+		}
 		if (direction) {} else {
 			dr = 1;
-		};
+		}
 		tlCon.update(tn, dr);
 	},
 	u: function (tabName, direction) {
@@ -340,6 +349,14 @@ const cmdDict = {
 	rs: {
 		"p": "resize width height",
 		"d": "Resize the window."
+	},
+	save: {
+		"p": "save( fileName)",
+		"d": "Save current app state."
+	},
+	load: {
+		"p": "load( fileName)",
+		"d": "Load the last saved(or specified) app state."
 	},
 	compose: {
 		"p": "",
@@ -444,7 +461,7 @@ let lastKeyCode = 0;
 let tToReply = ""; // tweet to reply
 let iToReply = ""; // id to reply
 let currentCmdInQuery;
-let currentTweetId;
+let currentTweetId; // handled in displayLayout.js and this file. Each handles keyboard movement cases and mouse click cases.
 let cmdContextText, cmdContextRightText;
 let lists = [];
 const setCmdContext = texts => {
@@ -530,30 +547,48 @@ function keyPress(e) {
 			}, 10);
 		}
 
-		// reply
-		if (!e.shiftKey && e.keyCode === 79) {
-			tToReply = layout.main.children[layout.selectorPos].id;
-			iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
-			changeCmdQueryTo(`reply ${ tToReply } @${ iToReply }`);
-			let d = setTimeout(function () {
-				query.value = query.value.substring(0, query.value.length - 1);clearTimeout(d);
-			}, 10);
+		// reply & quote
+		if (e.keyCode === 79) {
+			if (!e.shiftKey) {
+				tToReply = layout.main.children[layout.selectorPos].id;
+				iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
+				changeCmdQueryTo(`reply ${ tToReply } @${ iToReply }`);
+				let d = setTimeout(function () {
+					query.value = query.value.substring(0, query.value.length - 1);
+					clearTimeout(d);
+				}, 10);
+			} else if (e.shiftKey) {
+				const tToQuote = layout.main.children[layout.selectorPos].getElementsByClassName("timestamp")[0].outerHTML.match(/(https.+)&quot\;\)\"\>/)[1];
+				changeCmdQueryTo(`compose ` + ` ${ tToQuote }`);
+				let d = setTimeout(function () {
+					query.value = query.value.substring(0, query.value.length - 1);
+					query.setSelectionRange(9, 9);
+					clearTimeout(d);
+				}, 10);
+			}
 		}
 
-		// quote
-		if (e.shiftKey && e.keyCode === 79) {
-			const tToQuote = layout.main.children[layout.selectorPos].getElementsByClassName("timestamp")[0].outerHTML.match(/(https.+)&quot\;\)\"\>/)[1];
-			changeCmdQueryTo(`compose ` + ` ${ tToQuote }`);
-			let d = setTimeout(function () {
-				query.value = query.value.substring(0, query.value.length - 1);
-				query.setSelectionRange(9, 9);
-				clearTimeout(d);
-			}, 10);
+		// retweet
+		if (e.keyCode === 82) {
+			if (e.shiftKey) {
+				cmd["retweet"](layout.main.children[layout.selectorPos].id);
+			}
 		}
 
 		// update current tab
 		if (e.keyCode === 85) {
-			cmd["update"]();
+			if (!e.shiftKey) {
+				cmd["update"]();
+			} else if (e.shiftKey) {
+				const curScr = document.body.scrollTop;
+				// cmd.update(tlOrder[tlCurrent], -1);
+				tlCon.update(tlOrder[tlCurrent], -1);
+				let scrBack = setTimeout(function () {
+					window.scrollTo(0, curScr);
+					loCon.updateScroll();
+					clearTimeout(scrBack);
+				}, 1300);
+			}
 		}
 	} else {
 		// when the buffer is open
@@ -805,13 +840,13 @@ const loCon = {
 			// update older tweets when reaches the bottom or first 20 tweets don't reach the bottom
 			if (scrollPos === "100%" || layout.main.clientHeight <= window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height) {
 				layout.currentLine.innerHTML = "Bot";
-				const curScr = document.body.scrollTop;
-				tlCon.update(tlOrder[tlCurrent], -1);
-				let scrBack = setTimeout(function () {
-					window.scrollTo(0, curScr);
-					loCon.updateScroll();
-					clearTimeout(scrBack);
-				}, 1300);
+				// const curScr = document.body.scrollTop;
+				// tlCon.update(tlOrder[tlCurrent], -1);
+				// let scrBack = setTimeout(function(){
+				// 	window.scrollTo(0,curScr);
+				// 	loCon.updateScroll();
+				// 	clearTimeout(scrBack)
+				// },1300);
 			} else layout.currentLine.innerHTML = scrollPos;
 		}
 	},
@@ -1270,7 +1305,7 @@ const stateCon = {
 		fs.writeFile(defaultStateFileName, JSON.stringify(state), 'utf8', e => {
 			if (e) {
 				console.error("Failed creating the default one.\n" + "Any new changes made in this session won't be saved.");
-				console.log(e);
+				console.dir(e);
 				return e;
 			}
 			stateFileName = defaultStateFileName;
@@ -1281,7 +1316,7 @@ const stateCon = {
 	},
 	load: fileName => {
 		let target;
-		if (fileName) target = fileName;else target = defaultStateFileName;
+		if (fileName) target = `${ __dirname }/state/${ fileName }.json`;else target = defaultStateFileName;
 
 		fs.readFile(target, 'utf8', (e, d) => {
 			if (e) {
@@ -1302,8 +1337,8 @@ const stateCon = {
 					tlCon.forceUpdate(tlOrder[i], 1);
 				}
 			} catch (e) {
-				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse('${fileName}')`?");
-				console.log(e);
+				console.error("Failed parsing the state.\n" + "Does it succeed if you manually try parsing it with `JSON.parse(fileName)`?");
+				console.dir(e);
 			}
 			loCon.init();
 			// DAMN
@@ -1316,7 +1351,9 @@ const stateCon = {
 	forceSave: (fileName, contentOfState, silent) => {
 		// assert `contentOfState` is already in a JSON form.
 		let target;
-		if (fileName) target = fileName;else target = defaultStateFileName;
+		if (fileName) {
+			if (fileName.match(__dirname)) target = fileName;else target = `${ __dirname }/state/${ fileName }.json`;
+		} else target = defaultStateFileName;
 		let stateToSave;
 
 		if (contentOfState) {
@@ -1339,8 +1376,7 @@ const stateCon = {
 
 		fs.writeFile(target, stateToSave, 'utf8', e => {
 			if (e) {
-				console.error(`Failed saving current state!\n\
-				Try manually copy the result with \`JSON.stringify(state)\` and save it as \`${ __dirname }/state/state.json\`.`);
+				console.error(`Failed saving current state!\n` + `Try manually copy the state with \`JSON.stringify(state)\` and save it as \`${ fileName }\`.`);
 				return e;
 			}
 			stateFileName = target;
@@ -1352,16 +1388,16 @@ const stateCon = {
 			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
 			if (e) {
 				console.error("Failed loading the current state.\n" + "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
-				console.log(e);
+				console.dir(e);
 				return e;
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`${ __dirname }/state/state${ timestamp }.json`, d);
-				console.log(`Saved the current state in '${ __dirname }/state${ timestamp }.json'.`);
+				stateCon.forceSave(`state${ timestamp }`, d);
+				console.log(`Saved the last state in '${ __dirname }/state${ timestamp }.json'.`);
 			} catch (e) {
 				console.error("Failed making a backup of the current state.");
-				console.log(e);
+				console.dir(e);
 				return e;
 			}
 		});
