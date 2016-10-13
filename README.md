@@ -1,6 +1,8 @@
 # Text-Transmitter
 
-Text based Twitter client powered by electron.js 
+Text based Twitter client powered by electron.js
+
+*It's my graduation work, so not actually meant to be used daily. You can use it anyway, though.*
 
 # How to Setup Your Twitter Account
 

@@ -1,7 +1,14 @@
 {
   "name": "Text-Transmitter",
   "version": "0.1.0",
+  "keywords": ["twitter","twitter client"],
+  "homepage": "http://dinir.works/",
+  "bugs": {
+    "email": "DinirNertan@gmail.com"
+  },
+  "author": "Dinir Nertan <DinirNertan@gmail.com> (http://dinir.works)",
   "main": "./main.js",
+  "repository": "Dinir/Text-Transmitter",
   "scripts": {
     "start": "./node_modules/.bin/electron .",
     "buildscripts": "babel js --out-file js/script.js --ignore js/script.js,js/_twit.js",
@@ -15,5 +22,6 @@
   "dependencies": {
     "moment": "^2.13.0",
     "twit": "^2.2.3"
-  }
+  },
+  "private": true
 }

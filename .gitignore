@@ -7,4 +7,6 @@ displayTweetsOld.js
 /css/default.css.map
 /scss/default.css*
 /js/testFunctions.js
-state/*
+state/*.json
+*/.directory
+/indexMockup.html

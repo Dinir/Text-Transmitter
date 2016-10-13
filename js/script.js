@@ -227,6 +227,7 @@ let cmd = {
 			console.log("Composing succeed.");
 			composing = !composing;
 			cmd.update();
+			loCon.updateSelector(-1);
 		});
 		tToReply = "";
 	},
@@ -246,6 +247,7 @@ let cmd = {
 			console.log("The tweet has been retweeted.");
 			console.log(d);
 			cmd.update();
+			loCon.updateSelector(-1);
 		});
 	},
 	del: function (id) {
@@ -260,6 +262,7 @@ let cmd = {
 			console.log(d);
 			if (currentTweetId === d.id_str) {
 				layout.main.removeChild(layout.main.children[layout.selectorPos]);
+				tl[tlOrder[tlCurrent]].tweets.splice(layout.selectorPos, 1);
 			}
 		});
 	},
@@ -490,6 +493,7 @@ function keyPress(e) {
 	// scroll a page when presses 'PgUp/Dn'
 	if (e.keyCode === 33 || e.keyCode === 34) {
 		document.body.scrollTop += (e.code === 33 ? -1 : 1) * (window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height);
+		console.log(window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height);
 		// if(e.code==="PageUp") // selector also goes up
 		// 	loCon.updateSelector(2);
 		// else // selector also goes down
@@ -571,7 +575,14 @@ function keyPress(e) {
 		// retweet
 		if (e.keyCode === 82) {
 			if (e.shiftKey) {
-				cmd["retweet"](layout.main.children[layout.selectorPos].id);
+				cmd["retweet"](currentTweetId);
+			}
+		}
+
+		// del
+		if (e.keyCode === 68) {
+			if (e.shiftKey) {
+				cmd["del"](currentTweetId);
 			}
 		}
 
@@ -1371,7 +1382,7 @@ const stateCon = {
 				tlOrder: tlOrder,
 				tlCurrent: tlCurrent
 			};
-			stateToSave = JSON.stringify(state);console.log(stateToSave);
+			stateToSave = JSON.stringify(state);
 		}
 
 		fs.writeFile(target, stateToSave, 'utf8', e => {
@@ -1573,7 +1584,9 @@ let tlCon = {
 						layout.main.appendChild(dobj("div", "error", err, []));
 					}
 					console.log(`An error occured while updating ${ tabName }.`);
-					emitErrorMsgFromCode(err.code);
+					if (emitErrorMsgFromCode(err.code)) {
+						console.dir(err);
+					}
 					return err;
 				}
 				/*TODO check if received data should attach to or replace the previous data.
@@ -1627,6 +1640,9 @@ const emitErrorMsgFromCode = errCode => {
 	switch (errCode) {
 		case 215:
 			console.log("Authentication tokens is not set right. Check `js/_twit.js` and update the token data.");
+			break;
+		default:
+			return true;
 			break;
 	}
 };

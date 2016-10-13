@@ -43,6 +43,9 @@ function keyPress(e) {
 	// scroll a page when presses 'PgUp/Dn'
 	if(e.keyCode===33 || e.keyCode===34) {
 		document.body.scrollTop += (e.code===33?-1:1)*(window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height);
+		console.log(
+			window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height
+		);
 		// if(e.code==="PageUp") // selector also goes up
 		// 	loCon.updateSelector(2);
 		// else // selector also goes down
@@ -118,7 +121,14 @@ function keyPress(e) {
 		// retweet
 		if(e.keyCode === 82) {
 			if(e.shiftKey) {
-				cmd["retweet"](layout.main.children[layout.selectorPos].id);
+				cmd["retweet"](currentTweetId);
+			}
+		}
+		
+		// del
+		if(e.keyCode === 68) {
+			if(e.shiftKey) {
+				cmd["del"](currentTweetId);
 			}
 		}
 		

@@ -28,7 +28,8 @@ let cmd = {
 			console.log("Composing succeed.");
 			composing = !composing;
 			cmd.update();
-		})
+			loCon.updateSelector(-1);
+		});
 		tToReply = "";
 	},
 	reply: function(id,txt) {
@@ -47,6 +48,7 @@ let cmd = {
 			console.log("The tweet has been retweeted.");
 			console.log(d);
 			cmd.update();
+			loCon.updateSelector(-1);
 		});
 	},
 	del: function(id) {
@@ -61,6 +63,7 @@ let cmd = {
 			console.log(d);
 			if(currentTweetId === d.id_str) {
 				layout.main.removeChild(layout.main.children[layout.selectorPos]);
+				tl[tlOrder[tlCurrent]].tweets.splice(layout.selectorPos,1);
 			}
 		});
 	},
