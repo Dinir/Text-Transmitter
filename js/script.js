@@ -1469,7 +1469,7 @@ let tlCon = {
 			if (!tl.hasOwnProperty(tabName) && typeof tabName !== "undefined" && tlOrder.indexOf(tabName) === -1) {
 				let newTabFrame = {
 					type: address,
-					params: parameters,
+					params: parameters ? parameters : {},
 					tweets: []
 				};
 				if (streamURI.hasOwnProperty(tabName)) newTabFrame.notifications = 0;
@@ -1527,7 +1527,7 @@ let tlCon = {
 					// if toIndex is string
 					to = tlOrder.indexOf(toIndex);
 				}
-				if (fr !== to) {
+				if (fr !== to && fr !== -1 && to !== -1) {
 					if (typeof swap !== "undefined") {
 						const tt = tlOrder[fr];
 						tlOrder[fr] = tlOrder[to];
@@ -1593,6 +1593,7 @@ let tlCon = {
 						layout.main.appendChild(dobj("div", "error", err, []));
 					}
 					console.log(`An error occured while updating ${ tabName }.`);
+					// it returns true when it can't find the code in itself.
 					if (emitErrorMsgFromCode(err.code)) {
 						console.dir(err);
 					}
