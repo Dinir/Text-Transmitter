@@ -25,8 +25,7 @@ app.on('ready', function() {
 			defaultFontFamily: {
 				standard: "Noto Sans",
 				serif: "Georgia",
-				sansSerif: "Noto Sans",
-				monospace: "Droid Sans Mono"
+				sansSerif: "Noto Sans"
 			}
 		}
 	});

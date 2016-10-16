@@ -8,11 +8,11 @@
 // Backspace 8
 
 let receivingCommand = false;
-let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
 let tToReply = ""; // tweet to reply
 let iToReply = ""; // id to reply
+let oToReply = ""; // others to reply (people mentioned in tweets)
 let currentCmdInQuery;
 let currentTweetId; // handled in displayLayout.js and this file. Each handles keyboard movement cases and mouse click cases.
 let cmdContextText, cmdContextRightText;
@@ -102,9 +102,13 @@ function keyPress(e) {
 			if(!e.shiftKey) {
 				tToReply = layout.main.children[layout.selectorPos].id;
 				iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
-				changeCmdQueryTo(`reply ${tToReply} @${iToReply}`);
+				oToReply = layout.main.children[layout.selectorPos].getElementsByClassName("text")[0].innerHTML.match(/@\w+/g);
+				if(oToReply) {
+					oToReply = (oToReply.join(" ")+" ").replace(`@${myName} `,"");
+				} else {oToReply="";}
+				changeCmdQueryTo(`reply ${tToReply} @${iToReply} ${oToReply}`);
 				let d = setTimeout(function() {
-					query.value = query.value.substring(0, query.value.length-1);
+					query.value = query.value.substring(0, query.value.length-2);
 					clearTimeout(d);
 				}, 10);
 			} else if(e.shiftKey) {
@@ -120,6 +124,9 @@ function keyPress(e) {
 		
 		// retweet
 		if(e.keyCode === 82) {
+			if(e.ctrlKey && !e.shiftKey) {
+				location.reload();
+			}
 			if(e.shiftKey) {
 				cmd["retweet"](currentTweetId);
 			}

@@ -22,11 +22,10 @@ let cmd = {
 		t.post('statuses/update', p, function(e,d,r){
 			if(e) {
 				console.error("Failed composing tweet.");
-				console.log(e);
+				console.dir(e);
 				return;
 			}
 			console.log("Composing succeed.");
-			composing = !composing;
 			cmd.update();
 			loCon.updateSelector(-1);
 		});

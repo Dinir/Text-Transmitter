@@ -10,11 +10,10 @@ Text based Twitter client powered by electron.js
 2. Click '**Create New App**'.
 3. Fill up **Application Details**. Name should be unique (it checks duplicated name through all the apps created in this site).
 4. Agree the **Developer Agreement**, and click '**Create your Twitter application**'.
-
 5. Now you have made your app on this site. Go to '**Permissions**' Tab, and change '**Access Level**' to 'Read, Write and Access direct messages' so you can access direct messages in the app. Click 'Update Settings'.
-7. Go to '**Keys and Access Tokens**' tab. In **Your Access Token**, click '**Create my access token**'.
-8. Now you have your **Consumer Key** and Secret, **Access Token** and secret. In the app folder, go to **`resources/app/js`** and open **`_twit.js`**.
-9. Fill in your tokens and secrets in the variable named **`ck, cks, at, ats`**, wrapped in double quotes. Then save the file.
+6. Go to '**Keys and Access Tokens**' tab. In **Your Access Token**, click '**Create my access token**'.
+7. Now you have your **Consumer Key** and Secret, **Access Token** and secret. In the app folder, go to **`resources/app/js`** and open **`_twit.js`**.
+8. Fill in your tokens and secrets in the variable named **`ck, cks, at, ats`**, wrapped in double quotes. Then save the file.
 
 # Available Commands
 
@@ -46,7 +45,7 @@ reply tweetIdToReply message
 ```
 Reply to a tweet with id of tweetIdToReply. The id can be obtained by selecting a tweet you want to reply to and pressing 'o'.
 
-### quote 'O'
+### quote `O`
 (command pattern is same as 'compose')
 
 Pressing 'O' will open a buffer for composing and will include the address of the current selected tweet. Sending the tweet will include the address as a quote.
@@ -114,8 +113,10 @@ reorder oldIndex newIndex swap
 ```
 (ro for short) Move a tab in oldIndex-th position to newIndex-th position. If swap is true, only swap the two position. Otherwise(give no swap argument) the oldIndex-th tab will be picked up and inserted into the newIndex-th position. 
 
-### update
+### update `u` `U`
 ```
 update( tabName direction)
 ```
-(u for short) Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets.
+(u for short) Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets. 
+
+Shortcut key `u` fetches new tweets, and `U` fetches old tweets.

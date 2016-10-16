@@ -8,7 +8,7 @@ a {
 body {
   background-color: #000000;
   color: #ffffff;
-  font-family: 'Droid Sans Mono', 'Noto Mono', 'Oxygen Mono', 'fixedsys', monospace;
+  font-family: 'Droid Sans Mono', 'Noto Mono', 'Oxygen Mono', fixedsys, monospace;
   font-size: 13px;
   line-height: 1.2em;
   overflow: hidden; }
@@ -171,7 +171,7 @@ section#controls {
       font-size: inherit;
       background-color: transparent;
       color: #ffffff;
-      width: 100%;
+      width: 95.239%;
       height: 15px;
       padding: 0;
       border: 0;

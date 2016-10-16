@@ -1,4 +1,5 @@
 const sh = require('shell');
+
 // function that replaces string.
 // http://codepen.io/Dinir/pen/amJEzY
 // argument receive type:
@@ -221,11 +222,10 @@ let cmd = {
 		t.post('statuses/update', p, function (e, d, r) {
 			if (e) {
 				console.error("Failed composing tweet.");
-				console.log(e);
+				console.dir(e);
 				return;
 			}
 			console.log("Composing succeed.");
-			composing = !composing;
 			cmd.update();
 			loCon.updateSelector(-1);
 		});
@@ -458,11 +458,11 @@ function changeCmdQueryTo(command) {
 // Backspace 8
 
 let receivingCommand = false;
-let composing = false;
 let navigatingThroughTweets = true;
 let lastKeyCode = 0;
 let tToReply = ""; // tweet to reply
 let iToReply = ""; // id to reply
+let oToReply = ""; // others to reply (people mentioned in tweets)
 let currentCmdInQuery;
 let currentTweetId; // handled in displayLayout.js and this file. Each handles keyboard movement cases and mouse click cases.
 let cmdContextText, cmdContextRightText;
@@ -556,9 +556,15 @@ function keyPress(e) {
 			if (!e.shiftKey) {
 				tToReply = layout.main.children[layout.selectorPos].id;
 				iToReply = layout.main.children[layout.selectorPos].getElementsByClassName("username")[0].innerHTML;
-				changeCmdQueryTo(`reply ${ tToReply } @${ iToReply }`);
+				oToReply = layout.main.children[layout.selectorPos].getElementsByClassName("text")[0].innerHTML.match(/@\w+/g);
+				if (oToReply) {
+					oToReply = (oToReply.join(" ") + " ").replace(`@${ myName } `, "");
+				} else {
+					oToReply = "";
+				}
+				changeCmdQueryTo(`reply ${ tToReply } @${ iToReply } ${ oToReply }`);
 				let d = setTimeout(function () {
-					query.value = query.value.substring(0, query.value.length - 1);
+					query.value = query.value.substring(0, query.value.length - 2);
 					clearTimeout(d);
 				}, 10);
 			} else if (e.shiftKey) {
@@ -574,6 +580,9 @@ function keyPress(e) {
 
 		// retweet
 		if (e.keyCode === 82) {
+			if (e.ctrlKey && !e.shiftKey) {
+				location.reload();
+			}
 			if (e.shiftKey) {
 				cmd["retweet"](currentTweetId);
 			}
@@ -1274,7 +1283,7 @@ function cloneObj(obj) {
 
 const defaultStateFileName = `${ __dirname }/state/state.json`;
 let state;
-let stateFileName = `${ __dirname }/state/state.json`;
+let stateFileName = `./state/state.json`;
 const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
@@ -1363,7 +1372,7 @@ const stateCon = {
 		// assert `contentOfState` is already in a JSON form.
 		let target;
 		if (fileName) {
-			if (fileName.match(__dirname)) target = fileName;else target = `${ __dirname }/state/${ fileName }.json`;
+			target = fileName;
 		} else target = defaultStateFileName;
 		let stateToSave;
 
@@ -1404,8 +1413,8 @@ const stateCon = {
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`state${ timestamp }`, d);
-				console.log(`Saved the last state in '${ __dirname }/state${ timestamp }.json'.`);
+				stateCon.forceSave(`${ __dirname }/state/state${ timestamp }.json`, d);
+				console.log(`Saved the last state in 'state${ timestamp }.json'.`);
 			} catch (e) {
 				console.error("Failed making a backup of the current state.");
 				console.dir(e);
@@ -1416,7 +1425,7 @@ const stateCon = {
 	save: fileName => {
 		// what it does is backup the old state with a new file name, and save current state with the designated file name so you can get back to old one.
 		let target;
-		if (fileName) target = fileName;else target = defaultStateFileName;
+		if (fileName) target = `${ __dirname }/state/${ fileName }.json`;else target = defaultStateFileName;
 		// save the old one loaded at the startup.
 		stateCon.backup();
 		// save the current state with the designated file name.

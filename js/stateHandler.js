@@ -38,7 +38,7 @@ function cloneObj(obj) {
 
 const defaultStateFileName = `${__dirname}/state/state.json`;
 let state;
-let stateFileName = `${__dirname}/state/state.json`;
+let stateFileName = `./state/state.json`;
 const charWidth = 8;
 const charHeight = 15;
 const stateCon = {
@@ -133,10 +133,7 @@ const stateCon = {
 		// assert `contentOfState` is already in a JSON form.
 		let target;
 		if(fileName) {
-			if(fileName.match(__dirname))
-				target = fileName;
-			else
-				target = `${__dirname}/state/${fileName}.json`;
+			target = fileName;
 		}
 		else target=defaultStateFileName;
 		let stateToSave;
@@ -180,8 +177,8 @@ const stateCon = {
 			}
 			try {
 				const timestamp = moment().format("YYMMDDHHmmss");
-				stateCon.forceSave(`state${timestamp}`, d);
-				console.log(`Saved the last state in '${__dirname}/state${timestamp}.json'.`);
+				stateCon.forceSave(`${__dirname}/state/state${timestamp}.json`, d);
+				console.log(`Saved the last state in 'state${timestamp}.json'.`);
 			} catch(e) {
 				console.error("Failed making a backup of the current state.");
 				console.dir(e);
@@ -192,7 +189,7 @@ const stateCon = {
 	save: fileName => {
 		// what it does is backup the old state with a new file name, and save current state with the designated file name so you can get back to old one.
 		let target;
-		if(fileName) target=fileName;
+		if(fileName) target=`${__dirname}/state/${fileName}.json`;
 		else target=defaultStateFileName;
 		// save the old one loaded at the startup.
 		stateCon.backup();
