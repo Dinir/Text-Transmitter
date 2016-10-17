@@ -52,19 +52,19 @@ const moveInArray = function (arr, old_index, new_index) {
 };
 
 const URI = {
-	"Mention":'statuses/mentions_timeline',
-	"User":'statuses/user_timeline',
-	"Home":'statuses/home_timeline',
-	"RTed":'statuses/retweets_of_me',
-	"DM_Sent":'direct_messages/sent',
-	"Search":'search/tweets',
-	"DM":'direct_messages',
-	"L":'lists/statuses'
+	"mention":'statuses/mentions_timeline',
+	"user":'statuses/user_timeline',
+	"home":'statuses/home_timeline',
+	"rted":'statuses/retweets_of_me',
+	"DM_sent":'direct_messages/sent',
+	"search":'search/tweets',
+	"dm":'direct_messages',
+	"l":'lists/statuses',
 };
 const streamURI = {
-	"Filter":'statuses/filter',
-	"Sample":'statuses/sample',
-	"User":'user'
+	"filter":'statuses/filter',
+	"sample":'statuses/sample',
+	"user":'user'
 };
 
 const getURIListInString = () => {

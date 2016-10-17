@@ -51,19 +51,19 @@ const moveInArray = function (arr, old_index, new_index) {
 };
 
 const URI = {
-	"Mention": 'statuses/mentions_timeline',
-	"User": 'statuses/user_timeline',
-	"Home": 'statuses/home_timeline',
-	"RTed": 'statuses/retweets_of_me',
-	"DM_Sent": 'direct_messages/sent',
-	"Search": 'search/tweets',
-	"DM": 'direct_messages',
-	"L": 'lists/statuses'
+	"mention": 'statuses/mentions_timeline',
+	"user": 'statuses/user_timeline',
+	"home": 'statuses/home_timeline',
+	"rted": 'statuses/retweets_of_me',
+	"DM_sent": 'direct_messages/sent',
+	"search": 'search/tweets',
+	"dm": 'direct_messages',
+	"l": 'lists/statuses'
 };
 const streamURI = {
-	"Filter": 'statuses/filter',
-	"Sample": 'statuses/sample',
-	"User": 'user'
+	"filter": 'statuses/filter',
+	"sample": 'statuses/sample',
+	"user": 'user'
 };
 
 const getURIListInString = () => {
@@ -269,11 +269,17 @@ let cmd = {
 
 	add: function (names, par, pos) {
 		switch (names) {
+			case "l":
 			case "L":
 				changeCmdQueryTo("addlist");
 				break;
+			case "user":
 			case "User":
 				changeCmdQueryTo("adduser");
+				break;
+			case "search":
+			case "Search":
+				changeCmdQueryTo("addsearch");
 				break;
 			default:
 				tlCon.tab.add(names, par, pos);
@@ -285,10 +291,10 @@ let cmd = {
 			owner_screen_name: sname,
 			slug: lslug
 		};
-		tlCon.tab.add("L", p);
-		tlCon.tab.rename("L", `${ lslug }`);
+		tlCon.tab.add("l", p);
+		tlCon.tab.rename("l", `${ lslug }`);
 		let damn = setTimeout(function () {
-			tlCon.tab.remove("L");
+			tlCon.tab.remove("l");
 			clearTimeout(this);
 		}, 2000);
 	},
@@ -296,10 +302,22 @@ let cmd = {
 		let p = {
 			screen_name: sname
 		};
-		tlCon.tab.add("User", p);
-		tlCon.tab.rename("User", `@${ sname }`);
+		tlCon.tab.add("user", p);
+		tlCon.tab.rename("user", `@${ sname }`);
 		let damn = setTimeout(function () {
-			tlCon.tab.remove("User");
+			tlCon.tab.remove("user");
+			clearTimeout(this);
+		}, 2000);
+	},
+	addsearch: function (q) {
+		let p = {
+			q: q,
+			result_type: "mixed"
+		};
+		tlCon.tab.add("search", p);
+		tlCon.tab.rename("search", `${ q }`);
+		let damn = setTimeout(function () {
+			tlCon.tab.remove("search");
 			clearTimeout(this);
 		}, 2000);
 	},
@@ -388,6 +406,10 @@ const cmdDict = {
 	adduser: {
 		"p": "adduser screenName",
 		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
+	},
+	addsearch: {
+		"p": "addsearch query",
+		"d": "Add a tab of specific search results."
 	},
 	remove: {
 		"p": "remove nameOfTab",
@@ -917,7 +939,7 @@ const display = {
 		let text = raw.text;
 
 		// less original data
-		let isReply = raw.entities.user_mentions.length > 0 || raw.in_reply_to_status_id_str !== null;
+		let isReply = raw.in_reply_to_user_id_str || raw.in_reply_to_status_id_str;
 		let isRetweet = typeof raw.retweeted_status !== "undefined";
 		let isQuote = raw.is_quote_status;
 
@@ -1108,11 +1130,13 @@ const display = {
 					switch (curtp) {
 						case "RT":
 						case "T":
-							let addedText = text.replace(`#${ ci.text }`, newLinkAnchor([`#${ ci.text }`, `https://twitter.com/hashtag/${ ci.text }?src=hash`]));
+							//let addedText = text.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							let addedText = text.replace(`#${ ci.text }`, clickableCmdCandidate('addsearch', `#${ ci.text }`));
 							text = addedText;
 							break;
 						case "QT":
-							let addedTextQT = textQuote.replace(`#${ ci.text }`, newLinkAnchor([`#${ ci.text }`, `https://twitter.com/hashtag/${ ci.text }?src=hash`]));
+							//let addedTextQT = textQuote.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							let addedTextQT = textQuote.replace(`#${ ci.text }`, clickableCmdCandidate('addsearch', `#${ ci.text }`));
 							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
@@ -1127,18 +1151,20 @@ const display = {
 					switch (curtp) {
 						case "RT":
 						case "T":
-							let addedText = text.replace(`@${ ci.screen_name }`, newLinkAnchor([`@${ ci.screen_name }`, `https://twitter.com/${ ci.screen_name }`]));
+							//let addedText = text.replace(`@${ci.screen_name}`, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							let addedText = text.replace(`@${ ci.screen_name }`, clickableCmdCandidate('adduser', `${ ci.screen_name }`, `@${ ci.screen_name }`));
 							text = addedText;
 							break;
 						case "QT":
-							let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([`@${ ci.screen_name }`, `https://twitter.com/${ ci.screen_name }`]));
+							//let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							let addedTextQT = textQuote.replace(`@${ ci.screen_name }`, clickableCmdCandidate('adduser', `${ ci.screen_name }`, `@${ ci.screen_name }`));
 							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
 				} // for i in tp
 			} // if has[tp]
 		} // for mentions
-		let doesPing = false;
+		let doesPing = text.match(`@${ myName }`);
 
 		if (text.match("<br>") && textQuote.match("<br>")) {} else {
 			text = convertLineBreaks(text);
@@ -1223,8 +1249,14 @@ const clickableTimestamp = function (timestamp, uname, id) {
 const clickableUserDom = function (uname, isReply, doesPing) {
 	const uw = document.createElement("span");
 	uw.innerHTML = doCommandFromLink(uname, `:adduser ${ uname }`);
-	if (isReply && doesPing) uw.firstChild.className = `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`;else uw.firstChild.className = `username`;
+	uw.firstChild.className = `username${ isReply ? " reply" : "" }${ doesPing ? " ping" : "" }`;
 	return uw.firstChild;
+};
+
+const clickableCmdCandidate = function (cmd, content, displayAs) {
+	const ew = document.createElement("span");
+	ew.innerHTML = doCommandFromLink(displayAs ? displayAs : content, `:${ cmd } ${ content }`);
+	return ew.innerHTML;
 };
 window.onload = () => {
 	// load state stored before.
@@ -1311,8 +1343,10 @@ const stateCon = {
 	make: () => {
 		tlCon.tab.flush("Y");
 		loCon.init();
-		tlCon.tab.add("Mention", {});
-		tlCon.tab.add("Home", {});
+		tlCon.tab.add("mention", {});
+		tlCon.tab.add("home", {});
+		tlCon.tab.rename("mention", "Mention");
+		tlCon.tab.rename("home", "Home");
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width": 80,
@@ -1606,7 +1640,14 @@ let tlCon = {
     but we're only testing for home, mention, user timeline at the moment
     so the default behavior will be adding the data to the old one.*/
 				try {
-					data = data.map(c => new display.twitObj(c));
+					switch (contents.type) {
+						case "search/tweets":
+							data = data.statuses.map(c => new display.twitObj(c));
+							break;
+						default:
+							data = data.map(c => new display.twitObj(c));
+							break;
+					}
 					switch (direction) {
 						case 1:
 							tweets = data.concat(tweets);

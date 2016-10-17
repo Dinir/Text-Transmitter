@@ -79,7 +79,7 @@ section#main {
     font-weight: bold; }
     section#main div .username.reply:after {
       content: "￫"; }
-    section#main div .username.pinged {
+    section#main div .username.ping {
       color: #fce94f; }
     section#main div .username:hover {
       text-decoration: underline; }

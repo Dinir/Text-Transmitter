@@ -69,11 +69,17 @@ let cmd = {
 	
 	add: function(names,par,pos) {
 		switch(names) {
+			case "l":
 			case "L":
 				changeCmdQueryTo("addlist");
 				break;
+			case "user":
 			case "User":
 				changeCmdQueryTo("adduser");
+				break;
+			case "search":
+			case "Search":
+				changeCmdQueryTo("addsearch");
 				break;
 			default:
 				tlCon.tab.add(names,par,pos);
@@ -85,10 +91,10 @@ let cmd = {
 			owner_screen_name: sname,
 			slug: lslug
 		};
-		tlCon.tab.add("L",p);
-		tlCon.tab.rename("L",`${lslug}`);
+		tlCon.tab.add("l",p);
+		tlCon.tab.rename("l",`${lslug}`);
 		let damn = setTimeout(function() {
-			tlCon.tab.remove("L");
+			tlCon.tab.remove("l");
 			clearTimeout(this);
 		}, 2000)
 	},
@@ -96,10 +102,22 @@ let cmd = {
 		let p = {
 			screen_name: sname
 		};
-		tlCon.tab.add("User",p);
-		tlCon.tab.rename("User",`@${sname}`);
+		tlCon.tab.add("user",p);
+		tlCon.tab.rename("user",`@${sname}`);
 		let damn = setTimeout(function() {
-			tlCon.tab.remove("User");
+			tlCon.tab.remove("user");
+			clearTimeout(this);
+		}, 2000)
+	},
+	addsearch: function(q) {
+		let p = {
+			q: q,
+			result_type: "mixed"
+		};
+		tlCon.tab.add("search",p);
+		tlCon.tab.rename("search",`${q}`);
+		let damn = setTimeout(function() {
+			tlCon.tab.remove("search");
 			clearTimeout(this);
 		}, 2000)
 	},
@@ -181,6 +199,10 @@ const cmdDict = {
 	adduser: {
 		"p": "adduser screenName",
 		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
+	},
+	addsearch: {
+		"p": "addsearch query",
+		"d": "Add a tab of specific search results."
 	},
 	remove: {
 		"p": "remove nameOfTab",

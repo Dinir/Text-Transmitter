@@ -34,8 +34,8 @@ const display = {
 		
 		// less original data
 		let isReply =
-			raw.entities.user_mentions.length > 0 ||
-			raw.in_reply_to_status_id_str !== null;
+			(raw.in_reply_to_user_id_str ||
+			raw.in_reply_to_status_id_str);
 		let isRetweet = typeof raw.retweeted_status !== "undefined";
 		let isQuote = raw.is_quote_status;
 		
@@ -241,11 +241,13 @@ const display = {
 					switch(curtp) {
 						case "RT":
 						case "T":
-							let addedText = text.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							//let addedText = text.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							let addedText = text.replace(`#${ci.text}`, clickableCmdCandidate('addsearch',`#${ci.text}`));
 							text = addedText;
 							break;
 						case "QT":
-							let addedTextQT = textQuote.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							//let addedTextQT = textQuote.replace(`#${ci.text}`, newLinkAnchor([`#${ci.text}`,`https://twitter.com/hashtag/${ci.text}?src=hash`]));
+							let addedTextQT = textQuote.replace(`#${ci.text}`, clickableCmdCandidate('addsearch',`#${ci.text}`));
 							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
@@ -260,18 +262,20 @@ const display = {
 					switch(curtp) {
 						case "RT":
 						case "T":
-							let addedText = text.replace(`@${ci.screen_name}`, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							//let addedText = text.replace(`@${ci.screen_name}`, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							let addedText = text.replace(`@${ci.screen_name}`, clickableCmdCandidate('adduser',`${ci.screen_name}`,`@${ci.screen_name}`));
 							text = addedText;
 							break;
 						case "QT":
-							let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							//let addedTextQT = textQuote.replace(ci.url, newLinkAnchor([`@${ci.screen_name}`,`https://twitter.com/${ci.screen_name}`]));
+							let addedTextQT = textQuote.replace(`@${ci.screen_name}`, clickableCmdCandidate('adduser',`${ci.screen_name}`,`@${ci.screen_name}`));
 							textQuote = addedTextQT;
 							break;
 					} // switch rt t qt
 				} // for i in tp
 			} // if has[tp]
 		} // for mentions
-		let doesPing = false;
+		let doesPing = text.match(`@${myName}`);
 		
 		if(text.match("<br>") &&
 		   textQuote.match("<br>")) {} else {
@@ -388,9 +392,14 @@ const clickableUserDom = function(uname, isReply, doesPing){
 	uw.innerHTML = doCommandFromLink(
 		uname, `:adduser ${uname}`
 	);
-	if(isReply && doesPing)
 		uw.firstChild.className = `username${isReply?" reply":""}${doesPing?" ping":""}`;
-	else
-		uw.firstChild.className = `username`;
 	return uw.firstChild;
+};
+
+const clickableCmdCandidate = function(cmd, content, displayAs){
+	const ew = document.createElement("span");
+	ew.innerHTML = doCommandFromLink(
+		displayAs?displayAs:content, `:${cmd} ${content}`
+	);
+	return ew.innerHTML;
 };

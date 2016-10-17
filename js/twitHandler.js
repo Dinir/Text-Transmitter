@@ -202,7 +202,16 @@ let tlCon = {
 				but we're only testing for home, mention, user timeline at the moment
 				so the default behavior will be adding the data to the old one.*/
 				try {
-					data = data.map(c => new display.twitObj(c));
+					switch(contents.type) {
+						case "search/tweets":
+							data
+								= data.statuses.map(c => new display.twitObj(c));
+							break;
+						default:
+							data
+							= data.map(c => new display.twitObj(c));
+							break;
+					}
 					switch(direction) {
 						case 1:
 							tweets = data.concat(tweets);

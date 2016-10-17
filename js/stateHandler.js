@@ -67,8 +67,10 @@ const stateCon = {
 	make: () => {
 		tlCon.tab.flush("Y");
 		loCon.init();
-		tlCon.tab.add("Mention",{});
-		tlCon.tab.add("Home",{});
+		tlCon.tab.add("mention",{});
+		tlCon.tab.add("home",{});
+		tlCon.tab.rename("mention","Mention");
+		tlCon.tab.rename("home","Home");
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width":80,
