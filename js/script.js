@@ -1412,7 +1412,7 @@ const stateCon = {
 				return e;
 			}
 			try {
-				const timestamp = moment().format("YYMMDDHHmmss");
+				const timestamp = moment().format("YYMMDDHHmm");
 				stateCon.forceSave(`${ __dirname }/state/state${ timestamp }.json`, d);
 				console.log(`Saved the last state in 'state${ timestamp }.json'.`);
 			} catch (e) {
@@ -1595,6 +1595,7 @@ let tlCon = {
 					console.log(`An error occured while updating ${ tabName }.`);
 					// it returns true when it can't find the code in itself.
 					if (emitErrorMsgFromCode(err.code)) {
+						if (err.message) alert(err.message);
 						console.dir(err);
 					}
 					return err;

@@ -176,7 +176,7 @@ const stateCon = {
 				return e;
 			}
 			try {
-				const timestamp = moment().format("YYMMDDHHmmss");
+				const timestamp = moment().format("YYMMDDHHmm");
 				stateCon.forceSave(`${__dirname}/state/state${timestamp}.json`, d);
 				console.log(`Saved the last state in 'state${timestamp}.json'.`);
 			} catch(e) {

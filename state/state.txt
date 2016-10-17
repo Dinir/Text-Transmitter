@@ -1,0 +1,2 @@
+This is where the states of the app is stored.
+Leaving this file so the folder is uploaded to the git.

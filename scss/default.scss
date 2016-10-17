@@ -21,6 +21,12 @@ $taba:#aa0000;
 $char: 13px;
 $charWidth: 8px;
 $charHeight: 15px;
+
+@font-face {
+	font-family: "Noto Mono";
+	src: url(../fonts/NotoMono-Regular.ttf);
+}
+
 a {
 	color: yellow;
 	text-decoration: none;
@@ -31,7 +37,7 @@ a {
 body {
 	background-color: $blk;
 	color: $text;
-	font-family: 'Droid Sans Mono', 'Noto Mono', 'Oxygen Mono', fixedsys, monospace;
+	font-family: 'Noto Mono', 'Oxygen Mono', monospace;
 	font-size: $char;
 	line-height: 1.2em;
 	overflow: hidden;

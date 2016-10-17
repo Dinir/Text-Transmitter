@@ -191,6 +191,7 @@ let tlCon = {
 					console.log(`An error occured while updating ${tabName}.`);
 					// it returns true when it can't find the code in itself.
 					if(emitErrorMsgFromCode(err.code)) {
+						if(err.message) alert(err.message);
 						console.dir(err);
 					}
 					return err;

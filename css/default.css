@@ -1,4 +1,7 @@
 @charset "UTF-8";
+@font-face {
+  font-family: "Noto Mono";
+  src: url(../fonts/NotoMono-Regular.ttf); }
 a {
   color: yellow;
   text-decoration: none; }
@@ -8,7 +11,7 @@ a {
 body {
   background-color: #000000;
   color: #ffffff;
-  font-family: 'Droid Sans Mono', 'Noto Mono', 'Oxygen Mono', fixedsys, monospace;
+  font-family: 'Noto Mono', 'Oxygen Mono', monospace;
   font-size: 13px;
   line-height: 1.2em;
   overflow: hidden; }
