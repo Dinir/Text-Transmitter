@@ -1413,9 +1413,18 @@ const stateCon = {
 		if (contentOfState) {
 			stateToSave = contentOfState;
 		} else {
-			// wipe stored tweets
+			// wipe stored tweets, max_id, since_id
+			// sometimes those ids makes nothing to be loaded
 			for (var tab in tl) {
-				if (tl.hasOwnProperty(tab)) tl[tab].tweets = [];
+				if (tl.hasOwnProperty(tab)) {
+					tl[tab].tweets = [];
+					if (tl[tab].params.hasOwnProperty("since_id")) {
+						delete tl[tab].params.since_id;
+					}
+					if (tl[tab].params.hasOwnProperty("max_id")) {
+						delete tl[tab].params.max_id;
+					}
+				}
 			}
 			// overwrite the variable `state` below with the current state, which is used for saving and loading states.
 			state = {
@@ -1600,6 +1609,8 @@ let tlCon = {
 				case -1:
 					if (tweets[tweets.length - 1]) {
 						params.max_id = tweets[tweets.length - 1].id;
+					}
+					if (params.hasOwnProperty("since_id")) {
 						delete params.since_id;
 					}
 					break;
@@ -1607,12 +1618,9 @@ let tlCon = {
 				default:
 					if (tweets[0]) {
 						params.since_id = tweets[0].id;
+					}
+					if (params.hasOwnProperty("max_id")) {
 						delete params.max_id;
-						// } else {
-						// 	if(params.hasOwnProperty(since_id))
-						// 		delete params.since_id;
-						// 	if(params.hasOwnProperty(max_id))
-						// 		delete params.max_id;
 					}
 					break;
 			}

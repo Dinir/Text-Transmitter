@@ -143,10 +143,18 @@ const stateCon = {
 		if(contentOfState) {
 			stateToSave = contentOfState;
 		} else {
-			// wipe stored tweets
+			// wipe stored tweets, max_id, since_id
+			// sometimes those ids makes nothing to be loaded
 			for(var tab in tl){
-				if(tl.hasOwnProperty(tab))
+				if(tl.hasOwnProperty(tab)) {
 					tl[tab].tweets = [];
+					if(tl[tab].params.hasOwnProperty("since_id")) {
+						delete tl[tab].params.since_id
+					}
+					if(tl[tab].params.hasOwnProperty("max_id")) {
+						delete tl[tab].params.max_id
+					}
+				}
 			}
 			// overwrite the variable `state` below with the current state, which is used for saving and loading states.
 			state = {

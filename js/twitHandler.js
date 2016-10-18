@@ -160,6 +160,8 @@ let tlCon = {
 				case -1:
 					if(tweets[tweets.length-1]) {
 						params.max_id = tweets[tweets.length-1].id;
+					}
+					if(params.hasOwnProperty("since_id")) {
 						delete params.since_id;
 					}
 					break;
@@ -167,19 +169,13 @@ let tlCon = {
 				default:
 					if(tweets[0]) {
 						params.since_id = tweets[0].id;
+					}
+					if(params.hasOwnProperty("max_id")) {
 						delete params.max_id;
-					// } else {
-					// 	if(params.hasOwnProperty(since_id))
-					// 		delete params.since_id;
-					// 	if(params.hasOwnProperty(max_id))
-					// 		delete params.max_id;
 					}
 					break;
 			}
-
-			console.log("Updating...:");
-			console.log(contents.type);
-			console.log(params);
+			
 			t.get(contents.type, params, function(err,data,response){
 				// TODO learn what errors and response are for.
 				if(err) {
