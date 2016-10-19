@@ -1625,9 +1625,6 @@ let tlCon = {
 					break;
 			}
 
-			console.log("Updating...:");
-			console.log(contents.type);
-			console.log(params);
 			t.get(contents.type, params, function (err, data, response) {
 				// TODO learn what errors and response are for.
 				if (err) {
