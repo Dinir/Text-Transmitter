@@ -169,6 +169,9 @@ section#controls {
       font-weight: bold; }
     section#controls #commandInput #commandContext .rightText {
       margin-right: 2.45em; }
+    section#controls #commandInput #commandContext .link {
+      text-decoration: underline;
+      cursor: pointer; }
     section#controls #commandInput #query {
       font-family: inherit;
       font-size: inherit;

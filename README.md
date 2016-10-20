@@ -1,8 +1,14 @@
-# Text-Transmitter
+# Text-Transmitter (TTM)
 
 Text based Twitter client powered by electron.js
 
-*It's my graduation work, so not actually meant to be used daily. You can use it anyway, though.*
+TTM has a fake-console interface you can use with both a keyboard and a mouse.
+
+*It's my graduation work, so not actually meant for a daily use.*
+
+# Installation
+
+Download the file from Releases, extract the file and execute `Text-Transmitter.exe` (Windows) or `Text-Transmitter` (Linux).
 
 # How to Setup Your Twitter Account
 
@@ -20,6 +26,8 @@ Text based Twitter client powered by electron.js
 Press ':' to open the command buffer. You can also open the buffer by pressing shortcuts for some commands, which is shown after command names below.  
 Type commands end press 'Enter' to execute. If there's any error, the buffer won't close.  
 Press 'Esc' to close buffer.
+
+Press 'Ctrl-R' to reload at any time.
 
 In most cases the commands are case-sensitive.
 
@@ -68,16 +76,16 @@ Delete a tweet with the id. Omit id to delete currently selected tweet. You can 
 ```
 add [nameOfTab(,URI)]( parameters)
 ```
-Add new tab. You can specify the URI (the format should be an array: `['name','URI']`, or skip URI and just choose one from below as a nameOfTab:
+(a for short) Add new tab. You can specify the URI (the format should be an array: `['name','URI']`, or skip URI and just choose one from below as a nameOfTab:
 
-- Mention
-- User
-- Home
-- RTed
-- DM_Sent
-- Search
-- DM
-- L (for list)
+- mention
+- user
+- home
+- rted (your retweeted tweets)
+- dmsent
+- search
+- dm
+- l (for list)
 
 If you know what parameters are, you can add them as a form of an object.
 
@@ -87,13 +95,19 @@ Type 'add User' or 'add L' and press 'Enter' to change to command to 'adduser' o
 ```
 addlist screenName list-slug
 ```
-Add a list with the list-slug, made by screenName. screenName is the twitter username, list-slug is the list name in lower-cases-alphabet-and-hyphens.
+(al for short) Add a list with the list-slug, made by screenName. screenName is the twitter username, list-slug is the list name in lower-cases-alphabet-and-hyphens.
 
 ### adduser
 ```
 adduser screenName
 ```
-Add a tab of specific user tweets. You can add one by clicking the user name in a tweet, shown as  bold characters.
+(au for short) Add a tab of specific user tweets. You can add one by clicking the user name in a tweet, shown as  bold characters.
+
+### addsearch
+```
+addsearch query
+```
+(as for short) Add a tab of specific search query.
 
 ### remove
 ```
@@ -120,3 +134,15 @@ update( tabName direction)
 (u for short) Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets. 
 
 Shortcut key `u` fetches new tweets, and `U` fetches old tweets.
+
+### save
+```
+save( fileName)
+```
+(w for short) Save current state, including tab names and orders and the window size. By default the state will be saved in `resources/app/state/state.json`, and you can specify the name for json.
+
+### load
+```
+load( fileName)
+```
+(o for short) Load the saved state. If you specify the file name, load the state saved in that file. 

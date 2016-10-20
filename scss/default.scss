@@ -236,6 +236,10 @@ section#controls {
 				div {
 				}
 			}
+			.link {
+				text-decoration: underline;
+				cursor: pointer;
+			}
 		}
 		#query {
 			font-family: inherit;

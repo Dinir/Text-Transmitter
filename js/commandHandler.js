@@ -2,13 +2,15 @@ let cmd = {
 	resize: function(w,h) {
 		window.resizeTo((w>13?w:13)*8, (h>6?h:6)*15/*+25*/);
 	},
-	rs: function(w,h) { return this.resize(w,h) },
 	save: function(fileName) {
 		stateCon.save(fileName?fileName:"");
 	},
 	load: function(fileName) {
 		stateCon.load(fileName?fileName:"");
 	},
+	rs: function(w,h) { return this.resize(w,h) },
+	w: function(f) { return this.save(f) },
+	o: function(f) { return this.load(f) },
 
 	compose: function(txt, params) {
 		let p;
@@ -121,26 +123,34 @@ let cmd = {
 			clearTimeout(this);
 		}, 2000)
 	},
+	a: function(n,p,po) { return this.add(n,p,po) },
+	al: function(s,l) { return this.addlist(s,l) },
+	au: function(s) { return this.adduser(s) },
+	as: function(q) { return this.addsearch(q) },
+	
 	remove: function(tabName) {
 		tlCon.tab.remove(tabName);
 	},
-	rm: function(tabName) { return this.remove(tabName) },
 	rename: function(tabName, alterName) {
 		tlCon.tab.rename(tabName, alterName);
 	},
-	rn: function(tn,an) { return this.rename(tn,an) },
 	reorder: function(from,to,swap) {
 		tlCon.tab.reorder(from,to,swap);
 	},
+	rm: function(tabName) { return this.remove(tabName) },
+	rn: function(tn,an) { return this.rename(tn,an) },
 	ro: function(fr,to,sw) { return this.reorder(fr,to,sw) },
 	
 	update: function(tabName, direction) {
 		let tn, dr;
 		if(tabName) {} else {tn = tlOrder[tlCurrent]}
 		if(direction) {} else {dr = 1}
-		tlCon.update(tn, dr);
+		if(tl[tabName].tweets) {
+			tlCon.update(tn, dr);
+		}
 	},
 	u: function(tabName,direction) { return this.update(tabName,direction) },
+	about: function() {}
 };
 const cmdDict = {
 	show: cmd => {
@@ -163,7 +173,15 @@ const cmdDict = {
 		"p": "save( fileName)",
 		"d": "Save current app state."
 	},
+	w: {
+		"p": "save( fileName)",
+		"d": "Save current app state."
+	},
 	load: {
+		"p": "load( fileName)",
+		"d": "Load the last saved(or specified) app state."
+	},
+	o: {
 		"p": "load( fileName)",
 		"d": "Load the last saved(or specified) app state."
 	},
@@ -190,7 +208,20 @@ const cmdDict = {
 	       "If you know what parameters are, you can add them as a form of an object.<BR>" +
 	       "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
+	a: {
+		"p": "add [nameOfTab(,URI)]( parameters position)",
+		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" +
+		     `${getURIListInString()}<BR>` +
+	       "If you know what parameters are, you can add them as a form of an object.<BR>" +
+	       "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
+	},
 	addlist: {
+		"p": "addlist screenName list-slug",
+		"d": "Add a list with the list-slug, made by screenName. <br>" +
+		     "screenName is the twitter username, <br>" +
+		     "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
+	},
+	al: {
 		"p": "addlist screenName list-slug",
 		"d": "Add a list with the list-slug, made by screenName. <br>" +
 		     "screenName is the twitter username, <br>" +
@@ -200,7 +231,15 @@ const cmdDict = {
 		"p": "adduser screenName",
 		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
 	},
+	au: {
+		"p": "adduser screenName",
+		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
+	},
 	addsearch: {
+		"p": "addsearch query",
+		"d": "Add a tab of specific search results."
+	},
+	as: {
 		"p": "addsearch query",
 		"d": "Add a tab of specific search results."
 	},
@@ -236,6 +275,11 @@ const cmdDict = {
 		"p": "update( tabName direction)",
 		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets"
 	},
+	about: {
+		"d": "&copy; 2016 Dinir Nertan<br>" +
+	       `${newLinkAnchor(["dinir.works","http://dinir.works"])}<br>` +
+	       `${newLinkAnchor(["github.com/Dinir/Text-Transmitter","https://github.com/Dinir/Text-Transmitter"])}`
+	}
 };
 function execute(command) {
 	let prefix = command.slice(0,1);

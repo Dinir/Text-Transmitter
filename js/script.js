@@ -55,7 +55,7 @@ const URI = {
 	"user": 'statuses/user_timeline',
 	"home": 'statuses/home_timeline',
 	"rted": 'statuses/retweets_of_me',
-	"DM_sent": 'direct_messages/sent',
+	"dmsent": 'direct_messages/sent',
 	"search": 'search/tweets',
 	"dm": 'direct_messages',
 	"l": 'lists/statuses'
@@ -200,14 +200,20 @@ let cmd = {
 	resize: function (w, h) {
 		window.resizeTo((w > 13 ? w : 13) * 8, (h > 6 ? h : 6) * 15 /*+25*/);
 	},
-	rs: function (w, h) {
-		return this.resize(w, h);
-	},
 	save: function (fileName) {
 		stateCon.save(fileName ? fileName : "");
 	},
 	load: function (fileName) {
 		stateCon.load(fileName ? fileName : "");
+	},
+	rs: function (w, h) {
+		return this.resize(w, h);
+	},
+	w: function (f) {
+		return this.save(f);
+	},
+	o: function (f) {
+		return this.load(f);
 	},
 
 	compose: function (txt, params) {
@@ -321,20 +327,33 @@ let cmd = {
 			clearTimeout(this);
 		}, 2000);
 	},
+	a: function (n, p, po) {
+		return this.add(n, p, po);
+	},
+	al: function (s, l) {
+		return this.addlist(s, l);
+	},
+	au: function (s) {
+		return this.adduser(s);
+	},
+	as: function (q) {
+		return this.addsearch(q);
+	},
+
 	remove: function (tabName) {
 		tlCon.tab.remove(tabName);
-	},
-	rm: function (tabName) {
-		return this.remove(tabName);
 	},
 	rename: function (tabName, alterName) {
 		tlCon.tab.rename(tabName, alterName);
 	},
-	rn: function (tn, an) {
-		return this.rename(tn, an);
-	},
 	reorder: function (from, to, swap) {
 		tlCon.tab.reorder(from, to, swap);
+	},
+	rm: function (tabName) {
+		return this.remove(tabName);
+	},
+	rn: function (tn, an) {
+		return this.rename(tn, an);
 	},
 	ro: function (fr, to, sw) {
 		return this.reorder(fr, to, sw);
@@ -348,11 +367,14 @@ let cmd = {
 		if (direction) {} else {
 			dr = 1;
 		}
-		tlCon.update(tn, dr);
+		if (tl[tabName].tweets) {
+			tlCon.update(tn, dr);
+		}
 	},
 	u: function (tabName, direction) {
 		return this.update(tabName, direction);
-	}
+	},
+	about: function () {}
 };
 const cmdDict = {
 	show: cmd => {
@@ -375,7 +397,15 @@ const cmdDict = {
 		"p": "save( fileName)",
 		"d": "Save current app state."
 	},
+	w: {
+		"p": "save( fileName)",
+		"d": "Save current app state."
+	},
 	load: {
+		"p": "load( fileName)",
+		"d": "Load the last saved(or specified) app state."
+	},
+	o: {
 		"p": "load( fileName)",
 		"d": "Load the last saved(or specified) app state."
 	},
@@ -399,7 +429,15 @@ const cmdDict = {
 		"p": "add [nameOfTab(,URI)]( parameters position)",
 		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what parameters are, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
+	a: {
+		"p": "add [nameOfTab(,URI)]( parameters position)",
+		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what parameters are, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
+	},
 	addlist: {
+		"p": "addlist screenName list-slug",
+		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
+	},
+	al: {
 		"p": "addlist screenName list-slug",
 		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
 	},
@@ -407,7 +445,15 @@ const cmdDict = {
 		"p": "adduser screenName",
 		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
 	},
+	au: {
+		"p": "adduser screenName",
+		"d": "Add a tab of specific user tweets. screenName is the twitter username of the user."
+	},
 	addsearch: {
+		"p": "addsearch query",
+		"d": "Add a tab of specific search results."
+	},
+	as: {
 		"p": "addsearch query",
 		"d": "Add a tab of specific search results."
 	},
@@ -442,6 +488,9 @@ const cmdDict = {
 	u: {
 		"p": "update( tabName direction)",
 		"d": "Update current tab of tweets. Direction can be either 1 or -1, meaning 'fetch new tweets' or 'fetch old tweets'. Omit parameters to update current tab to fetch new tweets"
+	},
+	about: {
+		"d": "&copy; 2016 Dinir Nertan<br>" + `${ newLinkAnchor(["dinir.works", "http://dinir.works"]) }<br>` + `${ newLinkAnchor(["github.com/Dinir/Text-Transmitter", "https://github.com/Dinir/Text-Transmitter"]) }`
 	}
 };
 function execute(command) {
@@ -1345,8 +1394,6 @@ const stateCon = {
 		loCon.init();
 		tlCon.tab.add("mention", {});
 		tlCon.tab.add("home", {});
-		tlCon.tab.rename("mention", "Mention");
-		tlCon.tab.rename("home", "Home");
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width": 80,
@@ -1446,31 +1493,34 @@ const stateCon = {
 			if (!silent) console.log("Saved the state.");
 		});
 	},
-	backup: () => {
-		fs.readFile(stateFileName, 'utf8', (e, d) => {
-			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
-			if (e) {
-				console.error("Failed loading the current state.\n" + "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
-				console.dir(e);
-				return e;
-			}
-			try {
-				const timestamp = moment().format("YYMMDDHHmm");
-				stateCon.forceSave(`${ __dirname }/state/state${ timestamp }.json`, d);
-				console.log(`Saved the last state in 'state${ timestamp }.json'.`);
-			} catch (e) {
-				console.error("Failed making a backup of the current state.");
-				console.dir(e);
-				return e;
-			}
-		});
-	},
+	/*
+ 	backup: () => {
+ 		fs.readFile(stateFileName,'utf8',(e,d) => {
+ 			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
+ 			if(e) {
+ 				console.error("Failed loading the current state.\n" +
+ 				              "Manually backup the current state file and execute `stateCon.forceSave()` to overwrite your current state.");
+ 				console.dir(e);
+ 				return e;
+ 			}
+ 			try {
+ 				const timestamp = moment().format("YYMMDDHHmm");
+ 				stateCon.forceSave(`${__dirname}/state/state${timestamp}.json`, d);
+ 				console.log(`Saved the last state in 'state${timestamp}.json'.`);
+ 			} catch(e) {
+ 				console.error("Failed making a backup of the current state.");
+ 				console.dir(e);
+ 				return e;
+ 			}
+ 		});
+ 	},
+ */
 	save: fileName => {
 		// what it does is backup the old state with a new file name, and save current state with the designated file name so you can get back to old one.
 		let target;
 		if (fileName) target = `${ __dirname }/state/${ fileName }.json`;else target = defaultStateFileName;
 		// save the old one loaded at the startup.
-		stateCon.backup();
+		// stateCon.backup();
 		// save the current state with the designated file name.
 		stateCon.forceSave(target, "", 1);
 		stateFileName = target;

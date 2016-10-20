@@ -69,8 +69,6 @@ const stateCon = {
 		loCon.init();
 		tlCon.tab.add("mention",{});
 		tlCon.tab.add("home",{});
-		tlCon.tab.rename("mention","Mention");
-		tlCon.tab.rename("home","Home");
 		tlCurrent = 1;
 		const defaultState = JSON.stringify({
 			"width":80,
@@ -176,6 +174,7 @@ const stateCon = {
 			if(!silent) console.log("Saved the state.");
 		})
 	},
+/*
 	backup: () => {
 		fs.readFile(stateFileName,'utf8',(e,d) => {
 			// here I used two `e`. There must be a much clear and clever way to handle errors from multiple sources.
@@ -196,13 +195,14 @@ const stateCon = {
 			}
 		});
 	},
+*/
 	save: fileName => {
 		// what it does is backup the old state with a new file name, and save current state with the designated file name so you can get back to old one.
 		let target;
 		if(fileName) target=`${__dirname}/state/${fileName}.json`;
 		else target=defaultStateFileName;
 		// save the old one loaded at the startup.
-		stateCon.backup();
+		// stateCon.backup();
 		// save the current state with the designated file name.
 		stateCon.forceSave(target, "", 1);
 		stateFileName = target;
