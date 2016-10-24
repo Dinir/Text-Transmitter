@@ -13,6 +13,6 @@ window.onload = () => {
 	getLists();
 };
 
-window.onunload = () => {
+window.onbeforeunload = () => {
 	stateCon.save();
 };
