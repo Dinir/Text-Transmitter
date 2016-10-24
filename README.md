@@ -20,6 +20,7 @@ Download the file from Releases, extract the file and execute `Text-Transmitter.
 6. Go to '**Keys and Access Tokens**' tab. In **Your Access Token**, click '**Create my access token**'.
 7. Now you have your **Consumer Key** and Secret, **Access Token** and secret. In the app folder, go to **`resources/app/js`** and open **`_twit.js`**.
 8. Fill in your tokens and secrets in the variable named **`ck, cks, at, ats`**, wrapped in double quotes. Then save the file.
+9. Run the executable file, and type **`:startnew`**.
 
 # Available Commands
 
@@ -71,6 +72,12 @@ del( id)
 Delete a tweet with the id. Omit id to delete currently selected tweet. You can undo a retweet by trying to delete your retweeted status.
 
 ## Tab Behavior
+
+### startnew
+```
+startnew
+```
+Remove all tabs and load a default state.
 
 ### add
 ```

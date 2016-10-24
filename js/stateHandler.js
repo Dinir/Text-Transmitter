@@ -98,9 +98,11 @@ const stateCon = {
 		
 		fs.readFile(target,'utf8',(e,d) => {
 			if(e) {
-				console.error("Failed to load the state.\n" +
-				              "Creating new default one.");
-				stateCon.make();
+				console.error("Failed to load the state.");
+				if(t) {
+					console.log("Creating new default one.");
+					stateCon.make();
+				}
 				return e;
 			}
 			loCon.updateSelector(-2);

@@ -196,6 +196,9 @@ const replaceDobj = (to, from) => {
 	from.parentNode.replaceChild(to, from);
 };
 let cmd = {
+	startnew: function () {
+		stateCon.make();
+	},
 	resize: function (w, h) {
 		window.resizeTo((w > 13 ? w : 13) * 8, (h > 6 ? h : 6) * 15 /*+25*/);
 	},
@@ -384,6 +387,9 @@ const cmdDict = {
 		}
 	},
 
+	startnew: {
+		"d": "RESET EVERYTHING AND START AS A NEW INSTANCE."
+	},
 	resize: {
 		"p": "resize width height",
 		"d": "Resize the window."
@@ -426,7 +432,7 @@ const cmdDict = {
 	},
 	add: {
 		"p": "add [nameOfTab(,URI)]( parameters position)",
-		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<br>" + `${ getURIListInString() }<BR>` + "If you know what parameters are, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
+		"d": "Add new tab. You can specify the URI (the format should be an array: ['name','URI'], or skip URI and just choose one from below:<BR>" + `${ getURIListInString() }<BR>` + "If you know what parameters are, you can add them as a form of an object.<BR>" + "You can set which position the new tab should go. If you don't want to specify parameters, make it an empty object and specify the position: `{}, 3`"
 	},
 	a: {
 		"p": "add [nameOfTab(,URI)]( parameters position)",
@@ -1422,8 +1428,11 @@ const stateCon = {
 
 		fs.readFile(target, 'utf8', (e, d) => {
 			if (e) {
-				console.error("Failed to load the state.\n" + "Creating new default one.");
-				stateCon.make();
+				console.error("Failed to load the state.");
+				if (t) {
+					console.log("Creating new default one.");
+					stateCon.make();
+				}
 				return e;
 			}
 			loCon.updateSelector(-2);
