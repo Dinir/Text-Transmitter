@@ -16,7 +16,6 @@ let oToReply = ""; // others to reply (people mentioned in tweets)
 let currentCmdInQuery;
 let currentTweetId; // handled in displayLayout.js and this file. Each handles keyboard movement cases and mouse click cases.
 let cmdContextText, cmdContextRightText;
-let lists = [];
 const setCmdContext = (texts) => {
 	if(texts) {
 		if(texts.constructor===Array) {
@@ -36,20 +35,16 @@ const setCmdContext = (texts) => {
 
 function keyPress(e) {
 	lastKeyCode = e.keyCode;
-	console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
+	//console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
 	//e.preventDefault();
 	const query = document.getElementById("query");
 
 	// scroll a page when presses 'PgUp/Dn'
 	if(e.keyCode===33 || e.keyCode===34) {
-		document.body.scrollTop += (e.code===33?-1:1)*(window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height);
-		console.log(
-			window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height
-		);
-		// if(e.code==="PageUp") // selector also goes up
-		// 	loCon.updateSelector(2);
-		// else // selector also goes down
-		// 	loCon.updateSelector(-2);
+		document.body.scrollTop += (e.keyCode===33?-1:1)*(window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height);
+		// console.log(
+		// 	window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height
+		// );
 	}
 	
 	// scroll to the end when presses 'Home/End'

@@ -57,18 +57,19 @@ let tlCon = {
 			//else tabToDelete = tlOrder[tlCurrent];
 			//console.log(tabName);
 			//console.log(tabToDelete);
-			if(tl[tabName]) {
-				delete tl[tabName];
-			}
 			if(tlOrder.indexOf(tabName)!==-1) {
-				if(tlOrder[tlCurrent-1] &&
-				   tlOrder[tlCurrent] === tabName)
+				if(tlOrder[tlCurrent] === tabName
+				   && !tlOrder[tlCurrent+1]) {
 					tlCurrent--;
+				}
 				tlOrder.splice(tlOrder.indexOf(tabName), 1);
 				if(noUpdate) {} else {
 					loCon.updateTabs();
 					if(tlOrder.length!==0) loCon.updateMain();
 				}
+			}
+			if(tl[tabName]) {
+				delete tl[tabName];
 			}
 		},
 		flush: function(really) {
@@ -140,6 +141,7 @@ let tlCon = {
 		}
 	},
 	recentCall: false,
+	
 	update: function(tabName, direction) {
 		if(tlCon.recentCall) {} else if(direction) {
 			let contents;
@@ -151,8 +153,8 @@ let tlCon = {
 			}
 			
 			tlCon.recentCall = true;
-			let tweets = tl[tabName].tweets;
-			let params = tl[tabName].params;
+			let tweets = contents.tweets;
+			let params = contents.params;
 			
 			//params.count = 20;
 			// TODO make it check if the type can use `since_id` and `max_id` first.
@@ -190,7 +192,7 @@ let tlCon = {
 						if(err.message) alert(err.message);
 						console.dir(err);
 					}
-					return err;
+					return;
 				}
 				/*TODO check if received data should attach to or replace the previous data.
 				for some of the api address the `direction` is meaningless

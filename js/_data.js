@@ -83,8 +83,9 @@ const getLists = () => {
 			return e;
 		}
 		l = d;
-		l.list = l.map(v=>
-		v.slug+"<span>("+v.description+")</span>").join(", ");
-		lists = l;
+		cmdDict.addlist.d =
+			cmdDict.al.d =
+			cmdDict.al.d.substr(0, cmdDict.al.d.indexOf("Your lists:<br>")+15) +
+			l.map(v=>v.slug+"<span> ("+v.description+")</span>").join(", "); // the number is the length of the string put into the `indexOf`.
 	});
 };

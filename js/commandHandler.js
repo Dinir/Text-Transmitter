@@ -217,15 +217,21 @@ const cmdDict = {
 	},
 	addlist: {
 		"p": "addlist screenName list-slug",
+		// avblist:<br>_ <== index 182
+		// <== indexOf("lists:<br>")+10
 		"d": "Add a list with the list-slug, made by screenName. <br>" +
 		     "screenName is the twitter username, <br>" +
-		     "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
+		     "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>" +
+	       "Your lists:<br>" +
+	       "[]"
 	},
 	al: {
 		"p": "addlist screenName list-slug",
 		"d": "Add a list with the list-slug, made by screenName. <br>" +
 		     "screenName is the twitter username, <br>" +
-		     "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
+		     "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>" +
+		     "Your lists:<br>" +
+		     "[]"
 	},
 	adduser: {
 		"p": "adduser screenName",

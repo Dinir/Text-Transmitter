@@ -89,7 +89,7 @@ add [nameOfTab(,URI)]( parameters)
 
 If you know what parameters are, you can add them as a form of an object.
 
-Type 'add User' or 'add L' and press 'Enter' to change to command to 'adduser' or 'addlist', which are explained below.
+Type 'add user', 'add l', 'add search' and press 'Enter' to change to command to 'adduser', 'addlist', 'addsearch' respectively, which are explained below.
 
 ### addlist
 ```

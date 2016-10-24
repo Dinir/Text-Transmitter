@@ -30,6 +30,7 @@ app.on('ready', function() {
 		}
 	});
 	mainWindow.loadURL('file://'+__dirname+'/index.html');
+	// this line opens dev tools. Feel free to comment this line or not.
 	mainWindow.webContents.openDevTools();
 	mainWindow.on('closed', function() {
 		mainWindow = null;

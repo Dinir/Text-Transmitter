@@ -10,6 +10,9 @@ window.onload = () => {
 	document.addEventListener("keyup", checkStates);
 	document.addEventListener("click", function(){clickHandler(window.event.target)});
 	document.body.addEventListener("mousewheel", scrollHandler, false);
-	
-	lists = getLists();
+	getLists();
+};
+
+window.onunload = () => {
+	stateCon.save();
 };

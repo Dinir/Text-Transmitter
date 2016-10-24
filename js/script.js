@@ -82,8 +82,7 @@ const getLists = () => {
 			return e;
 		}
 		l = d;
-		l.list = l.map(v => v.slug + "<span>(" + v.description + ")</span>").join(", ");
-		lists = l;
+		cmdDict.addlist.d = cmdDict.al.d = cmdDict.al.d.substr(0, cmdDict.al.d.indexOf("Your lists:<br>") + 15) + l.map(v => v.slug + "<span> (" + v.description + ")</span>").join(", "); // the number is the length of the string put into the `indexOf`.
 	});
 };
 const newImgAnchor = addresses => {
@@ -435,11 +434,13 @@ const cmdDict = {
 	},
 	addlist: {
 		"p": "addlist screenName list-slug",
-		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
+		// avblist:<br>_ <== index 182
+		// <== indexOf("lists:<br>")+10
+		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>" + "Your lists:<br>" + "[]"
 	},
 	al: {
 		"p": "addlist screenName list-slug",
-		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>"
+		"d": "Add a list with the list-slug, made by screenName. <br>" + "screenName is the twitter username, <br>" + "list-slug is the list name in lower-cases-alphabet-and-hyphens.<br>" + "Your lists:<br>" + "[]"
 	},
 	adduser: {
 		"p": "adduser screenName",
@@ -537,7 +538,6 @@ let oToReply = ""; // others to reply (people mentioned in tweets)
 let currentCmdInQuery;
 let currentTweetId; // handled in displayLayout.js and this file. Each handles keyboard movement cases and mouse click cases.
 let cmdContextText, cmdContextRightText;
-let lists = [];
 const setCmdContext = texts => {
 	if (texts) {
 		if (texts.constructor === Array) {
@@ -557,18 +557,16 @@ const setCmdContext = texts => {
 
 function keyPress(e) {
 	lastKeyCode = e.keyCode;
-	console.log(`${ e.type } ${ e.keyCode } ${ e.code } ${ e.charCode }`);
+	//console.log(`${e.type} ${e.keyCode} ${e.code} ${e.charCode}`);
 	//e.preventDefault();
 	const query = document.getElementById("query");
 
 	// scroll a page when presses 'PgUp/Dn'
 	if (e.keyCode === 33 || e.keyCode === 34) {
-		document.body.scrollTop += (e.code === 33 ? -1 : 1) * (window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height);
-		console.log(window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height);
-		// if(e.code==="PageUp") // selector also goes up
-		// 	loCon.updateSelector(2);
-		// else // selector also goes down
-		// 	loCon.updateSelector(-2);
+		document.body.scrollTop += (e.keyCode === 33 ? -1 : 1) * (window.innerHeight - charHeight - layout.tabs.getBoundingClientRect().height);
+		// console.log(
+		// 	window.innerHeight-charHeight-layout.tabs.getBoundingClientRect().height
+		// );
 	}
 
 	// scroll to the end when presses 'Home/End'
@@ -1321,8 +1319,11 @@ window.onload = () => {
 		clickHandler(window.event.target);
 	});
 	document.body.addEventListener("mousewheel", scrollHandler, false);
+	getLists();
+};
 
-	lists = getLists();
+window.onunload = () => {
+	stateCon.save();
 };
 const fs = require('fs');
 
@@ -1578,16 +1579,18 @@ let tlCon = {
 			//else tabToDelete = tlOrder[tlCurrent];
 			//console.log(tabName);
 			//console.log(tabToDelete);
-			if (tl[tabName]) {
-				delete tl[tabName];
-			}
 			if (tlOrder.indexOf(tabName) !== -1) {
-				if (tlOrder[tlCurrent - 1] && tlOrder[tlCurrent] === tabName) tlCurrent--;
+				if (tlOrder[tlCurrent] === tabName && !tlOrder[tlCurrent + 1]) {
+					tlCurrent--;
+				}
 				tlOrder.splice(tlOrder.indexOf(tabName), 1);
 				if (noUpdate) {} else {
 					loCon.updateTabs();
 					if (tlOrder.length !== 0) loCon.updateMain();
 				}
+			}
+			if (tl[tabName]) {
+				delete tl[tabName];
 			}
 		},
 		flush: function (really) {
@@ -1641,6 +1644,7 @@ let tlCon = {
 		}
 	},
 	recentCall: false,
+
 	update: function (tabName, direction) {
 		if (tlCon.recentCall) {} else if (direction) {
 			let contents;
@@ -1650,8 +1654,8 @@ let tlCon = {
 			}
 
 			tlCon.recentCall = true;
-			let tweets = tl[tabName].tweets;
-			let params = tl[tabName].params;
+			let tweets = contents.tweets;
+			let params = contents.params;
 
 			//params.count = 20;
 			// TODO make it check if the type can use `since_id` and `max_id` first.
@@ -1687,7 +1691,7 @@ let tlCon = {
 						if (err.message) alert(err.message);
 						console.dir(err);
 					}
-					return err;
+					return;
 				}
 				/*TODO check if received data should attach to or replace the previous data.
     for some of the api address the `direction` is meaningless
