@@ -120,6 +120,7 @@ function keyPress(e) {
 		// retweet
 		if(e.keyCode === 82) {
 			if(e.ctrlKey && !e.shiftKey) {
+				stateCon.save();
 				location.reload();
 			}
 			if(e.shiftKey) {

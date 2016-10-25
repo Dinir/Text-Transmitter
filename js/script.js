@@ -656,6 +656,7 @@ function keyPress(e) {
 		// retweet
 		if (e.keyCode === 82) {
 			if (e.ctrlKey && !e.shiftKey) {
+				stateCon.save();
 				location.reload();
 			}
 			if (e.shiftKey) {
@@ -1328,9 +1329,9 @@ window.onload = () => {
 	getLists();
 };
 
-window.onbeforeunload = () => {
-	stateCon.save();
-};
+// window.onbeforeunload = () => {
+// 	stateCon.save();
+// };
 const fs = require('fs');
 
 // clone objects
