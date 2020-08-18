@@ -1,0 +1,155 @@
+$footerHeight: 2em;
+$titleHeight: 23.5em;
+
+html, body {
+	height: 100%;
+}
+body {
+	background-color: #eee;
+	color: #444;
+}
+a {
+	text-decoration: none;
+	color: #235;
+	&:hover {
+		text-decoration: underline;
+	}
+}
+h1 {
+	font-size: 3em;
+}
+h2 {
+	font-size: 2em;
+	margin: .5em 0;
+}
+i {
+	font-style: italic;
+}
+#background {
+}
+#title {
+	&:before {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		width: 100%;
+		height: $titleHeight;
+		overflow: hidden;
+		z-index: -1;
+		display: block;
+		background: url(../img/background.gif);
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+		-webkit-filter: blur(5px);
+		-moz-filter: blur(5px);
+		-o-filter: blur(5px);
+		-ms-filter: blur(5px);
+		filter: blur(5px);
+	}
+	position: absolute;
+	left: 0;
+	right: 0;
+	overflow: hidden;
+	z-index: 0;
+	text-align: center;
+	padding: 0;
+	background-color: #ddd;
+	min-width: 430px;
+	a {
+		color: #ccc;
+	}
+	h1 {
+		background-color: rgba(255,255,255,0.5);
+		color: #eee;
+		font-family: serif;
+		display: block;
+		padding: 1.8em 0 1.8em;
+	}
+	#subtitle {
+		background-color: rgba(255,255,255,0.25);
+		padding: 1em 0;
+		color: #eee;
+	}
+	#links {
+		background-color: rgba(255,255,255,0.0);
+		div {
+			text-align: center;
+			display: inline-block;
+			margin: 1.8em 1em;
+			border: 1px solid #ccc;
+			-webkit-border-radius: 2em;
+			-moz-border-radius: 2em;
+			border-radius: 2em;
+			padding: 1em;
+			&:hover {
+				background-color: rgba(255,255,255,0.36);
+			}
+			a:hover {
+				text-decoration: none;
+			}
+		}
+	}
+}
+article {
+	padding: $titleHeight+2em 2em 0;
+}
+#imagesSection {
+	img {
+		width: 98%;
+		margin: .2em;
+	}
+}
+
+#wholeExceptFooter {
+	min-height: 100%;
+	margin-bottom: -1*$footerHeight - 1em; /* minus equal to footer height */
+	&:after {
+		content: "";
+		display: block;
+		height: $footerHeight; /* equal to footer height */
+	}
+}
+footer {
+	height: $footerHeight;
+	padding: 1em 1em 0;
+	text-align: right;
+	background-color: #bbb;
+}
+
+@media only screen and (max-width: 429px) {
+	$footerHeight: 1.4em;
+$titleHeight: 17em;
+	h2 {
+		font-size: 1.5em;
+	}
+	#title {
+		min-width: 300px;
+		#subtitle {
+			font-size: .9em;
+		}
+		h1 {
+			font-size: 2em;
+		}
+		#links {
+			min-width: 100px;
+			div {
+				margin: 1em .3em;
+				padding: .3em;
+			}
+		}
+	}
+	article {
+	padding: $titleHeight+0em 2em 0;
+	}
+	#wholeExceptFooter {
+		margin-bottom: -1*$footerHeight - .3em;
+		&:after { height: $footerHeight; }
+	}
+	footer {
+		height: 1.4*$footerHeight;
+		font-size: .7em;
+	}
+}
